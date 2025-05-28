@@ -102,6 +102,12 @@ export const PaySignaturesConstructorComponent = () => {
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <h1>Single pay</h1>
+      <h3 style={{ textAlign: "center", color: "#3A9EE3" }}>
+        <a href="https://www.evvm.org/docs/SignatureStructures/EVVM/SinglePaymentSignatureStructure">
+          Learn more about single payment signatures structure here
+        </a>
+      </h3>
+      <br />
       <div>
         <div style={{ marginBottom: "1rem" }}>
           <p>

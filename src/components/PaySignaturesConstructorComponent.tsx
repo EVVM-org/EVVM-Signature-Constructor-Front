@@ -103,12 +103,17 @@ export const PaySignaturesConstructorComponent = () => {
     <div className="flex flex-1 flex-col justify-center items-center">
       <h1>Single pay</h1>
       <div>
-        <div>
+        <div style={{ marginBottom: "1rem" }}>
           <p>
             {`To: `}
             <select
               id="usingUsernames"
-              style={{ color: "black" }}
+              style={{
+                color: "black",
+                backgroundColor: "white",
+                height: "2rem",
+                width: "6rem",
+              }}
               onChange={(a) => {
                 setIsUsingUsernames(a.target.value === "true");
               }}
@@ -121,7 +126,12 @@ export const PaySignaturesConstructorComponent = () => {
                 type="text"
                 placeholder="Enter username"
                 id="toUsername"
-                style={{ color: "black" }}
+                style={{
+                  color: "black",
+                  backgroundColor: "white",
+                  height: "2rem",
+                  width: "25rem",
+                }}
               />
             )}
             {!isUsingUsernames && (
@@ -129,16 +139,31 @@ export const PaySignaturesConstructorComponent = () => {
                 type="text"
                 placeholder="Enter address"
                 id="toAddress"
-                style={{ color: "black" }}
+                style={{
+                  color: "black",
+                  backgroundColor: "white",
+                  height: "2rem",
+                  width: "25rem",
+                }}
               />
             )}
           </p>
         </div>
         <br />
-        <div>
+        <div style={{ marginBottom: "1rem" }}>
           <p>
             {`Nonce: `}
             <button
+              style={{
+                color: "white",
+                backgroundColor: "#50aad4",
+                border: "none",
+                cursor: "pointer",
+                padding: "0.5rem",
+                height: "2rem",
+                // text all center
+                textAlign: "center",
+              }}
               onClick={async () => {
                 const seed = Math.floor(Math.random() + Date.now());
                 const mt = mersenneTwister(seed);
@@ -155,40 +180,73 @@ export const PaySignaturesConstructorComponent = () => {
               type="number"
               placeholder="Enter nonce"
               id="nonceInput"
-              style={{ color: "black" }}
+              style={{
+                color: "black",
+                backgroundColor: "white",
+                height: "2rem",
+                width: "25rem",
+              }}
             />
           </p>
         </div>
         <br />
       </div>
-      <div>
+      <div style={{ marginBottom: "1rem" }}>
         <p>Token address</p>
         <input
           type="text"
           placeholder="Enter token address"
           id="tokenAddress"
-          style={{ color: "black" }}
+          style={{
+            color: "black",
+            backgroundColor: "white",
+            height: "2rem",
+            width: "25rem",
+          }}
           value={selectedToken}
           onChange={(e) => {
             setSelectedToken(e.target.value);
           }}
         />
+      </div>
+      <div style={{ marginBottom: "1rem" }}>
+        <p>Amount</p>
         <input
           type="number"
           placeholder="Enter amount"
           id="amountTokenInput"
-          style={{ color: "black" }}
+          style={{
+            color: "black",
+            backgroundColor: "white",
+            height: "2rem",
+            width: "25rem",
+          }}
         />
+      </div>
+      <div style={{ marginBottom: "1rem" }}>
+        <p>Priority fee</p>
         <input
           type="number"
           placeholder="Enter priority fee"
           id="priorityFeeInput"
-          style={{ color: "black" }}
+          style={{
+            color: "black",
+            backgroundColor: "white",
+            height: "2rem",
+            width: "25rem",
+          }}
         />
+      </div>
+      <div style={{ marginBottom: "1rem" }}>
         <p>Are you using an executor?</p>
         <select
           id="usingExecutor"
-          style={{ color: "black" }}
+          style={{
+            color: "black",
+            backgroundColor: "white",
+            height: "2rem",
+            width: "5rem",
+          }}
           onChange={(a) => {
             setIsUsingExecutor(a.target.value === "true");
           }}
@@ -199,23 +257,33 @@ export const PaySignaturesConstructorComponent = () => {
         {isUsingExecutor && (
           <input
             type="text"
-            placeholder="Enter executor"
+            placeholder="Enter executor address"
             id="executorInput"
-            style={{ color: "black" }}
+            style={{
+              color: "black",
+              backgroundColor: "white",
+              height: "2rem",
+              width: "25rem",
+            }}
           />
         )}
       </div>
-      <div>
+      <div style={{ marginBottom: "1rem" }}>
         <p>Priority</p>
         <select
           id="priority"
-          style={{ color: "black" }}
+          style={{
+            color: "black",
+            backgroundColor: "white",
+            height: "2rem",
+            width: "12rem",
+          }}
           onChange={(a) => {
             setPriority(a.target.value);
           }}
         >
-          <option value="low">Low</option>
-          <option value="high">High</option>
+          <option value="low">Low (synchronous nonce)</option>
+          <option value="high">High (asynchronous nonce)</option>
         </select>
       </div>
       <button
@@ -239,111 +307,176 @@ export const PaySignaturesConstructorComponent = () => {
                   color: "black",
                   whiteSpace: "pre-wrap",
                   wordBreak: "break-word",
+                  backgroundColor: "#f0f0f0",
+                  //enviar texto a la derecha
+                  textAlign: "left",
+                  padding: "1rem",
                 }}
               >
                 {`From: ${dataToGet.from} `}
                 <button
                   style={{
-                    color: "black",
-                    backgroundColor: "white",
+                    color: "white",
+                    backgroundColor: "#637988",
+                    padding: "0.3rem",
                     border: "none",
                     cursor: "pointer",
-                    padding: "0.5rem",
                   }}
                   onClick={() => {
                     navigator.clipboard.writeText(dataToGet.from);
                   }}
-                ></button>
+                >
+                  Copy
+                </button>
                 <br />
                 {`To address: ${dataToGet.to_address} `}
                 <button
                   style={{
-                    color: "black",
-                    backgroundColor: "white",
+                    color: "white",
+                    backgroundColor: "#637988",
+                    padding: "0.3rem",
                     border: "none",
                     cursor: "pointer",
-                    padding: "0.5rem",
                   }}
                   onClick={() => {
                     navigator.clipboard.writeText(dataToGet.to_address);
                   }}
-                ></button>
+                >
+                  Copy
+                </button>
                 <br />
 
                 {`To identity: ${dataToGet.to_identity} `}
                 <button
                   style={{
-                    color: "black",
-                    backgroundColor: "white",
+                    color: "white",
+                    backgroundColor: "#637988",
+                    padding: "0.3rem",
                     border: "none",
                     cursor: "pointer",
-                    padding: "0.5rem",
                   }}
                   onClick={() => {
                     navigator.clipboard.writeText(dataToGet.to_identity);
                   }}
-                ></button>
+                >
+                  Copy
+                </button>
                 <br />
                 {`Token: ${dataToGet.token} `}
                 <button
-                  style={copyButtonStyle}
+                  style={{
+                    color: "white",
+                    backgroundColor: "#637988",
+                    padding: "0.3rem",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
                   onClick={() => {
                     navigator.clipboard.writeText(dataToGet.token);
                   }}
-                ></button>
+                >
+                  Copy
+                </button>
                 <br />
                 {`Amount: ${dataToGet.amount} `}
                 <button
-                  style={copyButtonStyle}
+                  style={{
+                    color: "white",
+                    backgroundColor: "#637988",
+                    padding: "0.3rem",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
                   onClick={() => {
                     navigator.clipboard.writeText(dataToGet.amount);
                   }}
-                ></button>
+                >
+                  Copy
+                </button>
                 <br />
                 {`Priority fee: ${dataToGet.priorityFee} `}
                 <button
-                  style={copyButtonStyle}
+                  style={{
+                    color: "white",
+                    backgroundColor: "#637988",
+                    padding: "0.3rem",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
                   onClick={() => {
                     navigator.clipboard.writeText(dataToGet.priorityFee);
                   }}
-                ></button>
+                >
+                  Copy
+                </button>
                 <br />
                 {`Nonce: ${dataToGet.nonce} `}
                 <button
-                  style={copyButtonStyle}
+                  style={{
+                    color: "white",
+                    backgroundColor: "#637988",
+                    padding: "0.3rem",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
                   onClick={() => {
                     navigator.clipboard.writeText(dataToGet.nonce);
                   }}
-                ></button>
+                >
+                  Copy
+                </button>
                 <br />
                 {`Priority: ${dataToGet.priority} `}
                 <button
-                  style={copyButtonStyle}
+                  style={{
+                    color: "white",
+                    backgroundColor: "#637988",
+                    padding: "0.3rem",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
                   onClick={() => {
                     navigator.clipboard.writeText(dataToGet.priority);
                   }}
-                ></button>
+                >
+                  Copy
+                </button>
                 <br />
                 {`Executor: ${dataToGet.executor} `}
                 <button
-                  style={copyButtonStyle}
+                  style={{
+                    color: "white",
+                    backgroundColor: "#637988",
+                    padding: "0.3rem",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
                   onClick={() => {
                     navigator.clipboard.writeText(dataToGet.executor);
                   }}
-                ></button>
+                >
+                  Copy
+                </button>
                 <br />
                 {`Signature: ${dataToGet.signature} `}
                 <button
-                  style={copyButtonStyle}
+                  style={{
+                    color: "white",
+                    backgroundColor: "#637988",
+                    padding: "0.3rem",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
                   onClick={() => {
                     navigator.clipboard.writeText(dataToGet.signature);
                   }}
-                ></button>
+                >
+                  Copy
+                </button>
               </div>
             )}
             <button
               style={{
-                padding: "0.5rem",
                 margin: "0.5rem",
                 borderRadius: "5px",
               }}
@@ -371,7 +504,6 @@ export const PaySignaturesConstructorComponent = () => {
 
               <button
                 style={{
-                  color: "white",
                   padding: "0.5rem",
                   margin: "0.5rem",
                 }}

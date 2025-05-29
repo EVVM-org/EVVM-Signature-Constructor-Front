@@ -3,7 +3,7 @@ import { getAccount } from "@wagmi/core";
 import { useSignMessage } from "wagmi";
 import { config } from "../config/index";
 import mersenneTwister from "../utils/mersenneTwister";
-import { buildMessageSignedForPay } from "../config/constructMessage";
+import { buildMessageSignedForPay } from "../utils/constructMessage";
 
 type PayData = {
   from: `0x${string}`;

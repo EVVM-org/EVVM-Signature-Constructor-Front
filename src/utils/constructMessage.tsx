@@ -55,10 +55,10 @@ function buildMessageSignedForPay(
   return msg;
 }
 
-/*
 
 
-function constructMessageForDispersePay(
+
+function buildMessageSignedForDispersePay(
   fixedHashedEncodedData: string,
   TokenAddress: string,
   Ammount: string,
@@ -68,7 +68,7 @@ function constructMessageForDispersePay(
   Executor: string
 ): string {
   return (
-    `${EvvmMethodIdentifier["dispersePay"]},` +
+    `ef83c1d6` +
     `${fixedHashedEncodedData},` +
     `${TokenAddress.toLowerCase()},` +
     `${Ammount},` +
@@ -78,6 +78,8 @@ function constructMessageForDispersePay(
     `${Executor.toLowerCase()}`
   );
 }
+
+/*
 
 
 function constructMessageForPreRegistrationUsername(
@@ -235,18 +237,5 @@ function constructMessageForFisherWithdrawal(
 export {
   constructMessageForDepositFisher,
   buildMessageSignedForPay,
-  /*
-  constructMessageForDispersePay,
-  constructMessageForPreRegistrationUsername,
-  constructMessageForRegistrationUsername,
-  constructMessageForMakeOffer,
-  constructMessageForWithdrawOffer,
-  constructMessageForAcceptOffer,
-  constructMessageForRenewUsername,
-  constructMessageForAddCustomMetadata,
-  constructMessageForRemoveCustomMetadata,
-  constructMessageForFlushCustomMetadata,
-  constructMessageForWithdrawBridge,
-  constructMessageForFisherWithdrawal,
-  */
+  buildMessageSignedForDispersePay
 };

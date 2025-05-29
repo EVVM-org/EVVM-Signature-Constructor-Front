@@ -10,8 +10,10 @@ import { DispersePaySignatureConstructor } from "@/components/DispersePaySignatu
 export default function Home() {
   return (
     <div className={"pages"}>
-      <Image src="/reown.svg" alt="Reown" width={150} height={150} priority />
-      <h1>AppKit Wagmi Next.js App Router Example</h1>
+      <Image src="/evvm.svg" alt="Reown" width={100} height={150} priority />
+      <h1>EVVM Signature Constructor Example</h1>
+      <p>Using Reown, Wagmi and Next.js</p>
+      <br/>
 
       <ConnectButton />
       <ActionButtonList />
@@ -31,8 +33,35 @@ export default function Home() {
         </p>
       </div>
       {/*<InfoList />*/}
-      <PaySignaturesConstructorComponent />
-      <DispersePaySignatureConstructor />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "1rem",
+
+          padding: "1rem",
+          border: "1px solid #ccc",
+          borderRadius: "8px",
+          width: "100%",
+        }}
+      >
+        <PaySignaturesConstructorComponent />
+      </div>
+      <br />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "1rem",
+
+          padding: "1rem",
+          border: "1px solid #ccc",
+          borderRadius: "8px",
+          width: "100%",
+        }}
+      >
+        <DispersePaySignatureConstructor />
+      </div>
     </div>
   );
 }

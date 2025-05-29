@@ -34,7 +34,6 @@ const copyButtonStyle = {
 };
 
 export const DispersePaySignatureConstructor = () => {
-  
   const [isUsingExecutorDisperse, setIsUsingExecutorDisperse] =
     React.useState(false);
   const [priorityDisperse, setPriorityDisperse] = React.useState("low");
@@ -161,11 +160,26 @@ export const DispersePaySignatureConstructor = () => {
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <h1>Disperse pay</h1>
+      <h3 style={{ textAlign: "center", color: "#3A9EE3" }}>
+        <a href="https://www.evvm.org/docs/SignatureStructures/EVVM/DispersePaySignatureStructure">
+          Learn more about disperse payment signatures structure here
+        </a>
+      </h3>
       <br />
-      <div>
+      <div style={{ marginBottom: "1rem" }}>
         <p>
           {`Nonce: `}
           <button
+            style={{
+              color: "white",
+              backgroundColor: "#50aad4",
+              border: "none",
+              cursor: "pointer",
+              padding: "0.5rem",
+              height: "2rem",
+              // text all center
+              textAlign: "center",
+            }}
             onClick={async () => {
               const seed = Math.floor(Math.random() + Date.now());
               const mt = mersenneTwister(seed);
@@ -184,14 +198,16 @@ export const DispersePaySignatureConstructor = () => {
             type="number"
             placeholder="Enter nonce"
             id="nonceInputDispersePay"
-            style={{ color: "black" }}
+            style={{
+              color: "black",
+              backgroundColor: "white",
+              height: "2rem",
+              width: "25rem",
+            }}
           />
         </p>
       </div>
-      <br />
-
-      <div>
-        <div style={{ marginBottom: "1rem" }}>
+      <div style={{ marginBottom: "1rem" }}>
         <p>Token address</p>
         <input
           type="text"
@@ -206,22 +222,44 @@ export const DispersePaySignatureConstructor = () => {
           defaultValue="0x0000000000000000000000000000000000000000"
         />
       </div>
+      <div style={{ marginBottom: "1rem" }}>
+        <p>Amount</p>
         <input
           type="number"
           placeholder="Enter amount"
           id="amountTokenInputSplit"
-          style={{ color: "black" }}
+          style={{
+            color: "black",
+            backgroundColor: "white",
+            height: "2rem",
+            width: "25rem",
+          }}
         />
+      </div>{" "}
+      <div style={{ marginBottom: "1rem" }}>
+        <p>Priority fee</p>
         <input
           type="number"
           placeholder="Enter priority fee"
           id="priorityFeeInputSplit"
-          style={{ color: "black" }}
+          style={{
+            color: "black",
+            backgroundColor: "white",
+            height: "2rem",
+            width: "25rem",
+          }}
         />
+      </div>{" "}
+      <div style={{ marginBottom: "1rem" }}>
         <p>Are you using an executor?</p>
         <select
           id="usingExecutorSplit"
-          style={{ color: "black" }}
+          style={{
+            color: "black",
+            backgroundColor: "white",
+            height: "2rem",
+            width: "5rem",
+          }}
           onChange={(a) => {
             setIsUsingExecutorDisperse(a.target.value === "true");
           }}
@@ -234,30 +272,53 @@ export const DispersePaySignatureConstructor = () => {
             type="text"
             placeholder="Enter executor"
             id="executorInputSplit"
-            style={{ color: "black" }}
+            style={{
+              color: "black",
+              backgroundColor: "white",
+              height: "2rem",
+              width: "25rem",
+            }}
           />
         )}
       </div>
-      <p>number of accounts to split the payment</p>
-      <select
-        id="splitNumber"
-        style={{ color: "black" }}
-        onChange={(e) => {
-          setNumberOfUsersToDisperse(Number(e.target.value));
-        }}
-      >
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-      </select>
+      <div style={{ marginBottom: "1rem" }}>
+        <p>number of accounts to split the payment</p>
+        <select
+          id="splitNumber"
+          style={{
+            color: "black",
+            backgroundColor: "white",
+            height: "2rem",
+            width: "5rem",
+          }}
+          onChange={(e) => {
+            setNumberOfUsersToDisperse(Number(e.target.value));
+          }}
+        >
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </div>
       {Array.from({ length: numberOfUsersToDisperse }).map((_, index) => (
         <div key={index}>
-          <p>To:</p>
+          <h4
+            style={{
+              color: "black",
+              marginTop: "1rem",
+            }}
+          >{`User ${index + 1}`}</h4>
+          <p>{`To:`}</p>
           <select
             id={`usingUsernames${index}`}
-            style={{ color: "black" }}
+            style={{
+              color: "black",
+              backgroundColor: "white",
+              height: "2rem",
+              width: "5.5rem",
+            }}
             onChange={(a) => {
               setIsUsingUsernameOnDisperse((prev) => {
                 const newPrev = [...prev];
@@ -274,7 +335,12 @@ export const DispersePaySignatureConstructor = () => {
               type="text"
               placeholder="Enter username"
               id={`toUsernameSplitUserNumber${index}`}
-              style={{ color: "black" }}
+              style={{
+                color: "black",
+                backgroundColor: "white",
+                height: "2rem",
+                width: "25rem",
+              }}
             />
           )}
           {!isUsingUsernameOnDisperse[index] && (
@@ -282,7 +348,12 @@ export const DispersePaySignatureConstructor = () => {
               type="text"
               placeholder="Enter address"
               id={`toAddressSplitUserNumber${index}`}
-              style={{ color: "black" }}
+              style={{
+                color: "black",
+                backgroundColor: "white",
+                height: "2rem",
+                width: "25rem",
+              }}
             />
           )}
           <p>Amount</p>
@@ -290,23 +361,31 @@ export const DispersePaySignatureConstructor = () => {
             type="number"
             placeholder="Enter amount"
             id={`amountTokenToGiveUser${index}`}
-            style={{ color: "black" }}
+            style={{
+              color: "black",
+              backgroundColor: "white",
+              height: "2rem",
+              width: "25rem",
+            }}
           />
         </div>
       ))}
-
-      <br />
-      <div>
+      <div style={{ marginTop: "1rem" }}>
         <p>Priority</p>
         <select
           id="prioritySplit"
-          style={{ color: "black" }}
+          style={{
+            color: "black",
+            backgroundColor: "white",
+            height: "2rem",
+            width: "12rem",
+          }}
           onChange={(a) => {
             setPriorityDisperse(a.target.value);
           }}
         >
-          <option value="low">Low</option>
-          <option value="high">High</option>
+          <option value="low">Low (synchronous nonce)</option>
+          <option value="high">High (asynchronous nonce)</option>
         </select>
       </div>
       <button
@@ -328,12 +407,21 @@ export const DispersePaySignatureConstructor = () => {
                   color: "black",
                   whiteSpace: "pre-wrap",
                   wordBreak: "break-word",
+                  backgroundColor: "#f0f0f0",
+                  textAlign: "left",
+                  padding: "1rem",
                 }}
               >
                 <p>
                   From: {dispersePayMetadata.from}
                   <button
-                    style={copyButtonStyle}
+                    style={{
+                      color: "white",
+                      backgroundColor: "#637988",
+                      padding: "0.3rem",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
                     onClick={() => {
                       navigator.clipboard.writeText(dispersePayMetadata.from);
                     }}
@@ -353,7 +441,13 @@ export const DispersePaySignatureConstructor = () => {
                         <p>
                           amount: {data.amount}
                           <button
-                            style={copyButtonStyle}
+                            style={{
+                              color: "white",
+                              backgroundColor: "#637988",
+                              padding: "0.3rem",
+                              border: "none",
+                              cursor: "pointer",
+                            }}
                             onClick={() => {
                               navigator.clipboard.writeText(data.amount);
                             }}
@@ -364,7 +458,13 @@ export const DispersePaySignatureConstructor = () => {
                         <p>
                           to_address: {data.to_address}
                           <button
-                            style={copyButtonStyle}
+                            style={{
+                              color: "white",
+                              backgroundColor: "#637988",
+                              padding: "0.3rem",
+                              border: "none",
+                              cursor: "pointer",
+                            }}
                             onClick={() => {
                               navigator.clipboard.writeText(data.to_address);
                             }}
@@ -375,7 +475,13 @@ export const DispersePaySignatureConstructor = () => {
                         <p>
                           to_identity: {data.to_identity}
                           <button
-                            style={copyButtonStyle}
+                            style={{
+                              color: "white",
+                              backgroundColor: "#637988",
+                              padding: "0.3rem",
+                              border: "none",
+                              cursor: "pointer",
+                            }}
                             onClick={() => {
                               navigator.clipboard.writeText(data.to_identity);
                             }}
@@ -391,7 +497,13 @@ export const DispersePaySignatureConstructor = () => {
                 <p>
                   Token: {dispersePayMetadata.token}
                   <button
-                    style={copyButtonStyle}
+                    style={{
+                      color: "white",
+                      backgroundColor: "#637988",
+                      padding: "0.3rem",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
                     onClick={() => {
                       navigator.clipboard.writeText(dispersePayMetadata.token);
                     }}
@@ -402,7 +514,13 @@ export const DispersePaySignatureConstructor = () => {
                 <p>
                   Amount: {dispersePayMetadata.amount}
                   <button
-                    style={copyButtonStyle}
+                    style={{
+                      color: "white",
+                      backgroundColor: "#637988",
+                      padding: "0.3rem",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
                     onClick={() => {
                       navigator.clipboard.writeText(dispersePayMetadata.amount);
                     }}
@@ -413,7 +531,13 @@ export const DispersePaySignatureConstructor = () => {
                 <p>
                   Priority fee: {dispersePayMetadata.priorityFee}
                   <button
-                    style={copyButtonStyle}
+                    style={{
+                      color: "white",
+                      backgroundColor: "#637988",
+                      padding: "0.3rem",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
                     onClick={() => {
                       navigator.clipboard.writeText(
                         dispersePayMetadata.priorityFee
@@ -426,7 +550,13 @@ export const DispersePaySignatureConstructor = () => {
                 <p>
                   Priority: {dispersePayMetadata.priority ? "true" : "false"}
                   <button
-                    style={copyButtonStyle}
+                    style={{
+                      color: "white",
+                      backgroundColor: "#637988",
+                      padding: "0.3rem",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
                     onClick={() => {
                       navigator.clipboard.writeText(
                         dispersePayMetadata.priority ? "true" : "false"
@@ -439,7 +569,13 @@ export const DispersePaySignatureConstructor = () => {
                 <p>
                   Nonce: {dispersePayMetadata.nonce}
                   <button
-                    style={copyButtonStyle}
+                    style={{
+                      color: "white",
+                      backgroundColor: "#637988",
+                      padding: "0.3rem",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
                     onClick={() => {
                       navigator.clipboard.writeText(dispersePayMetadata.nonce);
                     }}
@@ -450,7 +586,13 @@ export const DispersePaySignatureConstructor = () => {
                 <p>
                   Executor: {dispersePayMetadata.executor}
                   <button
-                    style={copyButtonStyle}
+                    style={{
+                      color: "white",
+                      backgroundColor: "#637988",
+                      padding: "0.3rem",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
                     onClick={() => {
                       navigator.clipboard.writeText(
                         dispersePayMetadata.executor
@@ -463,7 +605,13 @@ export const DispersePaySignatureConstructor = () => {
                 <p>
                   Signature: {dispersePayMetadata.signature}
                   <button
-                    style={copyButtonStyle}
+                    style={{
+                      color: "white",
+                      backgroundColor: "#637988",
+                      padding: "0.3rem",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
                     onClick={() => {
                       navigator.clipboard.writeText(
                         dispersePayMetadata.signature

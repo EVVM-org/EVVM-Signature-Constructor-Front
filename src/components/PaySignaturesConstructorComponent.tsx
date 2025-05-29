@@ -314,7 +314,6 @@ export const PaySignaturesConstructorComponent = () => {
                   whiteSpace: "pre-wrap",
                   wordBreak: "break-word",
                   backgroundColor: "#f0f0f0",
-                  //enviar texto a la derecha
                   textAlign: "left",
                   padding: "1rem",
                 }}

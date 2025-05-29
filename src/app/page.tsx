@@ -4,8 +4,8 @@ import { ConnectButton } from "@/components/ConnectButton";
 import { InfoList } from "@/components/InfoList";
 import { ActionButtonList } from "@/components/ActionButtonList";
 import Image from "next/image";
-import { PaySignaturesConstructorComponent } from "@/components/PaySignaturesConstructorComponent";
-import { DispersePaySignatureConstructor } from "@/components/DispersePaySignatureConstructor";
+import { PaySignaturesConstructorComponent } from "@/components/Payment Functions/PaySignaturesConstructorComponent";
+import { DispersePaySignatureConstructor } from "@/components/Payment Functions/DispersePaySignatureConstructor";
 
 export default function Home() {
   return (

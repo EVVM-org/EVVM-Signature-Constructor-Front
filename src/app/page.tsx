@@ -1,11 +1,9 @@
-"use client";
 // import { cookieStorage, createStorage, http } from '@wagmi/core'
 import { ConnectButton } from "@/components/ConnectButton";
 import { InfoList } from "@/components/InfoList";
 import { ActionButtonList } from "@/components/ActionButtonList";
+import { SigMenu } from "@/components/SigMenu";
 import Image from "next/image";
-import { PaySignaturesConstructorComponent } from "@/components/Payment Functions/PaySignaturesConstructorComponent";
-import { DispersePaySignatureConstructor } from "@/components/Payment Functions/DispersePaySignatureConstructor";
 
 export default function Home() {
   return (
@@ -13,7 +11,7 @@ export default function Home() {
       <Image src="/evvm.svg" alt="Reown" width={100} height={150} priority />
       <h1>EVVM Signature Constructor Example</h1>
       <p>Using Reown, Wagmi and Next.js</p>
-      <br/>
+      <br />
 
       <ConnectButton />
       <ActionButtonList />
@@ -33,35 +31,7 @@ export default function Home() {
         </p>
       </div>
       {/*<InfoList />*/}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "1rem",
-
-          padding: "1rem",
-          border: "1px solid #ccc",
-          borderRadius: "8px",
-          width: "100%",
-        }}
-      >
-        <PaySignaturesConstructorComponent />
-      </div>
-      <br />
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "1rem",
-
-          padding: "1rem",
-          border: "1px solid #ccc",
-          borderRadius: "8px",
-          width: "100%",
-        }}
-      >
-        <DispersePaySignatureConstructor />
-      </div>
+      <SigMenu />
     </div>
   );
 }

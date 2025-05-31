@@ -1,3 +1,4 @@
+'use client'
 import React from "react";
 import { getAccount } from "@wagmi/core";
 import { useSignMessage, useAccount } from "wagmi";

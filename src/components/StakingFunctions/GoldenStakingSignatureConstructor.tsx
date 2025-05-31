@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { getAccount } from "@wagmi/core";
 import { useSignMessage } from "wagmi";
@@ -6,9 +7,9 @@ import mersenneTwister from "../../utils/mersenneTwister";
 import { buildMessageSignedForPay } from "../../utils/constructMessage";
 
 type PayData = {
+  isStaking: string; // "true" for staking, "false" for unstaking
   from: `0x${string}`;
   to_address: `0x${string}`;
-  to_identity: string;
   token: string;
   amount: string;
   priorityFee: string;
@@ -18,57 +19,39 @@ type PayData = {
   signature: string;
 };
 
-const copyButtonStyle = {
-  color: "black",
-  backgroundColor: "white",
-  border: "none",
-  cursor: "pointer",
-  paddingLeft: "0.5rem",
-};
-
-export const PaySignaturesConstructorComponent = () => {
+export const GoldenStakingSignatureConstructor = () => {
   const account = getAccount(config);
 
-  const [selectedToken, setSelectedToken] = React.useState(
-    "0x0000000000000000000000000000000000000000"
-  );
-  const [isUsingUsernames, setIsUsingUsernames] = React.useState(true);
-  const [isUsingExecutor, setIsUsingExecutor] = React.useState(false);
+  const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<PayData | null>(null);
   const [showData, setShowData] = React.useState(false);
 
   const { signMessage } = useSignMessage();
 
-  const makePayment = async () => {
+  const makeSigGoldenStaker = async () => {
     // Get the nonce value from the input field
     const nonce = (document.getElementById("nonceInput") as HTMLInputElement)
       .value;
 
-    // Get the token address from the input field
-    const tokenAddress = (
-      document.getElementById("tokenAddress") as HTMLInputElement
+    // Get the recipient value - either username or address based on user selection
+    const to = (
+      document.getElementById("sMateAddressInput") as HTMLInputElement
     ).value;
 
-    // Get the recipient value - either username or address based on user selection
-    const to = isUsingUsernames
-      ? (document.getElementById("toUsername") as HTMLInputElement).value
-      : (document.getElementById("toAddress") as HTMLInputElement).value;
-
     // Get the executor address if using executor, otherwise use zero address
-    const executor = isUsingExecutor
-      ? (document.getElementById("executorInput") as HTMLInputElement).value
-      : "0x0000000000000000000000000000000000000000";
+    const executor = (
+      document.getElementById("sMateAddressInput") as HTMLInputElement
+    ).value;
 
     // Get the amount of tokens to transfer
     const ammountConverted = (
-      document.getElementById("amountTokenInput") as HTMLInputElement
-    ).value;
-
-    // Get the priority fee value
-    const priorityFeeConverted = (
-      document.getElementById("priorityFeeInput") as HTMLInputElement
-    ).value;
+      Number(
+        (document.getElementById("amountOfSMateInput") as HTMLInputElement)
+          .value
+      ) *
+      (5083 * 10 ** 18)
+    ).toLocaleString("fullwide", { useGrouping: false });
 
     // Sign the message using wagmi's signMessage hook
     signMessage(
@@ -76,10 +59,10 @@ export const PaySignaturesConstructorComponent = () => {
         // Build the message to be signed with all the payment parameters
         message: buildMessageSignedForPay(
           to,
-          tokenAddress,
+          "0x0000000000000000000000000000000000000001",
           ammountConverted,
-          priorityFeeConverted,
-          nonce!.toString(),
+          "0",
+          nonce!,
           priority === "high", // Convert priority to boolean (high = true, low = false)
           executor
         ),
@@ -89,18 +72,16 @@ export const PaySignaturesConstructorComponent = () => {
         onSuccess: async (data, variables, context) => {
           console.log("----------Message signed----------");
           console.log(data);
-          
+
           // Create the PayData object with all the payment information and signature
           setDataToGet({
+            isStaking: isStaking ? "true" : "false", // Convert boolean to string
             from: account.address as `0x${string}`, // Current user's wallet address
-            to_address: (to.startsWith("0x")
-              ? to
-              : "0x0000000000000000000000000000000000000000") as `0x${string}`, // Use address if provided, otherwise zero address
-            to_identity: to.startsWith("0x") ? "" : to, // Use username if not an address, otherwise empty
-            token: tokenAddress,
+            to_address: to as `0x${string}`,
+            token: "0x0000000000000000000000000000000000000001",
             amount: ammountConverted,
-            priorityFee: priorityFeeConverted.toString(),
-            nonce: nonce.toString(),
+            priorityFee: "0",
+            nonce: nonce,
             priority: priority === "high" ? "true" : "false", // Convert boolean to string
             executor: executor,
             signature: data, // The generated signature from the wallet
@@ -112,34 +93,35 @@ export const PaySignaturesConstructorComponent = () => {
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
-      <h1>Single pay</h1>
-      <h3 style={{ textAlign: "center", color: "#3A9EE3" }}>
-        <a href="https://www.evvm.org/docs/SignatureStructures/EVVM/SinglePaymentSignatureStructure">
-          Learn more about single payment signatures structure here
-        </a>
-      </h3>
+      <h1>Golden staking</h1>
       <br />
 
-      {/* Recipient configuration section */}
       <div style={{ marginBottom: "1rem" }}>
         <p>
-          To:{" "}
+          Action:{" "}
           <select
+            onChange={(e) => setIsStaking(e.target.value === "true")}
             style={{
               color: "black",
               backgroundColor: "white",
               height: "2rem",
-              width: "6rem",
+              width: "5rem",
             }}
-            onChange={(e) => setIsUsingUsernames(e.target.value === "true")}
           >
-            <option value="true">Username</option>
-            <option value="false">Address</option>
+            <option value="true">Staking</option>
+            <option value="false">Unstaking</option>
           </select>
+        </p>
+      </div>
+
+      {/* Recipient configuration section */}
+      <div style={{ marginBottom: "1rem" }}>
+        <p>
+          sMate address:{" "}
           <input
             type="text"
-            placeholder={isUsingUsernames ? "Enter username" : "Enter address"}
-            id={isUsingUsernames ? "toUsername" : "toAddress"}
+            placeholder="Enter sMate address"
+            id="sMateAddressInput"
             style={{
               color: "black",
               backgroundColor: "white",
@@ -170,7 +152,9 @@ export const PaySignaturesConstructorComponent = () => {
               const seed = Math.floor(Math.random() + Date.now());
               const mt = mersenneTwister(seed);
               const nonce = mt.int32();
-              (document.getElementById("nonceInput") as HTMLInputElement).value = nonce.toString();
+              (
+                document.getElementById("nonceInput") as HTMLInputElement
+              ).value = nonce.toString();
             }}
           >
             Generate random nonce
@@ -191,18 +175,14 @@ export const PaySignaturesConstructorComponent = () => {
 
       {/* Basic input fields */}
       {[
-        { label: "Token address", id: "tokenAddress", type: "text", value: selectedToken, onChange: setSelectedToken },
-        { label: "Amount", id: "amountTokenInput", type: "number" },
-        { label: "Priority fee", id: "priorityFeeInput", type: "number" },
-      ].map(({ label, id, type, value, onChange }) => (
+        { label: "Amount of sMATE", id: "amountOfSMateInput", type: "number" },
+      ].map(({ label, id, type }) => (
         <div key={id} style={{ marginBottom: "1rem" }}>
           <p>{label}</p>
           <input
             type={type}
             placeholder={`Enter ${label.toLowerCase()}`}
             id={id}
-            value={value}
-            onChange={onChange ? (e) => onChange(e.target.value) : undefined}
             style={{
               color: "black",
               backgroundColor: "white",
@@ -212,39 +192,6 @@ export const PaySignaturesConstructorComponent = () => {
           />
         </div>
       ))}
-
-      {/* Executor configuration */}
-      <div style={{ marginBottom: "1rem" }}>
-        <p>
-          Are you using an executor?{" "}
-          <select
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "5rem",
-              marginRight: "0.5rem",
-            }}
-            onChange={(e) => setIsUsingExecutor(e.target.value === "true")}
-          >
-            <option value="false">No</option>
-            <option value="true">Yes</option>
-          </select>
-          {isUsingExecutor && (
-            <input
-              type="text"
-              placeholder="Enter executor address"
-              id="executorInput"
-              style={{
-                color: "black",
-                backgroundColor: "white",
-                height: "2rem",
-                width: "25rem",
-              }}
-            />
-          )}
-        </p>
-      </div>
 
       {/* Priority configuration */}
       <div style={{ marginBottom: "1rem" }}>
@@ -265,7 +212,7 @@ export const PaySignaturesConstructorComponent = () => {
 
       {/* Create signature button */}
       <button
-        onClick={makePayment}
+        onClick={makeSigGoldenStaker}
         style={{
           padding: "0.5rem",
           marginTop: "1rem",
@@ -278,7 +225,7 @@ export const PaySignaturesConstructorComponent = () => {
       {dataToGet && (
         <div style={{ marginTop: "2rem" }}>
           <h2>Ready</h2>
-          
+
           <button
             style={{
               margin: "0.5rem",
@@ -331,7 +278,11 @@ export const PaySignaturesConstructorComponent = () => {
                 margin: "0.5rem",
                 borderRadius: "5px",
               }}
-              onClick={() => navigator.clipboard.writeText(JSON.stringify(dataToGet, null, 2))}
+              onClick={() =>
+                navigator.clipboard.writeText(
+                  JSON.stringify(dataToGet, null, 2)
+                )
+              }
             >
               Copy for JSON
             </button>
@@ -343,7 +294,17 @@ export const PaySignaturesConstructorComponent = () => {
                 borderRadius: "5px",
               }}
               onClick={() => {
-                const solidityCode = `PayData({from: ${dataToGet.from}, to_address: ${dataToGet.to_address}, to_identity: "${dataToGet.to_identity}", token: ${dataToGet.token}, amount: ${dataToGet.amount}, priorityFee: ${dataToGet.priorityFee}, nonce: ${dataToGet.nonce}, priority: ${dataToGet.priority}, executor: ${dataToGet.executor}, signature: hex"${dataToGet.signature.slice(2)}"});`;
+                const solidityCode = `PayData({from: ${
+                  dataToGet.from
+                }, to_address: ${dataToGet.to_address}, token: ${
+                  dataToGet.token
+                }, amount: ${dataToGet.amount}, priorityFee: ${
+                  dataToGet.priorityFee
+                }, nonce: ${dataToGet.nonce}, priority: ${
+                  dataToGet.priority
+                }, executor: ${
+                  dataToGet.executor
+                }, signature: hex"${dataToGet.signature.slice(2)}"});`;
                 navigator.clipboard.writeText(solidityCode);
               }}
             >

@@ -390,7 +390,7 @@ export const PresaleStakingSignatureConstructor = () => {
             <button
               onClick={() =>
                 navigator.clipboard.writeText(
-                  JSON.stringify(payDataInfo, null, 2)
+                  JSON.stringify(presaleStakingDataInfo, null, 2)
                 )
               }
               style={{
@@ -402,28 +402,7 @@ export const PresaleStakingSignatureConstructor = () => {
               Copy JSON
             </button>
 
-            <button
-              onClick={() =>
-                navigator.clipboard.writeText(
-                  `PayData({from: ${payDataInfo.from}, to_address: ${
-                    payDataInfo.to_address
-                  }, token: ${payDataInfo.token}, amount: ${
-                    payDataInfo.amount
-                  }, priorityFee: ${payDataInfo.priorityFee}, nonce: ${
-                    payDataInfo.nonce
-                  }, priority: ${payDataInfo.priority}, executor: ${
-                    payDataInfo.executor
-                  }, signature: hex"${payDataInfo.signature.slice(2)}"});`
-                )
-              }
-              style={{
-                padding: "0.5rem",
-                margin: "0.5rem",
-                borderRadius: "5px",
-              }}
-            >
-              Copy Solidity
-            </button>
+            
 
             <button
               onClick={() => setPayDataInfo(null)}

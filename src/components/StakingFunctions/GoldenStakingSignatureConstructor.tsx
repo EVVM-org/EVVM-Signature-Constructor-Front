@@ -271,29 +271,7 @@ export const GoldenStakingSignatureConstructor = () => {
               Copy for JSON
             </button>
 
-            <button
-              style={{
-                padding: "0.5rem",
-                margin: "0.5rem",
-                borderRadius: "5px",
-              }}
-              onClick={() => {
-                const solidityCode = `PayData({from: ${
-                  dataToGet.from
-                }, to_address: ${dataToGet.to_address}, token: ${
-                  dataToGet.token
-                }, amount: ${dataToGet.amount}, priorityFee: ${
-                  dataToGet.priorityFee
-                }, nonce: ${dataToGet.nonce}, priority: ${
-                  dataToGet.priority
-                }, executor: ${
-                  dataToGet.executor
-                }, signature: hex"${dataToGet.signature.slice(2)}"});`;
-                navigator.clipboard.writeText(solidityCode);
-              }}
-            >
-              Copy for Solidity
-            </button>
+            
 
             <button
               style={{

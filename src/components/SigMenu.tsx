@@ -3,6 +3,7 @@ import { useState } from "react";
 import { PaySignaturesConstructorComponent } from "@/components/PaymentFunctions/PaySignaturesConstructor";
 import { DispersePaySignatureConstructor } from "@/components/PaymentFunctions/DispersePaySignatureConstructor";
 import { GoldenStakingSignatureConstructor } from "@/components/StakingFunctions/GoldenStakingSignatureConstructor";
+import { PresaleStakingSignatureConstructor } from "./StakingFunctions/PresaleStakingSignatureConstructor";
 
 const boxSignature = {
   display: "flex",
@@ -22,7 +23,7 @@ const menuStyle = {
   padding: "1rem",
   border: "1px solid #ccc",
   borderRadius: "8px",
-  width: "100%",
+  width: "50%",
   backgroundColor: "#f9f9f9",
   color: "#333",
   margin: "1rem 0",
@@ -31,7 +32,7 @@ const menuStyle = {
 export const SigMenu = () => {
   const [menu, setMenu] = useState("pay");
   return (
-    <div>
+    <>
       <select
         onChange={(e) => setMenu(e.target.value)}
         style={{
@@ -42,35 +43,46 @@ export const SigMenu = () => {
         <option value="staking">Staking signatures</option>
       </select>
 
-      {menu === "pay" ? (
-        <>
-          <div
-            style={{
-              ...boxSignature,
-            }}
-          >
-            <PaySignaturesConstructorComponent />
-          </div>
-          <br />
-          <div
-            style={{
-              ...boxSignature,
-            }}
-          >
-            <DispersePaySignatureConstructor />
-          </div>
-        </>
-      ) : (
-        <>
-          <div
-            style={{
-              ...boxSignature,
-            }}
-          >
-            <GoldenStakingSignatureConstructor />
-          </div>
-        </>
-      )}
-    </div>
+      <div>
+        {menu === "pay" ? (
+          <>
+            <div
+              style={{
+                ...boxSignature,
+              }}
+            >
+              <PaySignaturesConstructorComponent />
+            </div>
+            <br />
+            <div
+              style={{
+                ...boxSignature,
+              }}
+            >
+              <DispersePaySignatureConstructor />
+            </div>
+          </>
+        ) : (
+          <>
+            <div
+              style={{
+                ...boxSignature,
+              }}
+            >
+              <GoldenStakingSignatureConstructor />
+            </div>
+            <br />
+            <div
+              style={{
+                ...boxSignature,
+              }}
+            >
+              <PresaleStakingSignatureConstructor />
+            </div>
+            <br />
+          </>
+        )}
+      </div>
+    </>
   );
 };

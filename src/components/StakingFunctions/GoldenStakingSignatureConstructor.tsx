@@ -30,61 +30,45 @@ export const GoldenStakingSignatureConstructor = () => {
   const { signMessage } = useSignMessage();
 
   const makeSigGoldenStaker = async () => {
-    // Get the nonce value from the input field
-    const nonce = (document.getElementById("nonceInput") as HTMLInputElement)
+    // Get form values
+    const nonce = (document.getElementById("nonceInput_GoldenStaking") as HTMLInputElement)
       .value;
-
-    // Get the recipient value - either username or address based on user selection
     const to = (
-      document.getElementById("sMateAddressInput") as HTMLInputElement
+      document.getElementById("sMateAddressInput_GoldenStaking") as HTMLInputElement
     ).value;
-
-    // Get the executor address if using executor, otherwise use zero address
-    const executor = (
-      document.getElementById("sMateAddressInput") as HTMLInputElement
-    ).value;
-
-    // Get the amount of tokens to transfer
-    const ammountConverted = (
+    const amount =
       Number(
-        (document.getElementById("amountOfSMateInput") as HTMLInputElement)
+        (document.getElementById("amountOfSMateInput_GoldenStaking") as HTMLInputElement)
           .value
       ) *
-      (5083 * 10 ** 18)
-    ).toLocaleString("fullwide", { useGrouping: false });
+      (5083 * 10 ** 18);
 
-    // Sign the message using wagmi's signMessage hook
+    // Sign message
     signMessage(
       {
-        // Build the message to be signed with all the payment parameters
         message: buildMessageSignedForPay(
           to,
           "0x0000000000000000000000000000000000000001",
-          ammountConverted,
+          amount.toLocaleString("fullwide", { useGrouping: false }),
           "0",
-          nonce!,
-          priority === "high", // Convert priority to boolean (high = true, low = false)
-          executor
+          nonce,
+          priority === "high",
+          to
         ),
       },
       {
-        // Handle successful signature
-        onSuccess: async (data, variables, context) => {
-          console.log("----------Message signed----------");
-          console.log(data);
-
-          // Create the PayData object with all the payment information and signature
+        onSuccess: (data) => {
           setDataToGet({
-            isStaking: isStaking ? "true" : "false", // Convert boolean to string
-            from: account.address as `0x${string}`, // Current user's wallet address
+            isStaking: isStaking.toString(),
+            from: account.address as `0x${string}`,
             to_address: to as `0x${string}`,
             token: "0x0000000000000000000000000000000000000001",
-            amount: ammountConverted,
+            amount: amount.toLocaleString("fullwide", { useGrouping: false }),
             priorityFee: "0",
-            nonce: nonce,
-            priority: priority === "high" ? "true" : "false", // Convert boolean to string
-            executor: executor,
-            signature: data, // The generated signature from the wallet
+            nonce,
+            priority: (priority === "high").toString(),
+            executor: to,
+            signature: data,
           });
         },
       }
@@ -121,7 +105,7 @@ export const GoldenStakingSignatureConstructor = () => {
           <input
             type="text"
             placeholder="Enter sMate address"
-            id="sMateAddressInput"
+            id="sMateAddressInput_GoldenStaking"
             style={{
               color: "black",
               backgroundColor: "white",
@@ -153,7 +137,7 @@ export const GoldenStakingSignatureConstructor = () => {
               const mt = mersenneTwister(seed);
               const nonce = mt.int32();
               (
-                document.getElementById("nonceInput") as HTMLInputElement
+                document.getElementById("nonceInput_GoldenStaking") as HTMLInputElement
               ).value = nonce.toString();
             }}
           >
@@ -162,7 +146,7 @@ export const GoldenStakingSignatureConstructor = () => {
           <input
             type="number"
             placeholder="Enter nonce"
-            id="nonceInput"
+            id="nonceInput_GoldenStaking"
             style={{
               color: "black",
               backgroundColor: "white",
@@ -175,7 +159,7 @@ export const GoldenStakingSignatureConstructor = () => {
 
       {/* Basic input fields */}
       {[
-        { label: "Amount of sMATE", id: "amountOfSMateInput", type: "number" },
+        { label: "Amount of sMATE", id: "amountOfSMateInput_GoldenStaking", type: "number" },
       ].map(({ label, id, type }) => (
         <div key={id} style={{ marginBottom: "1rem" }}>
           <p>{label}</p>

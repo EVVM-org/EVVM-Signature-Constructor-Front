@@ -35,7 +35,7 @@ export const PaySignaturesConstructorComponent = () => {
 
   const makePayment = async () => {
     // Get the nonce value from the input field
-    const nonce = (document.getElementById("nonceInput") as HTMLInputElement)
+    const nonce = (document.getElementById("nonceInput_Pay") as HTMLInputElement)
       .value;
 
     // Get the token address from the input field
@@ -50,17 +50,17 @@ export const PaySignaturesConstructorComponent = () => {
 
     // Get the executor address if using executor, otherwise use zero address
     const executor = isUsingExecutor
-      ? (document.getElementById("executorInput") as HTMLInputElement).value
+      ? (document.getElementById("executorInput_Pay") as HTMLInputElement).value
       : "0x0000000000000000000000000000000000000000";
 
     // Get the amount of tokens to transfer
     const ammountConverted = (
-      document.getElementById("amountTokenInput") as HTMLInputElement
+      document.getElementById("amountTokenInput_Pay") as HTMLInputElement
     ).value;
 
     // Get the priority fee value
     const priorityFeeConverted = (
-      document.getElementById("priorityFeeInput") as HTMLInputElement
+      document.getElementById("priorityFeeInput_Pay") as HTMLInputElement
     ).value;
 
     // Sign the message using wagmi's signMessage hook
@@ -164,7 +164,7 @@ export const PaySignaturesConstructorComponent = () => {
               const mt = mersenneTwister(seed);
               const nonce = mt.int32();
               (
-                document.getElementById("nonceInput") as HTMLInputElement
+                document.getElementById("nonceInput_Pay") as HTMLInputElement
               ).value = nonce.toString();
             }}
           >
@@ -173,7 +173,7 @@ export const PaySignaturesConstructorComponent = () => {
           <input
             type="number"
             placeholder="Enter nonce"
-            id="nonceInput"
+            id="nonceInput_Pay"
             style={{
               color: "black",
               backgroundColor: "white",
@@ -193,8 +193,8 @@ export const PaySignaturesConstructorComponent = () => {
           value: selectedToken,
           onChange: setSelectedToken,
         },
-        { label: "Amount", id: "amountTokenInput", type: "number" },
-        { label: "Priority fee", id: "priorityFeeInput", type: "number" },
+        { label: "Amount", id: "amountTokenInput_Pay", type: "number" },
+        { label: "Priority fee", id: "priorityFeeInput_Pay", type: "number" },
       ].map(({ label, id, type, value, onChange }) => (
         <div key={id} style={{ marginBottom: "1rem" }}>
           <p>{label}</p>
@@ -235,7 +235,7 @@ export const PaySignaturesConstructorComponent = () => {
             <input
               type="text"
               placeholder="Enter executor address"
-              id="executorInput"
+              id="executorInput_Pay"
               style={{
                 color: "black",
                 backgroundColor: "white",

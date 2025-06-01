@@ -4,6 +4,7 @@ import { PaySignaturesConstructorComponent } from "@/components/PaymentFunctions
 import { DispersePaySignatureConstructor } from "@/components/PaymentFunctions/DispersePaySignatureConstructor";
 import { GoldenStakingSignatureConstructor } from "@/components/StakingFunctions/GoldenStakingSignatureConstructor";
 import { PresaleStakingSignatureConstructor } from "./StakingFunctions/PresaleStakingSignatureConstructor";
+import { PublicStakingSignatureConstructor } from "./StakingFunctions/PublicStakingSignatureConstructor";
 
 const boxSignature = {
   display: "flex",
@@ -78,6 +79,14 @@ export const SigMenu = () => {
               }}
             >
               <PresaleStakingSignatureConstructor />
+            </div>
+            <br />
+            <div
+              style={{
+                ...boxSignature,
+              }}
+            >
+              <PublicStakingSignatureConstructor />
             </div>
             <br />
           </>

@@ -146,6 +146,9 @@ export const DispersePaySignatureConstructor = () => {
           executor: Executor,
           signature: dispersePaySignature,
         });
+      },
+      (error) => {
+        console.error("Error signing disperse payment:", error);
       }
     );
   };

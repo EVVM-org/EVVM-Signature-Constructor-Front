@@ -17,7 +17,7 @@ type PayData = {
   signature: string;
 };
 
-type PresaleStakingData = {
+type PublicServiceStakingData = {
   isStaking: string;
   amount: string;
   nonce: string;
@@ -28,51 +28,59 @@ type PresaleStakingData = {
   signature_Evvm: string;
 };
 
-export const PresaleStakingSignatureConstructor = () => {
+export const PublicServiceStakingSignatureConstructor = () => {
   const account = getAccount(config);
-  const { signPresaleStaking } = wrapERC191sig();
-
+  const { signPublicServiceStaking } = wrapERC191sig();
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
-
   const [payDataInfo, setPayDataInfo] = React.useState<PayData | null>(null);
-  const [presaleStakingDataInfo, setPresaleStakingDataInfo] =
-    React.useState<PresaleStakingData | null>(null);
+  const [publicServiceStakingDataInfo, setPublicServiceStakingDataInfo] =
+    React.useState<PublicServiceStakingData | null>(null);
   const [showData, setShowData] = React.useState(false);
 
-  const makeSigPresaleStaking = async () => {
+  const makeSigPublicServiceStaking = async () => {
     // Get form values
     const nonceEVVM = (
       document.getElementById(
-        "nonceEVVMInput_presaleStaking"
+        "nonceEVVMInput_PublicServiceStaking"
       ) as HTMLInputElement
     ).value;
     const nonceSMATE = (
       document.getElementById(
-        "nonceSMATEInput_presaleStaking"
+        "nonceSMATEInput_PublicServiceStaking"
       ) as HTMLInputElement
     ).value;
-    const sMateAddressElement = document.getElementById(
-      "sMateAddressInput_presaleStaking"
-    ) as HTMLInputElement;
-    const sMateAddress = sMateAddressElement?.value || "";
+
+    const sMateAddress = (
+      document.getElementById(
+        "sMateAddressInput_PublicServiceStaking"
+      ) as HTMLInputElement
+    ).value;
+
+    const serviceAddress = (
+      document.getElementById(
+        "serviceAddressInput_PublicServiceStaking"
+      ) as HTMLInputElement
+    ).value;
 
     const amount = Number(
       (
         document.getElementById(
-          "amountOfSMateInput_presaleStaking"
+          "amountOfSMateInput_PublicServiceStaking"
         ) as HTMLInputElement
       ).value
     );
+
     const priorityFee = (
       document.getElementById(
-        "priorityFeeInput_presaleStaking"
+        "priorityFeeInput_PublicServiceStaking"
       ) as HTMLInputElement
     ).value;
 
     // Sign message
-    signPresaleStaking(
+    signPublicServiceStaking(
       sMateAddress,
+      serviceAddress,
       amount,
       priorityFee,
       nonceEVVM,
@@ -98,7 +106,7 @@ export const PresaleStakingSignatureConstructor = () => {
         });
 
         // Set staking data
-        setPresaleStakingDataInfo({
+        setPublicServiceStakingDataInfo({
           isStaking: isStaking.toString(),
           amount: amount.toString(),
           nonce: nonceSMATE,
@@ -118,10 +126,10 @@ export const PresaleStakingSignatureConstructor = () => {
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       {/* Header Section */}
-      <h1>Presale Staking</h1>
+      <h1>Service Staking</h1>
       <h3 style={{ textAlign: "center", color: "#3A9EE3" }}>
         <a href="https://www.evvm.org/docs/SignatureStructures/SMate/StakingUnstakingStructure">
-          Learn more about presale staking signatures structure here
+          Learn more about service staking signatures structure here
         </a>
       </h3>
       <br />
@@ -151,7 +159,24 @@ export const PresaleStakingSignatureConstructor = () => {
           <input
             type="text"
             placeholder="Enter sMate address"
-            id="sMateAddressInput_presaleStaking"
+            id="sMateAddressInput_PublicServiceStaking"
+            style={{
+              color: "black",
+              backgroundColor: "white",
+              height: "2rem",
+              width: "25rem",
+            }}
+          />
+        </label>
+      </div>
+
+      <div style={{ marginBottom: "1rem" }}>
+        <label>
+          sMate address:{" "}
+          <input
+            type="text"
+            placeholder="Enter service address"
+            id="serviceAddressInput_PublicServiceStaking"
             style={{
               color: "black",
               backgroundColor: "white",
@@ -180,7 +205,7 @@ export const PresaleStakingSignatureConstructor = () => {
               ).int32();
               (
                 document.getElementById(
-                  "nonceEVVMInput_presaleStaking"
+                  "nonceEVVMInput_PublicServiceStaking"
                 ) as HTMLInputElement
               ).value = nonce.toString();
             }}
@@ -189,7 +214,7 @@ export const PresaleStakingSignatureConstructor = () => {
           </button>
           <input
             type="number"
-            id="nonceEVVMInput_presaleStaking"
+            id="nonceEVVMInput_PublicServiceStaking"
             style={{
               color: "black",
               backgroundColor: "white",
@@ -217,7 +242,7 @@ export const PresaleStakingSignatureConstructor = () => {
               ).int32();
               (
                 document.getElementById(
-                  "nonceSMATEInput_presaleStaking"
+                  "nonceSMATEInput_PublicServiceStaking"
                 ) as HTMLInputElement
               ).value = nonce.toString();
             }}
@@ -226,7 +251,7 @@ export const PresaleStakingSignatureConstructor = () => {
           </button>
           <input
             type="number"
-            id="nonceSMATEInput_presaleStaking"
+            id="nonceSMATEInput_PublicServiceStaking"
             style={{
               color: "black",
               backgroundColor: "white",
@@ -242,7 +267,7 @@ export const PresaleStakingSignatureConstructor = () => {
         <p>Amount of sMate to{isStaking ? " stake" : " unstake"}: </p>
         <input
           type="number"
-          id="amountOfSMateInput_presaleStaking"
+          id="amountOfSMateInput_PublicServiceStaking"
           style={{
             color: "black",
             backgroundColor: "white",
@@ -257,7 +282,7 @@ export const PresaleStakingSignatureConstructor = () => {
           Priority fee:{" "}
           <input
             type="number"
-            id="priorityFeeInput_presaleStaking"
+            id="priorityFeeInput_PublicServiceStaking"
             style={{
               color: "black",
               backgroundColor: "white",
@@ -289,7 +314,7 @@ export const PresaleStakingSignatureConstructor = () => {
 
       {/* Action Button */}
       <button
-        onClick={makeSigPresaleStaking}
+        onClick={makeSigPublicServiceStaking}
         style={{
           padding: "0.5rem 1rem",
           marginTop: "1rem",
@@ -302,7 +327,7 @@ export const PresaleStakingSignatureConstructor = () => {
       </button>
 
       {/* Results Section */}
-      {payDataInfo && presaleStakingDataInfo && (
+      {payDataInfo && publicServiceStakingDataInfo && (
         <div style={{ marginTop: "2rem" }}>
           <h2>Signature Ready</h2>
 
@@ -343,23 +368,25 @@ export const PresaleStakingSignatureConstructor = () => {
               ))}
 
               <h3>Staking Data:</h3>
-              {Object.entries(presaleStakingDataInfo).map(([key, value]) => (
-                <div key={key} style={{ marginBottom: "0.5rem" }}>
-                  <strong>{key}:</strong> {value}
-                  <button
-                    onClick={() => navigator.clipboard.writeText(value)}
-                    style={{
-                      backgroundColor: "#637988",
-                      color: "white",
-                      border: "none",
-                      padding: "0.2rem",
-                      marginLeft: "0.5rem",
-                    }}
-                  >
-                    Copy
-                  </button>
-                </div>
-              ))}
+              {Object.entries(publicServiceStakingDataInfo).map(
+                ([key, value]) => (
+                  <div key={key} style={{ marginBottom: "0.5rem" }}>
+                    <strong>{key}:</strong> {value}
+                    <button
+                      onClick={() => navigator.clipboard.writeText(value)}
+                      style={{
+                        backgroundColor: "#637988",
+                        color: "white",
+                        border: "none",
+                        padding: "0.2rem",
+                        marginLeft: "0.5rem",
+                      }}
+                    >
+                      Copy
+                    </button>
+                  </div>
+                )
+              )}
             </div>
           )}
 
@@ -368,7 +395,7 @@ export const PresaleStakingSignatureConstructor = () => {
             <button
               onClick={() =>
                 navigator.clipboard.writeText(
-                  JSON.stringify(presaleStakingDataInfo, null, 2)
+                  JSON.stringify(publicServiceStakingDataInfo, null, 2)
                 )
               }
               style={{

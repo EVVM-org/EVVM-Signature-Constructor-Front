@@ -3,6 +3,7 @@ import {
   buildMessageSignedForDispersePay,
   buildMessageSignedForPay,
   buildMessageSignedForPresaleStaking,
+  buildMessageSignedForPublicServiceStaking,
   buildMessageSignedForPublicStaking,
 } from "../utils/constructMessage";
 import { keccak256, encodePacked, encodeAbiParameters, sha256 } from "viem";
@@ -219,6 +220,62 @@ export const wrapERC191sig = () => {
     );
   };
 
+  const signPublicServiceStaking = (
+    sMateAddress: string,
+    serviceAddress: string,
+    stakingAmount: number,
+    priorityFee: string,
+    nonceEVVM: string,
+    priorityFlag: boolean,
+    isStaking: boolean,
+    nonceSMATE: string,
+    onSuccess?: (paySignature: string, stakingSignature: string) => void,
+    onError?: (error: Error) => void
+  ) => {
+    const payMessage = buildMessageSignedForPay(
+      sMateAddress,
+      "0x0000000000000000000000000000000000000001",
+      isStaking
+        ? (stakingAmount * (5083 * 10 ** 18)).toLocaleString("fullwide", {
+            useGrouping: false,
+          })
+        : "0",
+      priorityFee,
+      nonceEVVM,
+      priorityFlag,
+      sMateAddress
+    );
+
+    signMessage(
+      { message: payMessage },
+      {
+        onSuccess: (paySignature) => {
+          const stakingMessage = buildMessageSignedForPublicServiceStaking(
+            serviceAddress,
+            isStaking,
+            stakingAmount.toString(),
+            nonceSMATE
+          );
+
+          signMessage(
+            { message: stakingMessage },
+            {
+              onSuccess: (stakingSignature) => {
+                onSuccess?.(paySignature, stakingSignature);
+              },
+              onError: (error) => {
+                onError?.(error);
+              },
+            }
+          );
+        },
+        onError: (error) => {
+          onError?.(error);
+        },
+      }
+    );
+  };
+
   function hashDispersePaymentUsersToPay(toData: DispersePayMetadata[]) {
     const formattedData = toData.map((item) => [
       BigInt(item.amount),
@@ -237,6 +294,7 @@ export const wrapERC191sig = () => {
     signDispersePay,
     signPresaleStaking,
     signPublicStaking,
+    signPublicServiceStaking,
     ...rest,
   };
 };

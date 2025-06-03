@@ -125,7 +125,7 @@ export const PublicStakingSignatureConstructor = () => {
       <h1>Public Staking</h1>
       <h3 style={{ textAlign: "center", color: "#3A9EE3" }}>
         <a href="https://www.evvm.org/docs/SignatureStructures/SMate/StakingUnstakingStructure">
-          Learn more about single payment signatures structure here
+          Learn more about public staking signatures structure here
         </a>
       </h3>
       <br />

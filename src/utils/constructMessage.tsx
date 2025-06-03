@@ -69,9 +69,9 @@ function buildMessageSignedForPay(
     `${priorityFee},` +
     // the nonce to avoid replay attacks
     `${nonce},` +
-    // the priority flag is set to true or false
+    // the priority flag is set to "true" or "false" as a string
     // false sync payment and true async payment
-    `${priorityFlag},` +
+    `${priorityFlag ? "true" : "false"},` +
     // the executor is the address of the fisher or service that will execute the transaction
     // we use toLowerCase() to avoid case sensitivity issues
     `${executor.toLowerCase()}`;
@@ -96,32 +96,34 @@ function buildMessageSignedForPay(
  * @returns A formatted string starting with 'ef83c1d6' followed by comma-separated parameters
  */
 function buildMessageSignedForDispersePay(
-  fixedHashedEncodedData: string,
-  TokenAddress: string,
-  Ammount: string,
-  PriorityFee: string,
-  Nonce: string,
-  PriorityConverted: boolean,
-  Executor: string
+  hashedEncodedData: string,
+  tokenAddress: string,
+  amount: string,
+  priorityFee: string,
+  nonce: string,
+  priorityFlag: boolean,
+  executor: string
 ): string {
   return (
     // is the function signature for disperse pay
     `ef83c1d6` +
-    // the fixed hashed encoded data is the first parameter
-    `${fixedHashedEncodedData},` +
+    // the hashed encoded data is the second parameter 
+    // we use toUpperCase() to avoid case sensitivity issues and slice(2) to remove the '0X'
+    // and set the `0x` prefix 
+    `${"0x" + hashedEncodedData.toUpperCase().slice(2)},` +
     // the token address is always an address so we use toLowerCase() to avoid case sensitivity issues
-    `${TokenAddress.toLowerCase()},` +
+    `${tokenAddress.toLowerCase()},` +
     // the amount is set all in decimal format
-    `${Ammount},` +
+    `${amount},` +
     // the priority fee is set all in decimal format
-    `${PriorityFee},` +
+    `${priorityFee},` +
     // the nonce to avoid replay attacks
-    `${Nonce},` +
-    // the priority flag is set to true or false
-    `${PriorityConverted},` +
+    `${nonce},` +
+    // the priority flag is set to "true" or "false" as a string
+    `${priorityFlag ? "true" : "false"},` +
     // the executor is the address of the fisher or service that will execute the transaction
     // we use toLowerCase() to avoid case sensitivity issues
-    `${Executor.toLowerCase()}`
+    `${executor.toLowerCase()}`
   );
 }
 

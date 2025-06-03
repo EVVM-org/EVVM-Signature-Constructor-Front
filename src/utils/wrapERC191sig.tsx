@@ -42,6 +42,13 @@ export const wrapERC191sig = () => {
     );
   };
 
+  /*
+  ┏━━━━━━━━━━━━━━━━┓
+  EVVM Signatures  
+  ┗━━━━━━━━━━━━━━━━┛
+  */
+  //・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈
+
   const signPay = (
     to: string,
     tokenAddress: string,
@@ -97,6 +104,48 @@ export const wrapERC191sig = () => {
       nonce,
       priorityFlag,
       executor
+    );
+
+    signMessage(
+      { message },
+      {
+        onSuccess: (data) => {
+          onSuccess?.(data);
+        },
+        onError: (error) => {
+          onError?.(error);
+        },
+      }
+    );
+  };
+
+  //・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈
+  /*
+  ┏━━━━━━━━━━━━━━━━━┓
+   sMate Signatures  
+  ┗━━━━━━━━━━━━━━━━━┛
+  */
+  //・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈
+
+  const signGoldenStaking = (
+    sMateAddress: string,
+    stakingAmount: number,
+    nonceEVVM: string,
+    priorityFlag: boolean,
+    onSuccess?: (signature: string) => void,
+    onError?: (error: Error) => void
+  ) => {
+    // if isStaking == false throw an error
+    const message = buildMessageSignedForPay(
+      sMateAddress,
+      "0x0000000000000000000000000000000000000001",
+      (stakingAmount * (5083 * 10 ** 18)).toLocaleString("fullwide", {
+        useGrouping: false,
+      }),
+      "0",
+      nonceEVVM,
+      priorityFlag,
+      sMateAddress
     );
 
     signMessage(
@@ -292,6 +341,7 @@ export const wrapERC191sig = () => {
     signERC191Message,
     signPay,
     signDispersePay,
+    signGoldenStaking,
     signPresaleStaking,
     signPublicStaking,
     signPublicServiceStaking,

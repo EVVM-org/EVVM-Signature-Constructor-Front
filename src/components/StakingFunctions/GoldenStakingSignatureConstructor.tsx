@@ -1,10 +1,9 @@
 "use client";
 import React from "react";
 import { getAccount } from "@wagmi/core";
-import { useSignMessage } from "wagmi";
-import { config } from "../../config/index";
-import mersenneTwister from "../../utils/mersenneTwister";
-import { buildMessageSignedForPay } from "../../utils/constructMessage";
+import { config } from "@/config/index";
+import mersenneTwister from "@/utils/mersenneTwister";
+import { wrapERC191sig } from "@/utils/wrapERC191sig";
 
 type PayData = {
   isStaking: string; // "true" for staking, "false" for unstaking
@@ -21,56 +20,60 @@ type PayData = {
 
 export const GoldenStakingSignatureConstructor = () => {
   const account = getAccount(config);
-
+  const { signGoldenStaking } = wrapERC191sig();
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<PayData | null>(null);
   const [showData, setShowData] = React.useState(false);
 
-  const { signMessage } = useSignMessage();
-
   const makeSigGoldenStaker = async () => {
     // Get form values
-    const nonce = (document.getElementById("nonceInput_GoldenStaking") as HTMLInputElement)
-      .value;
-    const to = (
-      document.getElementById("sMateAddressInput_GoldenStaking") as HTMLInputElement
+    const nonceEVVM = (
+      document.getElementById("nonceInput_GoldenStaking") as HTMLInputElement
     ).value;
-    const amount =
+    const sMateAddress = (
+      document.getElementById(
+        "sMateAddressInput_GoldenStaking"
+      ) as HTMLInputElement
+    ).value;
+    const stakingAmount =
       Number(
-        (document.getElementById("amountOfSMateInput_GoldenStaking") as HTMLInputElement)
-          .value
+        (
+          document.getElementById(
+            "amountOfSMateInput_GoldenStaking"
+          ) as HTMLInputElement
+        ).value
       ) *
       (5083 * 10 ** 18);
 
     // Sign message
-    signMessage(
-      {
-        message: buildMessageSignedForPay(
-          to,
-          "0x0000000000000000000000000000000000000001",
-          amount.toLocaleString("fullwide", { useGrouping: false }),
-          "0",
-          nonce,
-          priority === "high",
-          to
-        ),
+    signGoldenStaking(
+      sMateAddress,
+      stakingAmount,
+      nonceEVVM,
+      priority === "high",
+      (stakingSignature) => {
+        // Set pay data
+        setDataToGet({
+          isStaking: isStaking.toString(),
+          from: account.address as `0x${string}`,
+          to_address: sMateAddress as `0x${string}`,
+          token: "0x0000000000000000000000000000000000000001", // sMATE token address
+          amount: (stakingAmount * (5083 * 10 ** 18)).toLocaleString(
+            "fullwide",
+            {
+              useGrouping: false,
+            }
+          ),
+          priorityFee: "0", // Assuming no priority fee for staking
+          nonce: nonceEVVM,
+          priority: priority,
+          executor: sMateAddress as `0x${string}`,
+          signature: stakingSignature,
+        });
       },
-      {
-        onSuccess: (data) => {
-          setDataToGet({
-            isStaking: isStaking.toString(),
-            from: account.address as `0x${string}`,
-            to_address: to as `0x${string}`,
-            token: "0x0000000000000000000000000000000000000001",
-            amount: amount.toLocaleString("fullwide", { useGrouping: false }),
-            priorityFee: "0",
-            nonce,
-            priority: (priority === "high").toString(),
-            executor: to,
-            signature: data,
-          });
-        },
+      (error) => {
+        console.error("Error signing presale staking:", error);
       }
     );
   };
@@ -137,7 +140,9 @@ export const GoldenStakingSignatureConstructor = () => {
               const mt = mersenneTwister(seed);
               const nonce = mt.int32();
               (
-                document.getElementById("nonceInput_GoldenStaking") as HTMLInputElement
+                document.getElementById(
+                  "nonceInput_GoldenStaking"
+                ) as HTMLInputElement
               ).value = nonce.toString();
             }}
           >
@@ -159,7 +164,11 @@ export const GoldenStakingSignatureConstructor = () => {
 
       {/* Basic input fields */}
       {[
-        { label: "Amount of sMATE", id: "amountOfSMateInput_GoldenStaking", type: "number" },
+        {
+          label: "Amount of sMATE",
+          id: "amountOfSMateInput_GoldenStaking",
+          type: "number",
+        },
       ].map(({ label, id, type }) => (
         <div key={id} style={{ marginBottom: "1rem" }}>
           <p>{label}</p>
@@ -270,8 +279,6 @@ export const GoldenStakingSignatureConstructor = () => {
             >
               Copy for JSON
             </button>
-
-            
 
             <button
               style={{

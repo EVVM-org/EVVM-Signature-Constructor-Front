@@ -1,13 +1,9 @@
 "use client";
 import React from "react";
 import { getAccount } from "@wagmi/core";
-import { useSignMessage } from "wagmi";
-import { config } from "../../config/index";
-import mersenneTwister from "../../utils/mersenneTwister";
-import {
-  buildMessageSignedForPay,
-  buildMessageSignedForPresaleStaking,
-} from "../../utils/constructMessage";
+import { config } from "@/config/index";
+import mersenneTwister from "@/utils/mersenneTwister";
+import { wrapERC191sig } from "@/utils/wrapERC191sig";
 
 type PayData = {
   from: `0x${string}`;
@@ -34,7 +30,7 @@ type PresaleStakingData = {
 
 export const PresaleStakingSignatureConstructor = () => {
   const account = getAccount(config);
-  const { signMessage } = useSignMessage();
+  const { signPresaleStaking } = wrapERC191sig();
 
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
@@ -61,11 +57,6 @@ export const PresaleStakingSignatureConstructor = () => {
     ) as HTMLInputElement;
     const sMateAddress = sMateAddressElement?.value || "";
 
-    if (!sMateAddress) {
-      alert("Please enter a sMate address");
-      return;
-    }
-    console.log("sMateAddress", sMateAddress);
     const amount = Number(
       (
         document.getElementById(
@@ -73,7 +64,6 @@ export const PresaleStakingSignatureConstructor = () => {
         ) as HTMLInputElement
       ).value
     );
-    const amountMate = amount * (5083 * 10 ** 18);
     const priorityFee = (
       document.getElementById(
         "priorityFeeInput_presaleStaking"
@@ -81,58 +71,46 @@ export const PresaleStakingSignatureConstructor = () => {
     ).value;
 
     // Sign message
-    signMessage(
-      {
-        message: buildMessageSignedForPay(
-          sMateAddress,
-          "0x0000000000000000000000000000000000000001",
-          amountMate.toLocaleString("fullwide", { useGrouping: false }),
-          priorityFee,
-          nonceEVVM,
-          priority === "high",
-          sMateAddress
-        ),
-      },
-      {
-        onSuccess: (paySignature) => {
-          setPayDataInfo({
-            from: account.address as `0x${string}`,
-            to_address: sMateAddress as `0x${string}`,
-            token: "0x0000000000000000000000000000000000000001",
-            amount: isStaking
-              ? amountMate.toLocaleString("fullwide", { useGrouping: false })
-              : "0",
-            priorityFee: priorityFee,
-            nonce: nonceEVVM,
-            priority: (priority === "high").toString(),
-            executor: sMateAddress,
-            signature: paySignature,
-          });
+    signPresaleStaking(
+      sMateAddress,
+      amount,
+      priorityFee,
+      nonceEVVM,
+      priority === "high",
+      isStaking,
+      nonceSMATE,
+      (paySignature, stakingSignature) => {
+        // Set pay data
+        setPayDataInfo({
+          from: account.address as `0x${string}`,
+          to_address: sMateAddress as `0x${string}`,
+          token: "0x0000000000000000000000000000000000000001",
+          amount: isStaking
+            ? (amount * (5083 * 10 ** 18)).toLocaleString("fullwide", {
+                useGrouping: false,
+              })
+            : "0",
+          priorityFee: priorityFee,
+          nonce: nonceEVVM,
+          priority: (priority === "high").toString(),
+          executor: sMateAddress,
+          signature: paySignature,
+        });
 
-          signMessage(
-            {
-              message: buildMessageSignedForPresaleStaking(
-                isStaking,
-                amount.toString(),
-                nonceSMATE
-              ),
-            },
-            {
-              onSuccess: (stakingSignature) => {
-                setPresaleStakingDataInfo({
-                  isStaking: isStaking.toString(),
-                  amount: amount.toString(),
-                  nonce: nonceSMATE,
-                  signature: stakingSignature,
-                  priorityFee_Evvm: priorityFee.toString(),
-                  nonce_Evvm: nonceEVVM,
-                  priority_Evvm: priority.toString(),
-                  signature_Evvm: paySignature,
-                });
-              },
-            }
-          );
-        },
+        // Set staking data
+        setPresaleStakingDataInfo({
+          isStaking: isStaking.toString(),
+          amount: amount.toString(),
+          nonce: nonceSMATE,
+          signature: stakingSignature,
+          priorityFee_Evvm: priorityFee.toString(),
+          nonce_Evvm: nonceEVVM,
+          priority_Evvm: priority.toString(),
+          signature_Evvm: paySignature,
+        });
+      },
+      (error) => {
+        console.error("Error signing presale staking:", error);
       }
     );
   };
@@ -401,8 +379,6 @@ export const PresaleStakingSignatureConstructor = () => {
             >
               Copy JSON
             </button>
-
-            
 
             <button
               onClick={() => setPayDataInfo(null)}

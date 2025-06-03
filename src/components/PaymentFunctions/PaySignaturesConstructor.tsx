@@ -1,10 +1,9 @@
 "use client";
 import React from "react";
 import { getAccount } from "@wagmi/core";
-import { useSignMessage } from "wagmi";
-import { config } from "../../config/index";
-import mersenneTwister from "../../utils/mersenneTwister";
-import { buildMessageSignedForPay } from "../../utils/constructMessage";
+import { config } from "@/config/index";
+import mersenneTwister from "@/utils/mersenneTwister";
+import { wrapERC191sig } from "@/utils/wrapERC191sig";
 
 type PayData = {
   from: `0x${string}`;
@@ -20,6 +19,7 @@ type PayData = {
 };
 
 export const PaySignaturesConstructorComponent = () => {
+  const { signPay } = wrapERC191sig();
   const account = getAccount(config);
 
   const [selectedToken, setSelectedToken] = React.useState(
@@ -31,12 +31,11 @@ export const PaySignaturesConstructorComponent = () => {
   const [dataToGet, setDataToGet] = React.useState<PayData | null>(null);
   const [showData, setShowData] = React.useState(false);
 
-  const { signMessage } = useSignMessage();
-
   const makePayment = async () => {
     // Get the nonce value from the input field
-    const nonce = (document.getElementById("nonceInput_Pay") as HTMLInputElement)
-      .value;
+    const nonce = (
+      document.getElementById("nonceInput_Pay") as HTMLInputElement
+    ).value;
 
     // Get the token address from the input field
     const tokenAddress = (
@@ -63,42 +62,37 @@ export const PaySignaturesConstructorComponent = () => {
       document.getElementById("priorityFeeInput_Pay") as HTMLInputElement
     ).value;
 
-    // Sign the message using wagmi's signMessage hook
-    signMessage(
-      {
-        // Build the message to be signed with all the payment parameters
-        message: buildMessageSignedForPay(
-          to,
-          tokenAddress,
-          ammountConverted,
-          priorityFeeConverted,
-          nonce!.toString(),
-          priority === "high", // Convert priority to boolean (high = true, low = false)
-          executor
-        ),
-      },
-      {
-        // Handle successful signature
-        onSuccess: async (data, variables, context) => {
-          console.log("----------Message signed----------");
-          console.log(data);
+    // Sign the message 
+    signPay(
+      to,
+      tokenAddress,
+      ammountConverted,
+      priorityFeeConverted,
+      nonce!.toString(),
+      priority === "high",
+      executor,
+      (signature) => {
+        console.log("----------Message signed----------");
+        console.log(signature);
 
-          // Create the PayData object with all the payment information and signature
-          setDataToGet({
-            from: account.address as `0x${string}`, // Current user's wallet address
-            to_address: (to.startsWith("0x")
-              ? to
-              : "0x0000000000000000000000000000000000000000") as `0x${string}`, // Use address if provided, otherwise zero address
-            to_identity: to.startsWith("0x") ? "" : to, // Use username if not an address, otherwise empty
-            token: tokenAddress,
-            amount: ammountConverted,
-            priorityFee: priorityFeeConverted.toString(),
-            nonce: nonce.toString(),
-            priority: priority === "high" ? "true" : "false", // Convert boolean to string
-            executor: executor,
-            signature: data, // The generated signature from the wallet
-          });
-        },
+        // Create the PayData object with all the payment information and signature
+        setDataToGet({
+          from: account.address as `0x${string}`,
+          to_address: (to.startsWith("0x")
+            ? to
+            : "0x0000000000000000000000000000000000000000") as `0x${string}`,
+          to_identity: to.startsWith("0x") ? "" : to,
+          token: tokenAddress,
+          amount: ammountConverted,
+          priorityFee: priorityFeeConverted.toString(),
+          nonce: nonce.toString(),
+          priority: priority === "high" ? "true" : "false",
+          executor: executor,
+          signature,
+        });
+      },
+      (error) => {
+        console.error("Error signing payment:", error);
       }
     );
   };
@@ -340,8 +334,6 @@ export const PaySignaturesConstructorComponent = () => {
             >
               Copy for JSON
             </button>
-
-          
 
             <button
               style={{

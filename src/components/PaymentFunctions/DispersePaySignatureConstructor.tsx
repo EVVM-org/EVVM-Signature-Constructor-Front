@@ -1,12 +1,12 @@
-'use client'
+"use client";
 import React from "react";
 import { getAccount } from "@wagmi/core";
-import { useSignMessage, useAccount } from "wagmi";
-import { buildMessageSignedForDispersePay } from "../../utils/constructMessage";
-import { hashDispersePaymentUsersToPay } from "../../utils/hashData";
-import { config } from "../../config/index";
+import { buildMessageSignedForDispersePay } from "@/utils/constructMessage";
+import { hashDispersePaymentUsersToPay } from "@/utils/hashData";
+import { config } from "@/config/index";
+import { wrapERC191sig } from "@/utils/wrapERC191sig";
 
-import mersenneTwister from "../../utils/mersenneTwister";
+import mersenneTwister from "@/utils/mersenneTwister";
 
 type DispersePayMetadata = {
   amount: string;
@@ -48,7 +48,7 @@ export const DispersePaySignatureConstructor = () => {
 
   const [showDataDisperse, setShowDataDisperse] = React.useState(false);
 
-  const { signMessage } = useSignMessage();
+  const { signDispersePay } = wrapERC191sig();
 
   const makeDispersePayment = async () => {
     // Get the connected wallet account
@@ -83,24 +83,29 @@ export const DispersePaySignatureConstructor = () => {
     }
 
     // Build the payment data array for each recipient
-    const toData: (number | string)[][] = [];
+    const toData: DispersePayMetadata[] = [];
     for (let i = 0; i < numberOfUsersToDisperse; i++) {
       if (IsUsingUsernames[i]) {
         // For username: [amount, zero_address, username]
-        toData.push([
-          Number(AmountToUser[i]),
-          "0x0000000000000000000000000000000000000000",
-          To[i],
-        ]);
+        toData.push({
+          amount: AmountToUser[i],
+          to_address: "0x0000000000000000000000000000000000000000",
+          to_identity: To[i],
+        });
       } else {
         // For address: [amount, address, empty_string]
-        toData.push([Number(AmountToUser[i]), To[i], ""]);
+        toData.push({
+          amount: AmountToUser[i],
+          to_address: To[i],
+          to_identity: "",
+        });
       }
     }
 
     // Get executor address or use zero address if not using executor
     const Executor = isUsingExecutorDisperse
-      ? (document.getElementById("executorInputSplit") as HTMLInputElement).value
+      ? (document.getElementById("executorInputSplit") as HTMLInputElement)
+          .value
       : "0x0000000000000000000000000000000000000000";
 
     // Get total amount and priority fee from inputs
@@ -112,8 +117,7 @@ export const DispersePaySignatureConstructor = () => {
       document.getElementById("priorityFeeInputSplit") as HTMLInputElement
     ).value;
 
-    // Hash the payment data for signature
-    const hashedEncodedData = hashDispersePaymentUsersToPay(toData);
+  
 
     // Get nonce for the transaction
     const Nonce = (
@@ -121,40 +125,27 @@ export const DispersePaySignatureConstructor = () => {
     ).value;
 
     // Sign the message with wallet
-    signMessage(
-      {
-        message: buildMessageSignedForDispersePay(
-          "0x" + hashedEncodedData.toUpperCase().slice(2),
-          TokenAddress,
-          Amount,
-          PriorityFee,
-          Nonce,
-          priorityDisperse === "high",
-          Executor
-        ),
-      },
-      {
-        onSuccess: (data) => {
-          // Convert payment data to proper format for display
-          const toDataFormatted = toData.map((data) => ({
-            amount: data[0].toString(),
-            to_address: data[1].toString(),
-            to_identity: data[2].toString(),
-          }));
-
-          // Set the complete payment metadata with signature
-          setDispersePayMetadata({
-            from: account.address as `0x${string}`,
-            toData: toDataFormatted,
-            token: TokenAddress,
-            amount: Amount,
-            priorityFee: PriorityFee,
-            priority: priorityDisperse === "high",
-            nonce: Nonce,
-            executor: Executor,
-            signature: data,
-          });
-        },
+    signDispersePay(
+      toData,
+      TokenAddress,
+      Amount,
+      PriorityFee,
+      Nonce,
+      priorityDisperse === "high",
+      Executor,
+      (dispersePaySignature) => {
+        // Set the complete payment metadata with signature
+        setDispersePayMetadata({
+          from: account.address as `0x${string}`,
+          toData: toData,
+          token: TokenAddress,
+          amount: Amount,
+          priorityFee: PriorityFee,
+          priority: priorityDisperse === "high",
+          nonce: Nonce,
+          executor: Executor,
+          signature: dispersePaySignature,
+        });
       }
     );
   };

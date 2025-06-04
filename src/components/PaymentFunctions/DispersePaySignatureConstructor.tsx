@@ -1,10 +1,10 @@
 "use client";
 import React from "react";
 import { getAccount } from "@wagmi/core";
-import { buildMessageSignedForDispersePay } from "@/utils/constructMessage";
+import { buildMessageSignedForDispersePay } from "@/utils/EVVMSignatureBuilder/constructMessage";
 import { hashDispersePaymentUsersToPay } from "@/utils/hashData";
 import { config } from "@/config/index";
-import { wrapERC191sig } from "@/utils/wrapERC191sig";
+import { wrapERC191sig } from "@/utils/EVVMSignatureBuilder/wrapERC191sig";
 
 import mersenneTwister from "@/utils/mersenneTwister";
 

@@ -5,7 +5,7 @@ import {
   buildMessageSignedForPresaleStaking,
   buildMessageSignedForPublicServiceStaking,
   buildMessageSignedForPublicStaking,
-} from "../utils/constructMessage";
+} from "./constructMessage";
 import { keccak256, encodePacked, encodeAbiParameters, sha256 } from "viem";
 
 type DispersePayMetadata = {

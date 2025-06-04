@@ -3,7 +3,7 @@ import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import mersenneTwister from "@/utils/mersenneTwister";
-import { wrapERC191sig } from "@/utils/wrapERC191sig";
+import { wrapERC191sig } from "@/utils/EVVMSignatureBuilder/wrapERC191sig";
 
 type PayData = {
   from: `0x${string}`;

@@ -1,7 +1,3 @@
-import { getAccount } from "@wagmi/core";
-import { useSignMessage } from "wagmi";
-import { config } from "../config/index";
-
 /**
  * Constructs a message for depositing funds in EVVM Fisher
  * @param isERC20 - Whether the token is an ERC20 token or native currency

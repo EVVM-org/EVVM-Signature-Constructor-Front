@@ -171,6 +171,56 @@ function buildMessageSignedForPublicServiceStaking(
     `${nonce}`
   );
 }
+
+//・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈
+/*
+┏━━━━━━━━━━━━━━━┓
+ MNS Signatures  
+┗━━━━━━━━━━━━━━━┛
+*/
+//・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈
+
+/*
+function buildMessageSignedForPreRegistrationUsername(
+        bytes32 _hashUsername,
+        uint256 _mateNameServiceNonce
+    ) internal pure returns (bytes32 messageHash) {
+        return
+            buildHashForSign(
+                string.concat(
+                    "393b9c6f",
+                    ",",
+                    AdvancedStrings.bytes32ToString(_hashUsername),
+                    ",",
+                    Strings.toString(_mateNameServiceNonce)
+                )
+            );
+    }
+*/
+
+function buildMessageSignedForPreRegistrationUsername(
+  user: string,
+  nonce: string,
+  hashUsername: string,
+  priorityFeeForFisher: string,
+  signature: string,
+  nonceEVVM: string,
+  priorityEVVM: boolean,
+  signatureEVVM: string
+): string {
+  return (
+    "393b9c6f," +
+    `${user.toLowerCase()},` +
+    `${nonce},` +
+    `${hashUsername},` +
+    `${priorityFeeForFisher},` +
+    `${signature},` +
+    `${nonceEVVM},` +
+    `${priorityEVVM ? "true" : "false"},` +
+    `${signatureEVVM}`
+  );
+}
+
 export {
   constructMessageForDepositFisher,
   buildMessageSignedForPay,
@@ -178,4 +228,5 @@ export {
   buildMessageSignedForPublicStaking,
   buildMessageSignedForPresaleStaking,
   buildMessageSignedForPublicServiceStaking,
+  buildMessageSignedForPreRegistrationUsername,
 };

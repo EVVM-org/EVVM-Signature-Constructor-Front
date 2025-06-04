@@ -3,7 +3,7 @@ import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import mersenneTwister from "@/utils/mersenneTwister";
-import { wrapERC191sig } from "@/utils/EVVMSignatureBuilder/wrapERC191sig";
+import { useEVVMSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useEVVMSignatureBuilder";
 
 type PayData = {
   from: `0x${string}`;
@@ -19,7 +19,7 @@ type PayData = {
 };
 
 export const PaySignaturesConstructorComponent = () => {
-  const { signPay } = wrapERC191sig();
+  const { signPay } = useEVVMSignatureBuilder();
   const account = getAccount(config);
 
   const [selectedToken, setSelectedToken] = React.useState(

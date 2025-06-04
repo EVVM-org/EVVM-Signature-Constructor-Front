@@ -1,10 +1,8 @@
 "use client";
 import React from "react";
 import { getAccount } from "@wagmi/core";
-import { buildMessageSignedForDispersePay } from "@/utils/EVVMSignatureBuilder/constructMessage";
-import { hashDispersePaymentUsersToPay } from "@/utils/hashData";
 import { config } from "@/config/index";
-import { wrapERC191sig } from "@/utils/EVVMSignatureBuilder/wrapERC191sig";
+import { useEVVMSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useEVVMSignatureBuilder";
 
 import mersenneTwister from "@/utils/mersenneTwister";
 
@@ -48,7 +46,7 @@ export const DispersePaySignatureConstructor = () => {
 
   const [showDataDisperse, setShowDataDisperse] = React.useState(false);
 
-  const { signDispersePay } = wrapERC191sig();
+  const { signDispersePay } = useEVVMSignatureBuilder();
 
   const makeDispersePayment = async () => {
     // Get the connected wallet account

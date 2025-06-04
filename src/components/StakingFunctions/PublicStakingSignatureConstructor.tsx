@@ -3,7 +3,7 @@ import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import mersenneTwister from "@/utils/mersenneTwister";
-import { useEVVMSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useEVVMSignatureBuilder";
+import { useSMateSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useSMateSignatureBuilder";
 
 type PayData = {
   from: `0x${string}`;
@@ -30,7 +30,7 @@ type PublicStakingData = {
 
 export const PublicStakingSignatureConstructor = () => {
   const account = getAccount(config);
-  const { signPublicStaking } = useEVVMSignatureBuilder();
+  const { signPublicStaking } = useSMateSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
   const [payDataInfo, setPayDataInfo] = React.useState<PayData | null>(null);

@@ -4,6 +4,7 @@ import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import mersenneTwister from "@/utils/mersenneTwister";
 import { useEVVMSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useEVVMSignatureBuilder";
+import { TitleAndLink } from "../TitleAndLink";
 
 type PayData = {
   from: `0x${string}`;
@@ -99,12 +100,10 @@ export const PaySignaturesConstructorComponent = () => {
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
-      <h1>Single pay</h1>
-      <h3 style={{ textAlign: "center", color: "#3A9EE3" }}>
-        <a href="https://www.evvm.org/docs/SignatureStructures/EVVM/SinglePaymentSignatureStructure">
-          Learn more about single payment signatures structure here
-        </a>
-      </h3>
+      <TitleAndLink
+        title="Single payment"
+        link="https://www.evvm.org/docs/SignatureStructures/EVVM/SinglePaymentSignatureStructure"
+      />
       <br />
 
       {/* Recipient configuration section */}

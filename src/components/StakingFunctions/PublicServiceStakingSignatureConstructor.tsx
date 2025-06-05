@@ -4,6 +4,7 @@ import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import mersenneTwister from "@/utils/mersenneTwister";
 import { useSMateSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useSMateSignatureBuilder";
+import { TitleAndLink } from "../TitleAndLink";
 
 type PayData = {
   from: `0x${string}`;
@@ -125,13 +126,10 @@ export const PublicServiceStakingSignatureConstructor = () => {
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
-      {/* Header Section */}
-      <h1>Service Staking</h1>
-      <h3 style={{ textAlign: "center", color: "#3A9EE3" }}>
-        <a href="https://www.evvm.org/docs/SignatureStructures/SMate/StakingUnstakingStructure">
-          Learn more about service staking signatures structure here
-        </a>
-      </h3>
+      <TitleAndLink
+        title="Service Staking"
+        link="https://www.evvm.org/docs/SignatureStructures/SMate/StakingUnstakingStructure"
+      />
       <br />
       {/* Configuration Section */}
       <div style={{ marginBottom: "1rem" }}>

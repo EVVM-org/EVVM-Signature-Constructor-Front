@@ -5,6 +5,7 @@ import { config } from "@/config/index";
 import { useEVVMSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useEVVMSignatureBuilder";
 
 import mersenneTwister from "@/utils/mersenneTwister";
+import { TitleAndLink } from "../TitleAndLink";
 
 type DispersePayMetadata = {
   amount: string;
@@ -153,12 +154,10 @@ export const DispersePaySignatureConstructor = () => {
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
-      <h1>Disperse pay</h1>
-      <h3 style={{ textAlign: "center", color: "#3A9EE3" }}>
-        <a href="https://www.evvm.org/docs/SignatureStructures/EVVM/DispersePaySignatureStructure">
-          Learn more about disperse payment signatures structure here
-        </a>
-      </h3>
+      <TitleAndLink
+        title="Disperse payment"
+        link="https://www.evvm.org/docs/SignatureStructures/EVVM/DispersePaySignatureStructure"
+      />
       <br />
 
       {/* Nonce input */}

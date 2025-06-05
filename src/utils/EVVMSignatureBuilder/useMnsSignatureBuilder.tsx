@@ -3,7 +3,7 @@ import {
   buildMessageSignedForPay,
   buildMessageSignedForPreRegistrationUsername,
 } from "./constructMessage";
-import { keccak256, encodePacked, encodeAbiParameters, sha256 } from "viem";
+import { hashPreRegisteredUsername } from "./hashTools";
 
 export const useMnsSignatureBuilder = () => {
   const { signMessage, ...rest } = useSignMessage();
@@ -26,10 +26,9 @@ export const useMnsSignatureBuilder = () => {
   // MNS username pre-registration signature (dual signature if priority fee > 0)
   const signPreRegistrationUsername = (
     addressMNS: string,
-    user: string,
     nonceMNS: bigint,
     username: string,
-    clownNumber: bigint,
+    clowNumber: bigint,
     priorityFeeForFisher: bigint,
     nonceEVVM: bigint,
     priorityFlag: boolean,
@@ -40,16 +39,10 @@ export const useMnsSignatureBuilder = () => {
     onError?: (error: Error) => void
   ) => {
     // Hash username with clown number for pre-registration
-    const hashUsername = hashPreregisteredUsername(username, clownNumber);
+    const hashUsername = hashPreRegisteredUsername(username, clowNumber);
     const preRegistrationMessage = buildMessageSignedForPreRegistrationUsername(
-      user,
-      nonceMNS.toString(),
-      "0x" + hashUsername.toUpperCase().slice(2),
-      priorityFeeForFisher.toString(),
-      "",
-      nonceEVVM.toString(),
-      priorityFlag,
-      ""
+      hashUsername,
+      nonceMNS.toString()
     );
 
     signMessage(
@@ -87,12 +80,6 @@ export const useMnsSignatureBuilder = () => {
     );
   };
 
-  // Helper function: Hash username with clown number for MNS pre-registration
-  function hashPreregisteredUsername(username: string, clowNumber: bigint) {
-    return keccak256(
-      encodePacked(["string", "uint256"], [username, clowNumber])
-    );
-  }
 
   return {
     signMessage,

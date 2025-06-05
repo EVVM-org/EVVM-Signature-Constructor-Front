@@ -103,9 +103,9 @@ function buildMessageSignedForDispersePay(
   return (
     // is the function signature for disperse pay
     `ef83c1d6` +
-    // the hashed encoded data is the second parameter 
+    // the hashed encoded data is the second parameter
     // we use toUpperCase() to avoid case sensitivity issues and slice(2) to remove the '0X'
-    // and set the `0x` prefix 
+    // and set the `0x` prefix
     `${"0x" + hashedEncodedData.toUpperCase().slice(2)},` +
     // the token address is always an address so we use toLowerCase() to avoid case sensitivity issues
     `${tokenAddress.toLowerCase()},` +
@@ -199,26 +199,10 @@ function buildMessageSignedForPreRegistrationUsername(
 */
 
 function buildMessageSignedForPreRegistrationUsername(
-  user: string,
-  nonce: string,
   hashUsername: string,
-  priorityFeeForFisher: string,
-  signature: string,
-  nonceEVVM: string,
-  priorityEVVM: boolean,
-  signatureEVVM: string
+  nonceMNS: string
 ): string {
-  return (
-    "393b9c6f," +
-    `${user.toLowerCase()},` +
-    `${nonce},` +
-    `${hashUsername},` +
-    `${priorityFeeForFisher},` +
-    `${signature},` +
-    `${nonceEVVM},` +
-    `${priorityEVVM ? "true" : "false"},` +
-    `${signatureEVVM}`
-  );
+  return "393b9c6f," + `${hashUsername.toLowerCase()},` + `${nonceMNS}`;
 }
 
 export {

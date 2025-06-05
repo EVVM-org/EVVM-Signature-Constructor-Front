@@ -6,101 +6,70 @@ import { GoldenStakingSignatureConstructor } from "@/components/StakingFunctions
 import { PresaleStakingSignatureConstructor } from "./StakingFunctions/PresaleStakingSignatureConstructor";
 import { PublicStakingSignatureConstructor } from "./StakingFunctions/PublicStakingSignatureConstructor";
 import { PublicServiceStakingSignatureConstructor } from "./StakingFunctions/PublicServiceStakingSignatureConstructor";
+import { PreRegistrationUsernameConstructorComponent } from "./MNSFunctions/PreRegistrationUsernameConstructorComponent";
 
-const boxSignature = {
+const boxStyle = {
   display: "flex",
   flexDirection: "column",
   gap: "1rem",
-
   padding: "1rem",
   border: "1px solid #ccc",
   borderRadius: "8px",
   width: "100%",
+  marginBottom: "1rem",
 } as const;
 
-const menuStyle = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "1rem",
+const selectStyle = {
   padding: "1rem",
   border: "1px solid #ccc",
   borderRadius: "8px",
-  width: "50%",
+  width: "100%",
   backgroundColor: "#f9f9f9",
   color: "#333",
-  margin: "1rem 0",
+  marginBottom: "1rem",
 } as const;
 
 export const SigMenu = () => {
   const [menu, setMenu] = useState("pay");
+
+  const payComponents = [
+    <PaySignaturesConstructorComponent key="pay" />,
+    <DispersePaySignatureConstructor key="disperse" />,
+  ];
+
+  const stakingComponents = [
+    <GoldenStakingSignatureConstructor key="golden" />,
+    <PresaleStakingSignatureConstructor key="presale" />,
+    <PublicStakingSignatureConstructor key="public" />,
+    <PublicServiceStakingSignatureConstructor key="publicService" />,
+  ];
+
+  const mnsComponents = [
+    <PreRegistrationUsernameConstructorComponent key="preReg" />
+  ];
+
+  const components = menu === "pay"
+    ? payComponents
+    : menu === "staking"
+    ? stakingComponents
+    : menu === "mns"
+    ? mnsComponents
+    : [];
+
   return (
     <>
-      <select
-        onChange={(e) => setMenu(e.target.value)}
-        style={{
-          ...menuStyle,
-        }}
-      >
+      <select onChange={(e) => setMenu(e.target.value)} style={selectStyle}>
         <option value="pay">Payment signatures</option>
         <option value="staking">Staking signatures</option>
+        <option value="mns">MNS signatures</option>
       </select>
 
       <div>
-        {menu === "pay" ? (
-          <>
-            <div
-              style={{
-                ...boxSignature,
-              }}
-            >
-              <PaySignaturesConstructorComponent />
-            </div>
-            <br />
-            <div
-              style={{
-                ...boxSignature,
-              }}
-            >
-              <DispersePaySignatureConstructor />
-            </div>
-          </>
-        ) : (
-          <>
-            <div
-              style={{
-                ...boxSignature,
-              }}
-            >
-              <GoldenStakingSignatureConstructor />
-            </div>
-            <br />
-            <div
-              style={{
-                ...boxSignature,
-              }}
-            >
-              <PresaleStakingSignatureConstructor />
-            </div>
-            <br />
-            <div
-              style={{
-                ...boxSignature,
-              }}
-            >
-              <PublicStakingSignatureConstructor />
-            </div>
-            <br />
-
-            <div
-              style={{
-                ...boxSignature,
-              }}
-            >
-              <PublicServiceStakingSignatureConstructor />
-            </div>
-            <br />
-          </>
-        )}
+        {components.map((Component, index) => (
+          <div key={index} style={boxStyle}>
+            {Component}
+          </div>
+        ))}
       </div>
     </>
   );

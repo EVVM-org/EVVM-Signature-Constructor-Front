@@ -1,3 +1,5 @@
+"use client";
+
 export const TitleAndLink = ({ title , link }: { title: string; link: string }) => {
   return (
     <>

@@ -5,6 +5,7 @@ import { config } from "@/config/index";
 import mersenneTwister from "@/utils/mersenneTwister";
 import { useEVVMSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useEVVMSignatureBuilder";
 import { TitleAndLink } from "../TitleAndLink";
+import { DetailedData } from "../DetailedData";
 
 type PayData = {
   from: `0x${string}`;
@@ -30,7 +31,6 @@ export const PaySignaturesConstructorComponent = () => {
   const [isUsingExecutor, setIsUsingExecutor] = React.useState(false);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<PayData | null>(null);
-  const [showData, setShowData] = React.useState(false);
 
   const makePayment = async () => {
     // Get the nonce value from the input field
@@ -63,7 +63,7 @@ export const PaySignaturesConstructorComponent = () => {
       document.getElementById("priorityFeeInput_Pay") as HTMLInputElement
     ).value;
 
-    // Sign the message 
+    // Sign the message
     signPay(
       to,
       tokenAddress,
@@ -271,69 +271,10 @@ export const PaySignaturesConstructorComponent = () => {
       {/* Results section */}
       {dataToGet && (
         <div style={{ marginTop: "2rem" }}>
-          <h2>Ready</h2>
-
-          <button
-            style={{
-              margin: "0.5rem",
-              borderRadius: "5px",
-            }}
-            onClick={() => setShowData(!showData)}
-          >
-            {showData ? "Hide data" : "Show data"}
-          </button>
-
-          {/* Detailed data */}
-          {showData && (
-            <div
-              style={{
-                color: "black",
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-word",
-                backgroundColor: "#f0f0f0",
-                textAlign: "left",
-                padding: "1rem",
-                marginTop: "1rem",
-              }}
-            >
-              {Object.entries(dataToGet).map(([key, value]) => (
-                <div key={key} style={{ marginBottom: "0.5rem" }}>
-                  {`${key}: ${value} `}
-                  <button
-                    style={{
-                      color: "white",
-                      backgroundColor: "#637988",
-                      padding: "0.3rem",
-                      border: "none",
-                      cursor: "pointer",
-                      marginLeft: "0.5rem",
-                    }}
-                    onClick={() => navigator.clipboard.writeText(value)}
-                  >
-                    Copy
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+          <DetailedData dataToGet={dataToGet} />
 
           {/* Action buttons */}
           <div style={{ marginTop: "1rem" }}>
-            <button
-              style={{
-                padding: "0.5rem",
-                margin: "0.5rem",
-                borderRadius: "5px",
-              }}
-              onClick={() =>
-                navigator.clipboard.writeText(
-                  JSON.stringify(dataToGet, null, 2)
-                )
-              }
-            >
-              Copy for JSON
-            </button>
-
             <button
               style={{
                 backgroundColor: "red",

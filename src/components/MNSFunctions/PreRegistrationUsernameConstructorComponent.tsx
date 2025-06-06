@@ -6,6 +6,7 @@ import mersenneTwister from "@/utils/mersenneTwister";
 import { useMnsSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useMnsSignatureBuilder";
 import { TitleAndLink } from "../TitleAndLink";
 import { hashPreRegisteredUsername } from "@/utils/EVVMSignatureBuilder/hashTools";
+import { DetailedData } from "../DetailedData";
 
 type PreRegistrationData = {
   user: `0x${string}`;
@@ -19,19 +20,15 @@ type PreRegistrationData = {
 };
 
 export const PreRegistrationUsernameConstructorComponent = () => {
-  const { signPreRegistrationUsername } =
-    useMnsSignatureBuilder();
+  const { signPreRegistrationUsername } = useMnsSignatureBuilder();
   const account = getAccount(config);
 
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<PreRegistrationData | null>(
     null
   );
-  const [showData, setShowData] = React.useState(false);
 
   const makeSig = async () => {
-
-
     const addressMNS = (
       document.getElementById(
         "mnsAddressInput_preRegistration"
@@ -300,72 +297,12 @@ export const PreRegistrationUsernameConstructorComponent = () => {
         Make signature
       </button>
 
-      {/* Results section */}
       {dataToGet && (
         <div style={{ marginTop: "2rem" }}>
-          <h2>Ready</h2>
-
-          <button
-            style={{
-              margin: "0.5rem",
-              borderRadius: "5px",
-            }}
-            onClick={() => setShowData(!showData)}
-          >
-            {showData ? "Hide data" : "Show data"}
-          </button>
-
-          {/* Detailed data */}
-          {showData && (
-            <div
-              style={{
-                color: "black",
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-word",
-                backgroundColor: "#f0f0f0",
-                textAlign: "left",
-                padding: "1rem",
-                marginTop: "1rem",
-              }}
-            >
-              {Object.entries(dataToGet).map(([key, value]) => (
-                <div key={key} style={{ marginBottom: "0.5rem" }}>
-                  {`${key}: ${value} `}
-                  <button
-                    style={{
-                      color: "white",
-                      backgroundColor: "#637988",
-                      padding: "0.3rem",
-                      border: "none",
-                      cursor: "pointer",
-                      marginLeft: "0.5rem",
-                    }}
-                    onClick={() => navigator.clipboard.writeText(value)}
-                  >
-                    Copy
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+          <DetailedData dataToGet={dataToGet} />
 
           {/* Action buttons */}
           <div style={{ marginTop: "1rem" }}>
-            <button
-              style={{
-                padding: "0.5rem",
-                margin: "0.5rem",
-                borderRadius: "5px",
-              }}
-              onClick={() =>
-                navigator.clipboard.writeText(
-                  JSON.stringify(dataToGet, null, 2)
-                )
-              }
-            >
-              Copy for JSON
-            </button>
-
             <button
               style={{
                 backgroundColor: "red",

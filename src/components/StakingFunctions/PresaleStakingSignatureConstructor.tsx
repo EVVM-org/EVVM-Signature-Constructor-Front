@@ -1,22 +1,9 @@
 "use client";
 import React from "react";
-import { getAccount } from "@wagmi/core";
-import { config } from "@/config/index";
 import mersenneTwister from "@/utils/mersenneTwister";
 import { useSMateSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useSMateSignatureBuilder";
 import { TitleAndLink } from "../TitleAndLink";
-
-type PayData = {
-  from: `0x${string}`;
-  to_address: `0x${string}`;
-  token: string;
-  amount: string;
-  priorityFee: string;
-  nonce: string;
-  priority: string;
-  executor: string;
-  signature: string;
-};
+import { DetailedData } from "../DetailedData";
 
 type PresaleStakingData = {
   isStaking: string;
@@ -30,16 +17,14 @@ type PresaleStakingData = {
 };
 
 export const PresaleStakingSignatureConstructor = () => {
-  const account = getAccount(config);
   const { signPresaleStaking } = useSMateSignatureBuilder();
 
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
 
-  const [payDataInfo, setPayDataInfo] = React.useState<PayData | null>(null);
-  const [presaleStakingDataInfo, setPresaleStakingDataInfo] =
-    React.useState<PresaleStakingData | null>(null);
-  const [showData, setShowData] = React.useState(false);
+  const [dataToGet, setDataToGet] = React.useState<PresaleStakingData | null>(
+    null
+  );
 
   const makeSigPresaleStaking = async () => {
     // Get form values
@@ -81,25 +66,7 @@ export const PresaleStakingSignatureConstructor = () => {
       isStaking,
       nonceSMATE,
       (paySignature, stakingSignature) => {
-        // Set pay data
-        setPayDataInfo({
-          from: account.address as `0x${string}`,
-          to_address: sMateAddress as `0x${string}`,
-          token: "0x0000000000000000000000000000000000000001",
-          amount: isStaking
-            ? (amount * (5083 * 10 ** 18)).toLocaleString("fullwide", {
-                useGrouping: false,
-              })
-            : "0",
-          priorityFee: priorityFee,
-          nonce: nonceEVVM,
-          priority: (priority === "high").toString(),
-          executor: sMateAddress,
-          signature: paySignature,
-        });
-
-        // Set staking data
-        setPresaleStakingDataInfo({
+        setDataToGet({
           isStaking: isStaking.toString(),
           amount: amount.toString(),
           nonce: nonceSMATE,
@@ -118,7 +85,6 @@ export const PresaleStakingSignatureConstructor = () => {
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
-    
       <TitleAndLink
         title="Presale Staking"
         link="https://www.evvm.org/docs/SignatureStructures/SMate/StakingUnstakingStructure"
@@ -301,86 +267,13 @@ export const PresaleStakingSignatureConstructor = () => {
       </button>
 
       {/* Results Section */}
-      {payDataInfo && presaleStakingDataInfo && (
+      {dataToGet && (
         <div style={{ marginTop: "2rem" }}>
-          <h2>Signature Ready</h2>
+          <DetailedData dataToGet={dataToGet} />
 
-          <button
-            onClick={() => setShowData(!showData)}
-            style={{ margin: "0.5rem", padding: "0.5rem", borderRadius: "5px" }}
-          >
-            {showData ? "Hide Details" : "Show Details"}
-          </button>
-
-          {/* Data Display */}
-          {showData && (
-            <div
-              style={{
-                backgroundColor: "#f0f0f0",
-                padding: "1rem",
-                marginTop: "1rem",
-                color: "black",
-              }}
-            >
-              <h3>Pay Data:</h3>
-              {Object.entries(payDataInfo).map(([key, value]) => (
-                <div key={key} style={{ marginBottom: "0.5rem" }}>
-                  <strong>{key}:</strong> {value}
-                  <button
-                    onClick={() => navigator.clipboard.writeText(value)}
-                    style={{
-                      backgroundColor: "#637988",
-                      color: "white",
-                      border: "none",
-                      padding: "0.2rem",
-                      marginLeft: "0.5rem",
-                    }}
-                  >
-                    Copy
-                  </button>
-                </div>
-              ))}
-
-              <h3>Staking Data:</h3>
-              {Object.entries(presaleStakingDataInfo).map(([key, value]) => (
-                <div key={key} style={{ marginBottom: "0.5rem" }}>
-                  <strong>{key}:</strong> {value}
-                  <button
-                    onClick={() => navigator.clipboard.writeText(value)}
-                    style={{
-                      backgroundColor: "#637988",
-                      color: "white",
-                      border: "none",
-                      padding: "0.2rem",
-                      marginLeft: "0.5rem",
-                    }}
-                  >
-                    Copy
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Action Buttons */}
+          {/* Action buttons */}
           <div style={{ marginTop: "1rem" }}>
             <button
-              onClick={() =>
-                navigator.clipboard.writeText(
-                  JSON.stringify(presaleStakingDataInfo, null, 2)
-                )
-              }
-              style={{
-                padding: "0.5rem",
-                margin: "0.5rem",
-                borderRadius: "5px",
-              }}
-            >
-              Copy JSON
-            </button>
-
-            <button
-              onClick={() => setPayDataInfo(null)}
               style={{
                 backgroundColor: "red",
                 color: "white",
@@ -388,7 +281,9 @@ export const PresaleStakingSignatureConstructor = () => {
                 margin: "0.5rem",
                 borderRadius: "5px",
                 border: "none",
+                cursor: "pointer",
               }}
+              onClick={() => setDataToGet(null)}
             >
               Clear
             </button>

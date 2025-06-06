@@ -6,6 +6,7 @@ import { useEVVMSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useEVVMSig
 
 import mersenneTwister from "@/utils/mersenneTwister";
 import { TitleAndLink } from "../TitleAndLink";
+import { DetailedData } from "../DetailedData";
 
 type DispersePayMetadata = {
   amount: string;
@@ -44,8 +45,6 @@ export const DispersePaySignatureConstructor = () => {
 
   const [dispersePayMetadata, setDispersePayMetadata] =
     React.useState<DispersePayData | null>(null);
-
-  const [showDataDisperse, setShowDataDisperse] = React.useState(false);
 
   const { signDispersePay } = useEVVMSignatureBuilder();
 
@@ -115,8 +114,6 @@ export const DispersePaySignatureConstructor = () => {
     const PriorityFee = (
       document.getElementById("priorityFeeInputSplit") as HTMLInputElement
     ).value;
-
-  
 
     // Get nonce for the transaction
     const Nonce = (
@@ -386,209 +383,21 @@ export const DispersePaySignatureConstructor = () => {
 
       {/* Display results */}
       {dispersePayMetadata && (
-        <div style={{ marginTop: "1rem" }}>
-          {showDataDisperse && (
-            <div
-              style={{
-                color: "black",
-                backgroundColor: "#f0f0f0",
-                padding: "1rem",
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-word",
-                textAlign: "left",
-              }}
-            >
-              <p>
-                From: {dispersePayMetadata.from}
-                <button
-                  style={copyButtonStyle}
-                  onClick={() =>
-                    navigator.clipboard.writeText(dispersePayMetadata.from)
-                  }
-                >
-                  Copy
-                </button>
-              </p>
-              {dispersePayMetadata.toData.map((data, idx) => (
-                <div key={idx}>
-                  <p>DispersePayMetadata #{idx}</p>
-                  <p>
-                    amount: {data.amount}
-                    <button
-                      style={copyButtonStyle}
-                      onClick={() => navigator.clipboard.writeText(data.amount)}
-                    >
-                      Copy
-                    </button>
-                  </p>
-                  <p>
-                    to_address: {data.to_address}
-                    <button
-                      style={copyButtonStyle}
-                      onClick={() =>
-                        navigator.clipboard.writeText(data.to_address)
-                      }
-                    >
-                      Copy
-                    </button>
-                  </p>
-                  <p>
-                    to_identity: {data.to_identity}
-                    <button
-                      style={copyButtonStyle}
-                      onClick={() =>
-                        navigator.clipboard.writeText(data.to_identity)
-                      }
-                    >
-                      Copy
-                    </button>
-                  </p>
-                </div>
-              ))}
-              <p>
-                Token: {dispersePayMetadata.token}
-                <button
-                  style={copyButtonStyle}
-                  onClick={() =>
-                    navigator.clipboard.writeText(dispersePayMetadata.token)
-                  }
-                >
-                  Copy
-                </button>
-              </p>
-              <p>
-                Amount: {dispersePayMetadata.amount}
-                <button
-                  style={copyButtonStyle}
-                  onClick={() =>
-                    navigator.clipboard.writeText(dispersePayMetadata.amount)
-                  }
-                >
-                  Copy
-                </button>
-              </p>
-              <p>
-                Priority fee: {dispersePayMetadata.priorityFee}
-                <button
-                  style={copyButtonStyle}
-                  onClick={() =>
-                    navigator.clipboard.writeText(
-                      dispersePayMetadata.priorityFee
-                    )
-                  }
-                >
-                  Copy
-                </button>
-              </p>
-              <p>
-                Priority: {dispersePayMetadata.priority ? "true" : "false"}
-                <button
-                  style={copyButtonStyle}
-                  onClick={() =>
-                    navigator.clipboard.writeText(
-                      dispersePayMetadata.priority ? "true" : "false"
-                    )
-                  }
-                >
-                  Copy
-                </button>
-              </p>
-              <p>
-                Nonce: {dispersePayMetadata.nonce}
-                <button
-                  style={copyButtonStyle}
-                  onClick={() =>
-                    navigator.clipboard.writeText(dispersePayMetadata.nonce)
-                  }
-                >
-                  Copy
-                </button>
-              </p>
-              <p>
-                Executor: {dispersePayMetadata.executor}
-                <button
-                  style={copyButtonStyle}
-                  onClick={() =>
-                    navigator.clipboard.writeText(dispersePayMetadata.executor)
-                  }
-                >
-                  Copy
-                </button>
-              </p>
-              <p>
-                Signature: {dispersePayMetadata.signature}
-                <button
-                  style={copyButtonStyle}
-                  onClick={() =>
-                    navigator.clipboard.writeText(dispersePayMetadata.signature)
-                  }
-                >
-                  Copy
-                </button>
-              </p>
-            </div>
-          )}
+        <div style={{ marginTop: "2rem" }}>
+          <DetailedData dataToGet={dispersePayMetadata} />
 
           {/* Action buttons */}
-          <div
-            style={{
-              display: "flex",
-              gap: "0.5rem",
-              flexWrap: "wrap",
-              marginTop: "1rem",
-            }}
-          >
-            <button onClick={() => setShowDataDisperse(!showDataDisperse)}>
-              {showDataDisperse ? "Hide data" : "Show data"}
-            </button>
+          <div style={{ marginTop: "1rem" }}>
             <button
-              onClick={() =>
-                navigator.clipboard.writeText(
-                  JSON.stringify(dispersePayMetadata)
-                )
-              }
-            >
-              Copy for JSON
-            </button>
-            <button
-              onClick={() => {
-                const dataToCopy = dispersePayMetadata.toData
-                  .map(
-                    (
-                      data,
-                      idx
-                    ) => `dispersePayMetadata[${idx}] = EvvmMock.DispersePayMetadata({
-                    amount: ${data.amount},
-                    to_address: ${data.to_address},
-                    to_identity: ${data.to_identity}
-                });`
-                  )
-                  .join("\n");
-                navigator.clipboard.writeText(dataToCopy);
+              style={{
+                backgroundColor: "red",
+                color: "white",
+                padding: "0.5rem",
+                margin: "0.5rem",
+                borderRadius: "5px",
+                border: "none",
+                cursor: "pointer",
               }}
-            >
-              Copy dispersePaymetadata for Solidity
-            </button>
-            <button
-              onClick={() => {
-                const dataToCopy = `dispersePay(
-                ${dispersePayMetadata.from},
-                dispersePayMetadata,
-                ${dispersePayMetadata.token},
-                ${dispersePayMetadata.amount},
-                ${dispersePayMetadata.priorityFee},
-                ${dispersePayMetadata.priority},
-                ${dispersePayMetadata.nonce},
-                ${dispersePayMetadata.executor},
-                ${dispersePayMetadata.signature}
-              )`;
-                navigator.clipboard.writeText(dataToCopy);
-              }}
-            >
-              Copy dispersePay for Solidity
-            </button>
-            <button
-              style={{ backgroundColor: "red", color: "white" }}
               onClick={() => setDispersePayMetadata(null)}
             >
               Clear

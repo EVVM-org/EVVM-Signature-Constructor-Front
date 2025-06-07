@@ -29,39 +29,17 @@ export const PreRegistrationUsernameConstructorComponent = () => {
   );
 
   const makeSig = async () => {
-    const addressMNS = (
-      document.getElementById(
-        "mnsAddressInput_preRegistration"
-      ) as HTMLInputElement
-    ).value;
-    const nonceMNS = (
-      document.getElementById(
-        "nonceMNSInput_preRegistration"
-      ) as HTMLInputElement
-    ).value;
-    const username = (
-      document.getElementById(
-        "usernameInput_preRegistration"
-      ) as HTMLInputElement
-    ).value;
-    const clowNumber = (
-      document.getElementById(
-        "clowNumberInput_preRegistration"
-      ) as HTMLInputElement
-    ).value;
-    const priorityFeeForFisher = (
-      document.getElementById(
-        "priorityFeeInput_preRegistration"
-      ) as HTMLInputElement
-    ).value;
-    const nonceEVVM = (
-      document.getElementById(
-        "nonceEVVMInput_preRegistration"
-      ) as HTMLInputElement
-    ).value;
+    const getValue = (id: string) =>
+      (document.getElementById(id) as HTMLInputElement).value;
+
+    const addressMNS = getValue("mnsAddressInput_preRegistration");
+    const nonceMNS = getValue("nonceMNSInput_preRegistration");
+    const username = getValue("usernameInput_preRegistration");
+    const clowNumber = getValue("clowNumberInput_preRegistration");
+    const priorityFeeForFisher = getValue("priorityFeeInput_preRegistration");
+    const nonceEVVM = getValue("nonceEVVMInput_preRegistration");
     const priorityFlag = priority === "high";
 
-    // Sign the message
     signPreRegistrationUsername(
       addressMNS,
       BigInt(nonceMNS),
@@ -71,7 +49,6 @@ export const PreRegistrationUsernameConstructorComponent = () => {
       BigInt(nonceEVVM),
       priorityFlag,
       (paySignature, preRegistrationSignature) => {
-        // Create the PayData object with all the payment information and signature
         setDataToGet({
           user: account.address as `0x${string}`,
           nonce: nonceMNS,
@@ -83,9 +60,7 @@ export const PreRegistrationUsernameConstructorComponent = () => {
           signature_Evvm: paySignature,
         });
       },
-      (error) => {
-        console.error("Error signing payment:", error);
-      }
+      (error) => console.error("Error signing payment:", error)
     );
   };
 

@@ -32,51 +32,28 @@ export const PaySignaturesConstructorComponent = () => {
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<PayData | null>(null);
 
-  const makePayment = async () => {
-    // Get the nonce value from the input field
-    const nonce = (
-      document.getElementById("nonceInput_Pay") as HTMLInputElement
-    ).value;
+  const makeSig = async () => {
+    const getInputValue = (id: string) =>
+      (document.getElementById(id) as HTMLInputElement).value;
 
-    // Get the token address from the input field
-    const tokenAddress = (
-      document.getElementById("tokenAddress") as HTMLInputElement
-    ).value;
-
-    // Get the recipient value - either username or address based on user selection
-    const to = isUsingUsernames
-      ? (document.getElementById("toUsername") as HTMLInputElement).value
-      : (document.getElementById("toAddress") as HTMLInputElement).value;
-
-    // Get the executor address if using executor, otherwise use zero address
+    const nonce = getInputValue("nonceInput_Pay");
+    const tokenAddress = getInputValue("tokenAddress");
+    const to = getInputValue(isUsingUsernames ? "toUsername" : "toAddress");
     const executor = isUsingExecutor
-      ? (document.getElementById("executorInput_Pay") as HTMLInputElement).value
+      ? getInputValue("executorInput_Pay")
       : "0x0000000000000000000000000000000000000000";
+    const amount = getInputValue("amountTokenInput_Pay");
+    const priorityFee = getInputValue("priorityFeeInput_Pay");
 
-    // Get the amount of tokens to transfer
-    const ammountConverted = (
-      document.getElementById("amountTokenInput_Pay") as HTMLInputElement
-    ).value;
-
-    // Get the priority fee value
-    const priorityFeeConverted = (
-      document.getElementById("priorityFeeInput_Pay") as HTMLInputElement
-    ).value;
-
-    // Sign the message
     signPay(
       to,
       tokenAddress,
-      ammountConverted,
-      priorityFeeConverted,
-      nonce!.toString(),
+      amount,
+      priorityFee,
+      nonce,
       priority === "high",
       executor,
       (signature) => {
-        console.log("----------Message signed----------");
-        console.log(signature);
-
-        // Create the PayData object with all the payment information and signature
         setDataToGet({
           from: account.address as `0x${string}`,
           to_address: (to.startsWith("0x")
@@ -84,17 +61,15 @@ export const PaySignaturesConstructorComponent = () => {
             : "0x0000000000000000000000000000000000000000") as `0x${string}`,
           to_identity: to.startsWith("0x") ? "" : to,
           token: tokenAddress,
-          amount: ammountConverted,
-          priorityFee: priorityFeeConverted.toString(),
-          nonce: nonce.toString(),
+          amount,
+          priorityFee,
+          nonce,
           priority: priority === "high" ? "true" : "false",
-          executor: executor,
+          executor,
           signature,
         });
       },
-      (error) => {
-        console.error("Error signing payment:", error);
-      }
+      (error) => console.error("Error signing payment:", error)
     );
   };
 
@@ -259,7 +234,7 @@ export const PaySignaturesConstructorComponent = () => {
 
       {/* Create signature button */}
       <button
-        onClick={makePayment}
+        onClick={makeSig}
         style={{
           padding: "0.5rem",
           marginTop: "1rem",

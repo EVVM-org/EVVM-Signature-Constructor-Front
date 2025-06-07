@@ -26,68 +26,47 @@ export const PublicStakingSignatureConstructor = () => {
   const [dataToGet, setDataToGet] = React.useState<PublicStakingData | null>(
     null
   );
-  const [showData, setShowData] = React.useState(false);
 
-  const makeSigPublicStaking = async () => {
+  const makeSig = async () => {
     // Get form values
-    const nonceEVVM = (
-      document.getElementById(
-        "nonceEVVMInput_PublicStaking"
-      ) as HTMLInputElement
-    ).value;
-    const nonceSMATE = (
-      document.getElementById(
-        "nonceSMATEInput_PublicStaking"
-      ) as HTMLInputElement
-    ).value;
-    const sMateAddressElement = document.getElementById(
-      "sMateAddressInput_PublicStaking"
-    ) as HTMLInputElement;
-    const sMateAddress = sMateAddressElement?.value || "";
+    const getValue = (id: string) =>
+      (document.getElementById(id) as HTMLInputElement).value;
 
+    const sMateAddress = getValue("sMateAddressInput_PublicStaking");
     if (!sMateAddress) {
       alert("Please enter a sMate address");
       return;
     }
-    console.log("sMateAddress", sMateAddress);
-    const amount = Number(
-      (
-        document.getElementById(
-          "amountOfSMateInput_PublicStaking"
-        ) as HTMLInputElement
-      ).value
-    );
 
-    const priorityFee = (
-      document.getElementById(
-        "priorityFeeInput_PublicStaking"
-      ) as HTMLInputElement
-    ).value;
+    const formData = {
+      nonceEVVM: getValue("nonceEVVMInput_PublicStaking"),
+      nonceSMATE: getValue("nonceSMATEInput_PublicStaking"),
+      amount: Number(getValue("amountOfSMateInput_PublicStaking")),
+      priorityFee: getValue("priorityFeeInput_PublicStaking"),
+    };
 
     // Sign message
     signPublicStaking(
       sMateAddress,
-      amount,
-      priorityFee,
-      nonceEVVM,
+      formData.amount,
+      formData.priorityFee,
+      formData.nonceEVVM,
       priority === "high",
       isStaking,
-      nonceSMATE,
+      formData.nonceSMATE,
       (paySignature, stakingSignature) => {
         setDataToGet({
           isStaking: isStaking.toString(),
-          amount: amount.toString(),
-          nonce: nonceSMATE,
+          amount: formData.amount.toString(),
+          nonce: formData.nonceSMATE,
           signature: stakingSignature,
-          priorityFee_Evvm: priorityFee.toString(),
-          nonce_Evvm: nonceEVVM,
-          priority_Evvm: priority.toString(),
+          priorityFee_Evvm: formData.priorityFee,
+          nonce_Evvm: formData.nonceEVVM,
+          priority_Evvm: priority,
           signature_Evvm: paySignature,
         });
       },
-      (error) => {
-        console.error("Error signing presale staking:", error);
-      }
+      (error) => console.error("Error signing presale staking:", error)
     );
   };
 
@@ -262,7 +241,7 @@ export const PublicStakingSignatureConstructor = () => {
 
       {/* Action Button */}
       <button
-        onClick={makeSigPublicStaking}
+        onClick={makeSig}
         style={{
           padding: "0.5rem 1rem",
           marginTop: "1rem",

@@ -5,7 +5,6 @@ import { config } from "@/config/index";
 import mersenneTwister from "@/utils/mersenneTwister";
 import { useMnsSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useMnsSignatureBuilder";
 import { TitleAndLink } from "@/components/TitleAndLink";
-import { hashPreRegisteredUsername } from "@/utils/EVVMSignatureBuilder/hashTools";
 import { DetailedData } from "@/components/DetailedData";
 
 import styles from "@/components/SigConstructors/SignatureConstructor.module.css";
@@ -25,45 +24,24 @@ type RegistrationData = {
 export const RegistrationUsernameConstructorComponent = () => {
   const { signRegistrationUsername } = useMnsSignatureBuilder();
   const account = getAccount(config);
-
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<RegistrationData | null>(
     null
   );
 
   const makeSig = async () => {
-    const addressMNS = (
-      document.getElementById(
-        "mnsAddressInput_registration"
-      ) as HTMLInputElement
-    ).value;
-    const nonceMNS = (
-      document.getElementById("nonceMNSInput_registration") as HTMLInputElement
-    ).value;
-    const username = (
-      document.getElementById("usernameInput_registration") as HTMLInputElement
-    ).value;
-    const clowNumber = (
-      document.getElementById(
-        "clowNumberInput_registration"
-      ) as HTMLInputElement
-    ).value;
-    const mateRewardAmount = (
-      document.getElementById(
-        "mateRewardInput_registration"
-      ) as HTMLInputElement
-    ).value;
-    const priorityFeeForFisher = (
-      document.getElementById(
-        "priorityFeeInput_registration"
-      ) as HTMLInputElement
-    ).value;
-    const nonceEVVM = (
-      document.getElementById("nonceEVVMInput_registration") as HTMLInputElement
-    ).value;
+    const getValue = (id: string) => 
+      (document.getElementById(id) as HTMLInputElement).value;
+
+    const addressMNS = getValue("mnsAddressInput_registration");
+    const nonceMNS = getValue("nonceMNSInput_registration");
+    const username = getValue("usernameInput_registration");
+    const clowNumber = getValue("clowNumberInput_registration");
+    const mateRewardAmount = getValue("mateRewardInput_registration");
+    const priorityFeeForFisher = getValue("priorityFeeInput_registration");
+    const nonceEVVM = getValue("nonceEVVMInput_registration");
     const priorityFlag = priority === "high";
 
-    // Sign the message
     signRegistrationUsername(
       addressMNS,
       BigInt(nonceMNS),
@@ -74,22 +52,19 @@ export const RegistrationUsernameConstructorComponent = () => {
       BigInt(nonceEVVM),
       priorityFlag,
       (paySignature, registrationSignature) => {
-        // Create the PayData object with all the payment information and signature
         setDataToGet({
           user: account.address as `0x${string}`,
           nonce: nonceMNS,
-          username: (username),
-          clowNumber: clowNumber,
+          username,
+          clowNumber,
           signature: registrationSignature,
-          priorityFeeForFisher: priorityFeeForFisher,
+          priorityFeeForFisher,
           nonce_Evvm: nonceEVVM,
           priority_Evvm: priorityFlag ? "true" : "false",
           signature_Evvm: paySignature,
         });
       },
-      (error) => {
-        console.error("Error signing payment:", error);
-      }
+      (error) => console.error("Error signing payment:", error)
     );
   };
 

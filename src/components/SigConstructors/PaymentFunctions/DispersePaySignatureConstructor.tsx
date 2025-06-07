@@ -8,7 +8,7 @@ import mersenneTwister from "@/utils/mersenneTwister";
 import { TitleAndLink } from "@/components/TitleAndLink";
 import { DetailedData } from "@/components/DetailedData";
 
-import styles from "@/components/SigConstructors/SignatureConstructor.module.css"
+import styles from "@/components/SigConstructors/SignatureConstructor.module.css";
 
 type DispersePayMetadata = {
   amount: string;
@@ -50,79 +50,37 @@ export const DispersePaySignatureConstructor = () => {
 
   const { signDispersePay } = useEVVMSignatureBuilder();
 
-  const makeDispersePayment = async () => {
-    // Get the connected wallet account
+  const getValue = (id: string) =>
+    (document.getElementById(id) as HTMLInputElement).value;
+
+  const makeSig = async () => {
     const account = getAccount(config);
+    const TokenAddress = getValue("tokenAddressDispersePay");
+    const Amount = getValue("amountTokenInputSplit");
+    const PriorityFee = getValue("priorityFeeInputSplit");
+    const Nonce = getValue("nonceInputDispersePay");
+    const Executor = isUsingExecutorDisperse
+      ? getValue("executorInputSplit")
+      : "0x0000000000000000000000000000000000000000";
 
-    // Get token address from input field
-    const TokenAddress = (
-      document.getElementById("tokenAddressDispersePay") as HTMLInputElement
-    ).value;
-
-    // Collect user data from form inputs
-    const To: string[] = [];
-    const IsUsingUsernames: boolean[] = [];
-    const AmountToUser: string[] = [];
-
-    // Loop through each user and collect their data
+    const toData: DispersePayMetadata[] = [];
     for (let i = 0; i < numberOfUsersToDisperse; i++) {
       const isUsingUsername = isUsingUsernameOnDisperse[i];
       const toInputId = isUsingUsername
         ? `toUsernameSplitUserNumber${i}`
         : `toAddressSplitUserNumber${i}`;
-      const amountInputId = `amountTokenToGiveUser${i}`;
+      const to = getValue(toInputId);
+      const amount = getValue(`amountTokenToGiveUser${i}`);
 
-      const to = (document.getElementById(toInputId) as HTMLInputElement).value;
-      const amountToUser = (
-        document.getElementById(amountInputId) as HTMLInputElement
-      ).value;
-
-      To.push(to);
-      IsUsingUsernames.push(isUsingUsername);
-      AmountToUser.push(amountToUser);
+      toData.push({
+        amount,
+        to_address: isUsingUsername
+          ? "0x0000000000000000000000000000000000000000"
+          : to,
+        to_identity: isUsingUsername ? to : "",
+      });
     }
 
-    // Build the payment data array for each recipient
-    const toData: DispersePayMetadata[] = [];
-    for (let i = 0; i < numberOfUsersToDisperse; i++) {
-      if (IsUsingUsernames[i]) {
-        // For username: [amount, zero_address, username]
-        toData.push({
-          amount: AmountToUser[i],
-          to_address: "0x0000000000000000000000000000000000000000",
-          to_identity: To[i],
-        });
-      } else {
-        // For address: [amount, address, empty_string]
-        toData.push({
-          amount: AmountToUser[i],
-          to_address: To[i],
-          to_identity: "",
-        });
-      }
-    }
-
-    // Get executor address or use zero address if not using executor
-    const Executor = isUsingExecutorDisperse
-      ? (document.getElementById("executorInputSplit") as HTMLInputElement)
-          .value
-      : "0x0000000000000000000000000000000000000000";
-
-    // Get total amount and priority fee from inputs
-    const Amount = (
-      document.getElementById("amountTokenInputSplit") as HTMLInputElement
-    ).value;
-
-    const PriorityFee = (
-      document.getElementById("priorityFeeInputSplit") as HTMLInputElement
-    ).value;
-
-    // Get nonce for the transaction
-    const Nonce = (
-      document.getElementById("nonceInputDispersePay") as HTMLInputElement
-    ).value;
-
-    // Sign the message with wallet
     signDispersePay(
       toData,
       TokenAddress,
@@ -132,10 +90,9 @@ export const DispersePaySignatureConstructor = () => {
       priorityDisperse === "high",
       Executor,
       (dispersePaySignature) => {
-        // Set the complete payment metadata with signature
         setDispersePayMetadata({
           from: account.address as `0x${string}`,
-          toData: toData,
+          toData,
           token: TokenAddress,
           amount: Amount,
           priorityFee: PriorityFee,
@@ -349,7 +306,7 @@ export const DispersePaySignatureConstructor = () => {
 
       {/* Make signature button */}
       <button
-        onClick={makeDispersePayment}
+        onClick={makeSig}
         style={{ padding: "0.5rem", marginTop: "1rem" }}
       >
         Make signature

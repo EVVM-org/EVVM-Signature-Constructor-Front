@@ -26,37 +26,16 @@ export const PresaleStakingSignatureConstructor = () => {
     null
   );
 
-  const makeSigPresaleStaking = async () => {
-    // Get form values
-    const nonceEVVM = (
-      document.getElementById(
-        "nonceEVVMInput_presaleStaking"
-      ) as HTMLInputElement
-    ).value;
-    const nonceSMATE = (
-      document.getElementById(
-        "nonceSMATEInput_presaleStaking"
-      ) as HTMLInputElement
-    ).value;
-    const sMateAddressElement = document.getElementById(
-      "sMateAddressInput_presaleStaking"
-    ) as HTMLInputElement;
-    const sMateAddress = sMateAddressElement?.value || "";
+  const makeSig = async () => {
+    const getValue = (id: string) =>
+      (document.getElementById(id) as HTMLInputElement).value;
 
-    const amount = Number(
-      (
-        document.getElementById(
-          "amountOfSMateInput_presaleStaking"
-        ) as HTMLInputElement
-      ).value
-    );
-    const priorityFee = (
-      document.getElementById(
-        "priorityFeeInput_presaleStaking"
-      ) as HTMLInputElement
-    ).value;
+    const sMateAddress = getValue("sMateAddressInput_presaleStaking");
+    const amount = Number(getValue("amountOfSMateInput_presaleStaking"));
+    const priorityFee = getValue("priorityFeeInput_presaleStaking");
+    const nonceEVVM = getValue("nonceEVVMInput_presaleStaking");
+    const nonceSMATE = getValue("nonceSMATEInput_presaleStaking");
 
-    // Sign message
     signPresaleStaking(
       sMateAddress,
       amount,
@@ -71,15 +50,13 @@ export const PresaleStakingSignatureConstructor = () => {
           amount: amount.toString(),
           nonce: nonceSMATE,
           signature: stakingSignature,
-          priorityFee_Evvm: priorityFee.toString(),
+          priorityFee_Evvm: priorityFee,
           nonce_Evvm: nonceEVVM,
-          priority_Evvm: priority.toString(),
+          priority_Evvm: priority,
           signature_Evvm: paySignature,
         });
       },
-      (error) => {
-        console.error("Error signing presale staking:", error);
-      }
+      (error) => console.error("Error signing presale staking:", error)
     );
   };
 
@@ -254,7 +231,7 @@ export const PresaleStakingSignatureConstructor = () => {
 
       {/* Action Button */}
       <button
-        onClick={makeSigPresaleStaking}
+        onClick={makeSig}
         style={{
           padding: "0.5rem 1rem",
           marginTop: "1rem",

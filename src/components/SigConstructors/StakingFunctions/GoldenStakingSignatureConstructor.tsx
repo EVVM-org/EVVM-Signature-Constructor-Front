@@ -26,55 +26,37 @@ export const GoldenStakingSignatureConstructor = () => {
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<PayData | null>(null);
 
-  const makeSigGoldenStaker = async () => {
+  const makeSig = async () => {
     // Get form values
-    const nonceEVVM = (
-      document.getElementById("nonceInput_GoldenStaking") as HTMLInputElement
-    ).value;
-    const sMateAddress = (
-      document.getElementById(
-        "sMateAddressInput_GoldenStaking"
-      ) as HTMLInputElement
-    ).value;
-    const stakingAmount =
-      Number(
-        (
-          document.getElementById(
-            "amountOfSMateInput_GoldenStaking"
-          ) as HTMLInputElement
-        ).value
-      ) *
-      (5083 * 10 ** 18);
+    const getValue = (id: string) =>
+      (document.getElementById(id) as HTMLInputElement).value;
 
-    // Sign message
+    const nonce = getValue("nonceInput_GoldenStaking");
+    const sMateAddress = getValue("sMateAddressInput_GoldenStaking");
+    const amount =
+      Number(getValue("amountOfSMateInput_GoldenStaking")) * (5083 * 10 ** 18);
+
+    // Sign and set data
     signGoldenStaking(
       sMateAddress,
-      stakingAmount,
-      nonceEVVM,
+      amount,
+      nonce,
       priority === "high",
-      (stakingSignature) => {
-        // Set pay data
+      (signature) => {
         setDataToGet({
           isStaking: isStaking.toString(),
           from: account.address as `0x${string}`,
           to_address: sMateAddress as `0x${string}`,
-          token: "0x0000000000000000000000000000000000000001", // sMATE token address
-          amount: (stakingAmount * (5083 * 10 ** 18)).toLocaleString(
-            "fullwide",
-            {
-              useGrouping: false,
-            }
-          ),
-          priorityFee: "0", // Assuming no priority fee for staking
-          nonce: nonceEVVM,
-          priority: priority,
+          token: "0x0000000000000000000000000000000000000001",
+          amount: amount.toLocaleString("fullwide", { useGrouping: false }),
+          priorityFee: "0",
+          nonce,
+          priority,
           executor: sMateAddress as `0x${string}`,
-          signature: stakingSignature,
+          signature,
         });
       },
-      (error) => {
-        console.error("Error signing presale staking:", error);
-      }
+      (error) => console.error("Error signing staking:", error)
     );
   };
 
@@ -205,7 +187,7 @@ export const GoldenStakingSignatureConstructor = () => {
 
       {/* Create signature button */}
       <button
-        onClick={makeSigGoldenStaker}
+        onClick={makeSig}
         style={{
           padding: "0.5rem",
           marginTop: "1rem",

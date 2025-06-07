@@ -7,6 +7,7 @@ import { PresaleStakingSignatureConstructor } from "./StakingFunctions/PresaleSt
 import { PublicStakingSignatureConstructor } from "./StakingFunctions/PublicStakingSignatureConstructor";
 import { PublicServiceStakingSignatureConstructor } from "./StakingFunctions/PublicServiceStakingSignatureConstructor";
 import { PreRegistrationUsernameConstructorComponent } from "./MNSFunctions/PreRegistrationUsernameConstructorComponent";
+import { RegistrationUsernameConstructorComponent } from "./MNSFunctions/RegistrationUsernameConstructorComponent";
 
 const boxStyle = {
   display: "flex",
@@ -46,6 +47,7 @@ export const SigMenu = () => {
 
   const mnsComponents = [
     <PreRegistrationUsernameConstructorComponent key="preReg" />,
+    <RegistrationUsernameConstructorComponent key="reg" />,
   ];
 
   const components =

@@ -180,29 +180,21 @@ function buildMessageSignedForPublicServiceStaking(
 */
 //・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈
 
-/*
-function buildMessageSignedForPreRegistrationUsername(
-        bytes32 _hashUsername,
-        uint256 _mateNameServiceNonce
-    ) internal pure returns (bytes32 messageHash) {
-        return
-            buildHashForSign(
-                string.concat(
-                    "393b9c6f",
-                    ",",
-                    AdvancedStrings.bytes32ToString(_hashUsername),
-                    ",",
-                    Strings.toString(_mateNameServiceNonce)
-                )
-            );
-    }
-*/
-
 function buildMessageSignedForPreRegistrationUsername(
   hashUsername: string,
-  nonceMNS: string
+  nonceMNS: bigint
 ): string {
-  return "393b9c6f," + `${hashUsername.toLowerCase()},` + `${nonceMNS}`;
+  return "393b9c6f," + `${hashUsername.toLowerCase()},` + `${nonceMNS.toString()}`;
+}
+
+function buildMessageSignedForRegistrationUsername(
+  username: string,
+  clowNumber: bigint,
+  nonceMNS: bigint
+): string {
+  return (
+    "d134f8b4," + `${username},` + `${clowNumber.toString()},` + `${nonceMNS.toString()}`
+  );
 }
 
 export {
@@ -213,4 +205,5 @@ export {
   buildMessageSignedForPresaleStaking,
   buildMessageSignedForPublicServiceStaking,
   buildMessageSignedForPreRegistrationUsername,
+  buildMessageSignedForRegistrationUsername,
 };

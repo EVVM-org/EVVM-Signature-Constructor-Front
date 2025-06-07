@@ -2,6 +2,7 @@ import { useSignMessage } from "wagmi";
 import {
   buildMessageSignedForPay,
   buildMessageSignedForPreRegistrationUsername,
+  buildMessageSignedForRegistrationUsername,
 } from "./constructMessage";
 import { hashPreRegisteredUsername } from "./hashTools";
 
@@ -42,7 +43,7 @@ export const useMnsSignatureBuilder = () => {
     const hashUsername = hashPreRegisteredUsername(username, clowNumber);
     const preRegistrationMessage = buildMessageSignedForPreRegistrationUsername(
       hashUsername,
-      nonceMNS.toString()
+      nonceMNS
     );
 
     signMessage(
@@ -80,11 +81,58 @@ export const useMnsSignatureBuilder = () => {
     );
   };
 
+  const signRegistrationUsername = (
+    addressMNS: string,
+    nonceMNS: bigint,
+    username: string,
+    clowNumber: bigint,
+    mateReward: bigint,
+    priorityFeeForFisher: bigint,
+    nonceEVVM: bigint,
+    priorityFlag: boolean,
+    onSuccess?: (paySignature: string, registrationSignature: string) => void,
+    onError?: (error: Error) => void
+  ) => {
+    const registrationMessage = buildMessageSignedForRegistrationUsername(
+      username,
+      clowNumber,
+      nonceMNS
+    );
+
+    signMessage(
+      { message: registrationMessage },
+      {
+        onSuccess: (registrationSignature) => {
+          // Payment signature for priority fee
+          const payMessage = buildMessageSignedForPay(
+            addressMNS,
+            "0x0000000000000000000000000000000000000001",
+            (mateReward * BigInt(100)).toString(),
+            priorityFeeForFisher.toString(),
+            nonceEVVM.toString(),
+            priorityFlag,
+            addressMNS
+          );
+
+          signMessage(
+            { message: payMessage },
+            {
+              onSuccess: (paySignature) =>
+                onSuccess?.(paySignature, registrationSignature),
+              onError: (error) => onError?.(error),
+            }
+          );
+        },
+        onError: (error) => onError?.(error),
+      }
+    );
+  };
 
   return {
     signMessage,
     signERC191Message,
     signPreRegistrationUsername,
+    signRegistrationUsername,
     ...rest,
   };
 };

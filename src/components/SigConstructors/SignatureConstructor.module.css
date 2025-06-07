@@ -1,0 +1,47 @@
+.addressInput {
+    color: black;
+    background-color: white;
+    height: 2rem;
+    width: 25rem;
+    padding: 0.5rem;
+}
+
+.amountInput {
+    color: black;
+    background-color: white;
+    height: 2rem;
+    width: 25rem;
+    padding: 0.5rem;
+    -moz-appearance: textfield;
+}
+
+.amountInput::-webkit-outer-spin-button,
+.amountInput::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.nonceInput {
+    color: black;
+    background-color: white;
+    height: 2rem;
+    width: 15rem;
+    padding: 0.5rem;
+    -moz-appearance: textfield;
+}
+
+.nonceInput::-webkit-outer-spin-button,
+.nonceInput::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.nonceButton {
+    color: white;
+    background-color: #50aad4;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    height: 2rem;
+    text-align: center;
+}

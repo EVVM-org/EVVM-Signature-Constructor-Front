@@ -8,6 +8,8 @@ import mersenneTwister from "@/utils/mersenneTwister";
 import { TitleAndLink } from "@/components/TitleAndLink";
 import { DetailedData } from "@/components/DetailedData";
 
+import styles from "@/components/SigConstructors/SignatureConstructor.module.css"
+
 type DispersePayMetadata = {
   amount: string;
   to_address: string;
@@ -161,15 +163,7 @@ export const DispersePaySignatureConstructor = () => {
       <div style={{ marginBottom: "1rem" }}>
         <p>Nonce:</p>
         <button
-          style={{
-            color: "white",
-            backgroundColor: "#50aad4",
-            border: "none",
-            cursor: "pointer",
-            padding: "0.5rem",
-            height: "2rem",
-            textAlign: "center",
-          }}
+          className={styles.nonceButton}
           onClick={() => {
             const seed = Math.floor(Math.random() + Date.now());
             const mt = mersenneTwister(seed);
@@ -187,12 +181,7 @@ export const DispersePaySignatureConstructor = () => {
           type="number"
           placeholder="Enter nonce"
           id="nonceInputDispersePay"
-          style={{
-            color: "black",
-            backgroundColor: "white",
-            height: "2rem",
-            width: "25rem",
-          }}
+          className={styles.nonceInput}
         />
       </div>
 
@@ -203,12 +192,7 @@ export const DispersePaySignatureConstructor = () => {
           type="text"
           placeholder="Enter token address"
           id="tokenAddressDispersePay"
-          style={{
-            color: "black",
-            backgroundColor: "white",
-            height: "2rem",
-            width: "25rem",
-          }}
+          className={styles.addressInput}
           defaultValue="0x0000000000000000000000000000000000000000"
         />
       </div>
@@ -220,12 +204,7 @@ export const DispersePaySignatureConstructor = () => {
           type="number"
           placeholder="Enter amount"
           id="amountTokenInputSplit"
-          style={{
-            color: "black",
-            backgroundColor: "white",
-            height: "2rem",
-            width: "25rem",
-          }}
+          className={styles.amountInput}
         />
       </div>
 
@@ -236,12 +215,7 @@ export const DispersePaySignatureConstructor = () => {
           type="number"
           placeholder="Enter priority fee"
           id="priorityFeeInputSplit"
-          style={{
-            color: "black",
-            backgroundColor: "white",
-            height: "2rem",
-            width: "25rem",
-          }}
+          className={styles.amountInput}
         />
       </div>
 

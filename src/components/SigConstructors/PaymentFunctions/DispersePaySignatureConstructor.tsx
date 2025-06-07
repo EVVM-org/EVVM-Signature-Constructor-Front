@@ -5,8 +5,8 @@ import { config } from "@/config/index";
 import { useEVVMSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useEVVMSignatureBuilder";
 
 import mersenneTwister from "@/utils/mersenneTwister";
-import { TitleAndLink } from "../TitleAndLink";
-import { DetailedData } from "../DetailedData";
+import { TitleAndLink } from "@/components/TitleAndLink";
+import { DetailedData } from "@/components/DetailedData";
 
 type DispersePayMetadata = {
   amount: string;

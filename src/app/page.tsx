@@ -2,7 +2,7 @@
 import { ConnectButton } from "@/components/ConnectButton";
 import { InfoList } from "@/components/InfoList";
 import { ActionButtonList } from "@/components/ActionButtonList";
-import { SigMenu } from "@/components/SigMenu";
+import { SigMenu } from "@/components/SigConstructors/SigMenu";
 import Image from "next/image";
 
 export default function Home() {

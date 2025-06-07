@@ -4,8 +4,8 @@ import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import mersenneTwister from "@/utils/mersenneTwister";
 import { useSMateSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useSMateSignatureBuilder";
-import { TitleAndLink } from "../TitleAndLink";
-import { DetailedData } from "../DetailedData";
+import { TitleAndLink } from "@/components/TitleAndLink";
+import { DetailedData } from "@/components/DetailedData";
 
 type PublicStakingData = {
   isStaking: string;

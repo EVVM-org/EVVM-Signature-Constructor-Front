@@ -4,8 +4,8 @@ import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import mersenneTwister from "@/utils/mersenneTwister";
 import { useEVVMSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useEVVMSignatureBuilder";
-import { TitleAndLink } from "../TitleAndLink";
-import { DetailedData } from "../DetailedData";
+import { TitleAndLink } from "@/components/TitleAndLink";
+import { DetailedData } from "@/components/DetailedData";
 
 type PayData = {
   from: `0x${string}`;

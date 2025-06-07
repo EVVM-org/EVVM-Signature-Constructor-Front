@@ -1,13 +1,11 @@
 "use client";
 import React from "react";
-import { getAccount } from "@wagmi/core";
-import { config } from "@/config/index";
 import mersenneTwister from "@/utils/mersenneTwister";
 import { useSMateSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useSMateSignatureBuilder";
-import { TitleAndLink } from "../TitleAndLink";
-import { DetailedData } from "../DetailedData";
+import { TitleAndLink } from "@/components/TitleAndLink";
+import { DetailedData } from "@/components/DetailedData";
 
-type PublicServiceStakingData = {
+type PresaleStakingData = {
   isStaking: string;
   amount: string;
   nonce: string;
@@ -18,58 +16,49 @@ type PublicServiceStakingData = {
   signature_Evvm: string;
 };
 
-export const PublicServiceStakingSignatureConstructor = () => {
-  const account = getAccount(config);
-  const { signPublicServiceStaking } = useSMateSignatureBuilder();
+export const PresaleStakingSignatureConstructor = () => {
+  const { signPresaleStaking } = useSMateSignatureBuilder();
+
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
-  const [dataToGet, setDataToGet] =
-    React.useState<PublicServiceStakingData | null>(null);
-  const [showData, setShowData] = React.useState(false);
 
-  const makeSigPublicServiceStaking = async () => {
+  const [dataToGet, setDataToGet] = React.useState<PresaleStakingData | null>(
+    null
+  );
+
+  const makeSigPresaleStaking = async () => {
     // Get form values
     const nonceEVVM = (
       document.getElementById(
-        "nonceEVVMInput_PublicServiceStaking"
+        "nonceEVVMInput_presaleStaking"
       ) as HTMLInputElement
     ).value;
     const nonceSMATE = (
       document.getElementById(
-        "nonceSMATEInput_PublicServiceStaking"
+        "nonceSMATEInput_presaleStaking"
       ) as HTMLInputElement
     ).value;
-
-    const sMateAddress = (
-      document.getElementById(
-        "sMateAddressInput_PublicServiceStaking"
-      ) as HTMLInputElement
-    ).value;
-
-    const serviceAddress = (
-      document.getElementById(
-        "serviceAddressInput_PublicServiceStaking"
-      ) as HTMLInputElement
-    ).value;
+    const sMateAddressElement = document.getElementById(
+      "sMateAddressInput_presaleStaking"
+    ) as HTMLInputElement;
+    const sMateAddress = sMateAddressElement?.value || "";
 
     const amount = Number(
       (
         document.getElementById(
-          "amountOfSMateInput_PublicServiceStaking"
+          "amountOfSMateInput_presaleStaking"
         ) as HTMLInputElement
       ).value
     );
-
     const priorityFee = (
       document.getElementById(
-        "priorityFeeInput_PublicServiceStaking"
+        "priorityFeeInput_presaleStaking"
       ) as HTMLInputElement
     ).value;
 
     // Sign message
-    signPublicServiceStaking(
+    signPresaleStaking(
       sMateAddress,
-      serviceAddress,
       amount,
       priorityFee,
       nonceEVVM,
@@ -97,7 +86,7 @@ export const PublicServiceStakingSignatureConstructor = () => {
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
-        title="Service Staking"
+        title="Presale Staking"
         link="https://www.evvm.org/docs/SignatureStructures/SMate/StakingUnstakingStructure"
       />
       <br />
@@ -127,24 +116,7 @@ export const PublicServiceStakingSignatureConstructor = () => {
           <input
             type="text"
             placeholder="Enter sMate address"
-            id="sMateAddressInput_PublicServiceStaking"
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "25rem",
-            }}
-          />
-        </label>
-      </div>
-
-      <div style={{ marginBottom: "1rem" }}>
-        <label>
-          sMate address:{" "}
-          <input
-            type="text"
-            placeholder="Enter service address"
-            id="serviceAddressInput_PublicServiceStaking"
+            id="sMateAddressInput_presaleStaking"
             style={{
               color: "black",
               backgroundColor: "white",
@@ -173,7 +145,7 @@ export const PublicServiceStakingSignatureConstructor = () => {
               ).int32();
               (
                 document.getElementById(
-                  "nonceEVVMInput_PublicServiceStaking"
+                  "nonceEVVMInput_presaleStaking"
                 ) as HTMLInputElement
               ).value = nonce.toString();
             }}
@@ -182,7 +154,7 @@ export const PublicServiceStakingSignatureConstructor = () => {
           </button>
           <input
             type="number"
-            id="nonceEVVMInput_PublicServiceStaking"
+            id="nonceEVVMInput_presaleStaking"
             style={{
               color: "black",
               backgroundColor: "white",
@@ -210,7 +182,7 @@ export const PublicServiceStakingSignatureConstructor = () => {
               ).int32();
               (
                 document.getElementById(
-                  "nonceSMATEInput_PublicServiceStaking"
+                  "nonceSMATEInput_presaleStaking"
                 ) as HTMLInputElement
               ).value = nonce.toString();
             }}
@@ -219,7 +191,7 @@ export const PublicServiceStakingSignatureConstructor = () => {
           </button>
           <input
             type="number"
-            id="nonceSMATEInput_PublicServiceStaking"
+            id="nonceSMATEInput_presaleStaking"
             style={{
               color: "black",
               backgroundColor: "white",
@@ -235,7 +207,7 @@ export const PublicServiceStakingSignatureConstructor = () => {
         <p>Amount of sMate to{isStaking ? " stake" : " unstake"}: </p>
         <input
           type="number"
-          id="amountOfSMateInput_PublicServiceStaking"
+          id="amountOfSMateInput_presaleStaking"
           style={{
             color: "black",
             backgroundColor: "white",
@@ -250,7 +222,7 @@ export const PublicServiceStakingSignatureConstructor = () => {
           Priority fee:{" "}
           <input
             type="number"
-            id="priorityFeeInput_PublicServiceStaking"
+            id="priorityFeeInput_presaleStaking"
             style={{
               color: "black",
               backgroundColor: "white",
@@ -282,7 +254,7 @@ export const PublicServiceStakingSignatureConstructor = () => {
 
       {/* Action Button */}
       <button
-        onClick={makeSigPublicServiceStaking}
+        onClick={makeSigPresaleStaking}
         style={{
           padding: "0.5rem 1rem",
           marginTop: "1rem",

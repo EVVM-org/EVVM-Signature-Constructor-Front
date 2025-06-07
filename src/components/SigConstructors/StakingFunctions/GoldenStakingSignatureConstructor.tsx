@@ -4,7 +4,7 @@ import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import mersenneTwister from "@/utils/mersenneTwister";
 import { useSMateSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useSMateSignatureBuilder";
-import { DetailedData } from "../DetailedData";
+import { DetailedData } from "@/components/DetailedData";
 
 type PayData = {
   isStaking: string; // "true" for staking, "false" for unstaking

@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import { PaySignaturesConstructorComponent } from "@/components/PaymentFunctions/PaySignaturesConstructor";
-import { DispersePaySignatureConstructor } from "@/components/PaymentFunctions/DispersePaySignatureConstructor";
-import { GoldenStakingSignatureConstructor } from "@/components/StakingFunctions/GoldenStakingSignatureConstructor";
+import { PaySignaturesConstructorComponent } from "@/components/SigConstructors/PaymentFunctions/PaySignaturesConstructor";
+import { DispersePaySignatureConstructor } from "@/components/SigConstructors/PaymentFunctions/DispersePaySignatureConstructor";
+import { GoldenStakingSignatureConstructor } from "@/components/SigConstructors/StakingFunctions/GoldenStakingSignatureConstructor";
 import { PresaleStakingSignatureConstructor } from "./StakingFunctions/PresaleStakingSignatureConstructor";
 import { PublicStakingSignatureConstructor } from "./StakingFunctions/PublicStakingSignatureConstructor";
 import { PublicServiceStakingSignatureConstructor } from "./StakingFunctions/PublicServiceStakingSignatureConstructor";
@@ -45,16 +45,17 @@ export const SigMenu = () => {
   ];
 
   const mnsComponents = [
-    <PreRegistrationUsernameConstructorComponent key="preReg" />
+    <PreRegistrationUsernameConstructorComponent key="preReg" />,
   ];
 
-  const components = menu === "pay"
-    ? payComponents
-    : menu === "staking"
-    ? stakingComponents
-    : menu === "mns"
-    ? mnsComponents
-    : [];
+  const components =
+    menu === "pay"
+      ? payComponents
+      : menu === "staking"
+      ? stakingComponents
+      : menu === "mns"
+      ? mnsComponents
+      : [];
 
   return (
     <>

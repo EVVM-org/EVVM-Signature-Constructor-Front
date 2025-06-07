@@ -4,9 +4,9 @@ import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import mersenneTwister from "@/utils/mersenneTwister";
 import { useMnsSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useMnsSignatureBuilder";
-import { TitleAndLink } from "../TitleAndLink";
+import { TitleAndLink } from "@/components/TitleAndLink";
 import { hashPreRegisteredUsername } from "@/utils/EVVMSignatureBuilder/hashTools";
-import { DetailedData } from "../DetailedData";
+import { DetailedData } from "@/components/DetailedData";
 
 type PreRegistrationData = {
   user: `0x${string}`;

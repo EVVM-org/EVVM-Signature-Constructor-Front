@@ -3,12 +3,18 @@ import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import { useSMateSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useSMateSignatureBuilder";
-import { TitleAndLink } from "@/components/SigConstructors/TitleAndLink";
-import { DetailedData } from "@/components/DetailedData";
-import { NumberInputWithGenerator } from "@/components/SigConstructors/NumberInputWithGenerator";
+import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
+import { DetailedData } from "@/components/SigConstructors/InputsAndModules/DetailedData";
+import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
+import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector";
+import { AddressInputField } from "../InputsAndModules/AddressInputField";
+import { NumberInputField } from "../InputsAndModules/NumberInputField";
+import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
+import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
 
 type PublicServiceStakingData = {
   isStaking: string;
+  serviceAddress: string;
   amount: string;
   nonce: string;
   signature: string;
@@ -56,6 +62,7 @@ export const PublicServiceStakingSignatureConstructor = () => {
       (paySignature, stakingSignature) => {
         setDataToGet({
           isStaking: isStaking.toString(),
+          serviceAddress: serviceAddress as `0x${string}`,
           amount: amount.toString(),
           nonce: nonceSMATE,
           signature: stakingSignature,
@@ -77,58 +84,20 @@ export const PublicServiceStakingSignatureConstructor = () => {
       />
       <br />
       {/* Configuration Section */}
-      <div style={{ marginBottom: "1rem" }}>
-        <label>
-          Action:{" "}
-          <select
-            onChange={(e) => setIsStaking(e.target.value === "true")}
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "5rem",
-            }}
-          >
-            <option value="true">Staking</option>
-            <option value="false">Unstaking</option>
-          </select>
-        </label>
-      </div>
+      <StakingActionSelector onChange={setIsStaking} />
 
       {/* Address Input */}
-      <div style={{ marginBottom: "1rem" }}>
-        <label>
-          sMate address:{" "}
-          <input
-            type="text"
-            placeholder="Enter sMate address"
-            id="sMateAddressInput_PublicServiceStaking"
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "25rem",
-            }}
-          />
-        </label>
-      </div>
+      <AddressInputField
+        label="sMate Address"
+        inputId="sMateAddressInput_PublicServiceStaking"
+        placeholder="Enter sMate address"
+      />
 
-      <div style={{ marginBottom: "1rem" }}>
-        <label>
-          sMate address:{" "}
-          <input
-            type="text"
-            placeholder="Enter service address"
-            id="serviceAddressInput_PublicServiceStaking"
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "25rem",
-            }}
-          />
-        </label>
-      </div>
+      <AddressInputField
+        label="Service Address"
+        inputId="serviceAddressInput_PublicServiceStaking"
+        placeholder="Enter service address"
+      />
 
       {/* Nonce Generators */}
 
@@ -145,54 +114,20 @@ export const PublicServiceStakingSignatureConstructor = () => {
       />
 
       {/* Amount Inputs */}
-      <div style={{ marginBottom: "1rem" }}>
-        <p>Amount of sMate to{isStaking ? " stake" : " unstake"}: </p>
-        <input
-          type="number"
-          id="amountOfSMateInput_PublicServiceStaking"
-          style={{
-            color: "black",
-            backgroundColor: "white",
-            height: "2rem",
-            width: "25rem",
-          }}
-        />
-      </div>
+      <NumberInputField
+        label="Amount of sMate"
+        inputId="amountOfSMateInput_PublicServiceStaking"
+        placeholder="Enter amount of sMate"
+      />
 
-      <div style={{ marginBottom: "1rem" }}>
-        <label>
-          Priority fee:{" "}
-          <input
-            type="number"
-            id="priorityFeeInput_PublicServiceStaking"
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "25rem",
-            }}
-          />
-        </label>
-      </div>
+      <NumberInputField
+        label="Priority fee"
+        inputId="priorityFeeInput_PublicServiceStaking"
+        placeholder="Enter priority fee"
+      />
 
       {/* Priority Selection */}
-      <div style={{ marginBottom: "1rem" }}>
-        <label>
-          Priority:{" "}
-          <select
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "10rem",
-            }}
-            onChange={(e) => setPriority(e.target.value)}
-          >
-            <option value="low">Low (synchronous)</option>
-            <option value="high">High (asynchronous)</option>
-          </select>
-        </label>
-      </div>
+      <PrioritySelector onPriorityChange={setPriority} />
 
       {/* Action Button */}
       <button
@@ -209,29 +144,10 @@ export const PublicServiceStakingSignatureConstructor = () => {
       </button>
 
       {/* Results Section */}
-      {dataToGet && (
-        <div style={{ marginTop: "2rem" }}>
-          <DetailedData dataToGet={dataToGet} />
-
-          {/* Action buttons */}
-          <div style={{ marginTop: "1rem" }}>
-            <button
-              style={{
-                backgroundColor: "red",
-                color: "white",
-                padding: "0.5rem",
-                margin: "0.5rem",
-                borderRadius: "5px",
-                border: "none",
-                cursor: "pointer",
-              }}
-              onClick={() => setDataToGet(null)}
-            >
-              Clear
-            </button>
-          </div>
-        </div>
-      )}
+      <DataDisplayWithClear
+        dataToGet={dataToGet}
+        onClear={() => setDataToGet(null)}
+      />
     </div>
   );
 };

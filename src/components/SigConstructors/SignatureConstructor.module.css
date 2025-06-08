@@ -6,7 +6,15 @@
     padding: 0.5rem;
 }
 
-.amountInput {
+.textInput {
+    color: black;
+    background-color: white;
+    height: 2rem;
+    width: 25rem;
+    padding: 0.5rem;
+}
+
+.numberInput {
     color: black;
     background-color: white;
     height: 2rem;
@@ -15,8 +23,8 @@
     -moz-appearance: textfield;
 }
 
-.amountInput::-webkit-outer-spin-button,
-.amountInput::-webkit-inner-spin-button {
+.numberInput::-webkit-outer-spin-button,
+.numberInput::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
@@ -44,4 +52,15 @@
     padding: 0.5rem;
     height: 2rem;
     text-align: center;
+}
+
+
+.clearButton {
+    background-color: red;
+    color: white;
+    padding: 0.5rem;
+    margin: 0.5rem;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
 }

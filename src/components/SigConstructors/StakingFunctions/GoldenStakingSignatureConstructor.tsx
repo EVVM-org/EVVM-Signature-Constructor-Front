@@ -3,8 +3,13 @@ import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import { useSMateSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useSMateSignatureBuilder";
-import { DetailedData } from "@/components/DetailedData";
-import { NumberInputWithGenerator } from "@/components/SigConstructors/NumberInputWithGenerator";
+import { DetailedData } from "@/components/SigConstructors/InputsAndModules/DetailedData";
+import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
+import { AddressInputField } from "../InputsAndModules/AddressInputField";
+import { NumberInputField } from "../InputsAndModules/NumberInputField";
+import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
+import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
+import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector";
 
 type PayData = {
   isStaking: string; // "true" for staking, "false" for unstaking
@@ -65,45 +70,17 @@ export const GoldenStakingSignatureConstructor = () => {
       <h1>Golden staking</h1>
       <br />
 
-      <div style={{ marginBottom: "1rem" }}>
-        <p>
-          Action:{" "}
-          <select
-            onChange={(e) => setIsStaking(e.target.value === "true")}
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "5rem",
-            }}
-          >
-            <option value="true">Staking</option>
-            <option value="false">Unstaking</option>
-          </select>
-        </p>
-      </div>
+      {/* Configuration Section */}
+      <StakingActionSelector onChange={setIsStaking} />
 
       {/* Recipient configuration section */}
-      <div style={{ marginBottom: "1rem" }}>
-        <p>
-          sMate address:{" "}
-          <input
-            type="text"
-            placeholder="Enter sMate address"
-            id="sMateAddressInput_GoldenStaking"
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "25rem",
-              marginLeft: "0.5rem",
-            }}
-          />
-        </p>
-      </div>
+      <AddressInputField
+        label="sMate Address"
+        inputId="sMateAddressInput_GoldenStaking"
+        placeholder="Enter sMate address"
+      />
 
       {/* Nonce section with automatic generator */}
-
 
       <NumberInputWithGenerator
         label="Nonce"
@@ -112,45 +89,14 @@ export const GoldenStakingSignatureConstructor = () => {
       />
 
       {/* Basic input fields */}
-      {[
-        {
-          label: "Amount of sMATE",
-          id: "amountOfSMateInput_GoldenStaking",
-          type: "number",
-        },
-      ].map(({ label, id, type }) => (
-        <div key={id} style={{ marginBottom: "1rem" }}>
-          <p>{label}</p>
-          <input
-            type={type}
-            placeholder={`Enter ${label.toLowerCase()}`}
-            id={id}
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "25rem",
-            }}
-          />
-        </div>
-      ))}
+      <NumberInputField
+        label="Amount of sMATE"
+        inputId="amountOfSMateInput_GoldenStaking"
+        placeholder="Enter amount of sMATE"
+      />
 
       {/* Priority configuration */}
-      <div style={{ marginBottom: "1rem" }}>
-        <p>Priority</p>
-        <select
-          style={{
-            color: "black",
-            backgroundColor: "white",
-            height: "2rem",
-            width: "12rem",
-          }}
-          onChange={(e) => setPriority(e.target.value)}
-        >
-          <option value="low">Low (synchronous nonce)</option>
-          <option value="high">High (asynchronous nonce)</option>
-        </select>
-      </div>
+      <PrioritySelector onPriorityChange={setPriority} />
 
       {/* Create signature button */}
       <button
@@ -164,29 +110,10 @@ export const GoldenStakingSignatureConstructor = () => {
       </button>
 
       {/* Results section */}
-      {dataToGet && (
-        <div style={{ marginTop: "2rem" }}>
-          <DetailedData dataToGet={dataToGet} />
-
-          {/* Action buttons */}
-          <div style={{ marginTop: "1rem" }}>
-            <button
-              style={{
-                backgroundColor: "red",
-                color: "white",
-                padding: "0.5rem",
-                margin: "0.5rem",
-                borderRadius: "5px",
-                border: "none",
-                cursor: "pointer",
-              }}
-              onClick={() => setDataToGet(null)}
-            >
-              Clear
-            </button>
-          </div>
-        </div>
-      )}
+      <DataDisplayWithClear
+        dataToGet={dataToGet}
+        onClear={() => setDataToGet(null)}
+      />
     </div>
   );
 };

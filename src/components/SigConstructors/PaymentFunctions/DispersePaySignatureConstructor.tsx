@@ -3,10 +3,13 @@ import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import { useEVVMSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useEVVMSignatureBuilder";
-import { TitleAndLink } from "@/components/SigConstructors/TitleAndLink";
-import { DetailedData } from "@/components/DetailedData";
-import styles from "@/components/SigConstructors/SignatureConstructor.module.css";
-import { NumberInputWithGenerator } from "@/components/SigConstructors/NumberInputWithGenerator";
+import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
+import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
+import { AddressInputField } from "../InputsAndModules/AddressInputField";
+import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
+import { NumberInputField } from "../InputsAndModules/NumberInputField";
+import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
+import { ExecutorSelector } from "../InputsAndModules/ExecutorSelector";
 
 type DispersePayMetadata = {
   amount: string;
@@ -26,14 +29,6 @@ type DispersePayData = {
   signature: string;
 };
 
-const copyButtonStyle = {
-  color: "black",
-  backgroundColor: "white",
-  border: "none",
-  cursor: "pointer",
-  paddingLeft: "0.5rem",
-};
-
 export const DispersePaySignatureConstructor = () => {
   const [isUsingExecutorDisperse, setIsUsingExecutorDisperse] =
     React.useState(false);
@@ -43,8 +38,9 @@ export const DispersePaySignatureConstructor = () => {
   const [numberOfUsersToDisperse, setNumberOfUsersToDisperse] =
     React.useState(1);
 
-  const [dispersePayMetadata, setDispersePayMetadata] =
-    React.useState<DispersePayData | null>(null);
+  const [dataToGet, setDataToGet] = React.useState<DispersePayData | null>(
+    null
+  );
 
   const { signDispersePay } = useEVVMSignatureBuilder();
 
@@ -88,7 +84,7 @@ export const DispersePaySignatureConstructor = () => {
       priorityDisperse === "high",
       Executor,
       (dispersePaySignature) => {
-        setDispersePayMetadata({
+        setDataToGet({
           from: account.address as `0x${string}`,
           toData,
           token: TokenAddress,
@@ -123,70 +119,36 @@ export const DispersePaySignatureConstructor = () => {
       />
 
       {/* Token address */}
-      <div style={{ marginBottom: "1rem" }}>
-        <p>Token address</p>
-        <input
-          type="text"
-          placeholder="Enter token address"
-          id="tokenAddressDispersePay"
-          className={styles.addressInput}
-          defaultValue="0x0000000000000000000000000000000000000000"
-        />
-      </div>
+      <AddressInputField
+        label="Token address"
+        inputId="tokenAddressDispersePay"
+        placeholder="Enter token address"
+        defaultValue="0x0000000000000000000000000000000000000000"
+      />
 
       {/* Amount */}
-      <div style={{ marginBottom: "1rem" }}>
-        <p>Amount</p>
-        <input
-          type="number"
-          placeholder="Enter amount"
-          id="amountTokenInputSplit"
-          className={styles.amountInput}
-        />
-      </div>
+
+      <NumberInputField
+        label="Amount"
+        inputId="amountTokenInputSplit"
+        placeholder="Enter amount"
+      />
 
       {/* Priority fee */}
-      <div style={{ marginBottom: "1rem" }}>
-        <p>Priority fee</p>
-        <input
-          type="number"
-          placeholder="Enter priority fee"
-          id="priorityFeeInputSplit"
-          className={styles.amountInput}
-        />
-      </div>
+
+      <NumberInputField
+        label="Priority fee"
+        inputId="priorityFeeInputSplit"
+        placeholder="Enter priority fee"
+      />
 
       {/* Executor selection */}
-      <div style={{ marginBottom: "1rem" }}>
-        <p>Are you using an executor?</p>
-        <select
-          style={{
-            color: "black",
-            backgroundColor: "white",
-            height: "2rem",
-            width: "5rem",
-          }}
-          onChange={(e) =>
-            setIsUsingExecutorDisperse(e.target.value === "true")
-          }
-        >
-          <option value="false">No</option>
-          <option value="true">Yes</option>
-        </select>
-        {isUsingExecutorDisperse && (
-          <input
-            type="text"
-            placeholder="Enter executor"
-            id="executorInputSplit"
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "25rem",
-            }}
-          />
-        )}
-      </div>
+      <ExecutorSelector
+        inputId="executorInputSplit"
+        placeholder="Enter executor"
+        onExecutorToggle={setIsUsingExecutorDisperse}
+        isUsingExecutor={isUsingExecutorDisperse}
+      />
 
       {/* Number of users */}
       <div style={{ marginBottom: "1rem" }}>
@@ -268,21 +230,7 @@ export const DispersePaySignatureConstructor = () => {
       ))}
 
       {/* Priority selection */}
-      <div style={{ marginTop: "1rem" }}>
-        <p>Priority</p>
-        <select
-          style={{
-            color: "black",
-            backgroundColor: "white",
-            height: "2rem",
-            width: "12rem",
-          }}
-          onChange={(e) => setPriorityDisperse(e.target.value)}
-        >
-          <option value="low">Low (synchronous nonce)</option>
-          <option value="high">High (asynchronous nonce)</option>
-        </select>
-      </div>
+      <PrioritySelector onPriorityChange={setPriorityDisperse} />
 
       {/* Make signature button */}
       <button
@@ -293,29 +241,10 @@ export const DispersePaySignatureConstructor = () => {
       </button>
 
       {/* Display results */}
-      {dispersePayMetadata && (
-        <div style={{ marginTop: "2rem" }}>
-          <DetailedData dataToGet={dispersePayMetadata} />
-
-          {/* Action buttons */}
-          <div style={{ marginTop: "1rem" }}>
-            <button
-              style={{
-                backgroundColor: "red",
-                color: "white",
-                padding: "0.5rem",
-                margin: "0.5rem",
-                borderRadius: "5px",
-                border: "none",
-                cursor: "pointer",
-              }}
-              onClick={() => setDispersePayMetadata(null)}
-            >
-              Clear
-            </button>
-          </div>
-        </div>
-      )}
+      <DataDisplayWithClear
+        dataToGet={dataToGet}
+        onClear={() => setDataToGet(null)}
+      />
     </div>
   );
 };

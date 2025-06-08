@@ -3,11 +3,16 @@ import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import { useMnsSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useMnsSignatureBuilder";
-import { TitleAndLink } from "@/components/SigConstructors/TitleAndLink";
-import { DetailedData } from "@/components/DetailedData";
+import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
+import { DetailedData } from "@/components/SigConstructors/InputsAndModules/DetailedData";
 
 import styles from "@/components/SigConstructors/SignatureConstructor.module.css";
-import { NumberInputWithGenerator } from "@/components/SigConstructors/NumberInputWithGenerator";
+import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
+import { AddressInputField } from "../InputsAndModules/AddressInputField";
+import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
+import { NumberInputField } from "../InputsAndModules/NumberInputField";
+import { TextInputField } from "../InputsAndModules/TextInputField";
+import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
 
 type RegistrationData = {
   user: `0x${string}`;
@@ -77,17 +82,11 @@ export const RegistrationUsernameConstructorComponent = () => {
 
       <br />
 
-      <div style={{ marginBottom: "1rem" }}>
-        <p>
-          MNS address:{" "}
-          <input
-            type="text"
-            placeholder="Enter MNS address"
-            id="mnsAddressInput_registration"
-            className={styles.addressInput}
-          />
-        </p>
-      </div>
+      <AddressInputField
+        label="MNS Address"
+        inputId="mnsAddressInput_registration"
+        placeholder="Enter MNS address"
+      />
 
       {/* Nonce section with automatic generator */}
 
@@ -97,51 +96,29 @@ export const RegistrationUsernameConstructorComponent = () => {
         placeholder="Enter nonce"
       />
 
-      <div style={{ marginBottom: "1rem" }}>
-        <p>
-          Clow Number:{" "}
-          <input
-            type="number"
-            placeholder="Enter clow number"
-            id="clowNumberInput_registration"
-            className={styles.nonceInput}
-          />
-        </p>
-      </div>
+      <NumberInputField
+        label="Clow Number"
+        inputId="clowNumberInput_registration"
+        placeholder="Enter clow number"
+      />
 
-      {/* Basic input fields */}
-      {[
-        {
-          label: "Username",
-          id: "usernameInput_registration",
-          type: "text",
-        },
-        {
-          label: "Mate reward amount",
-          id: "mateRewardInput_registration",
-          type: "number",
-        },
-        {
-          label: "Priority fee",
-          id: "priorityFeeInput_registration",
-          type: "number",
-        },
-      ].map(({ label, id, type }) => (
-        <div key={id} style={{ marginBottom: "1rem" }}>
-          <p>{label}</p>
-          <input
-            type={type}
-            placeholder={`Enter ${label.toLowerCase()}`}
-            id={id}
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "25rem",
-            }}
-          />
-        </div>
-      ))}
+      <TextInputField
+        label="Username"
+        inputId="usernameInput_registration"
+        placeholder="Enter username"
+      />
+
+      <NumberInputField
+        label="Mate reward amount"
+        inputId="mateRewardInput_registration"
+        placeholder="Enter mate reward amount"
+      />
+
+      <NumberInputField
+        label="Priority fee"
+        inputId="priorityFeeInput_registration"
+        placeholder="Enter priority fee"
+      />
 
       <NumberInputWithGenerator
         label="EVVM Nonce"
@@ -150,21 +127,7 @@ export const RegistrationUsernameConstructorComponent = () => {
       />
 
       {/* Priority configuration */}
-      <div style={{ marginBottom: "1rem" }}>
-        <p>Priority</p>
-        <select
-          style={{
-            color: "black",
-            backgroundColor: "white",
-            height: "2rem",
-            width: "12rem",
-          }}
-          onChange={(e) => setPriority(e.target.value)}
-        >
-          <option value="low">Low (synchronous nonce)</option>
-          <option value="high">High (asynchronous nonce)</option>
-        </select>
-      </div>
+      <PrioritySelector onPriorityChange={setPriority} />
 
       {/* Create signature button */}
       <button
@@ -177,29 +140,10 @@ export const RegistrationUsernameConstructorComponent = () => {
         Make signature
       </button>
 
-      {dataToGet && (
-        <div style={{ marginTop: "2rem" }}>
-          <DetailedData dataToGet={dataToGet} />
-
-          {/* Action buttons */}
-          <div style={{ marginTop: "1rem" }}>
-            <button
-              style={{
-                backgroundColor: "red",
-                color: "white",
-                padding: "0.5rem",
-                margin: "0.5rem",
-                borderRadius: "5px",
-                border: "none",
-                cursor: "pointer",
-              }}
-              onClick={() => setDataToGet(null)}
-            >
-              Clear
-            </button>
-          </div>
-        </div>
-      )}
+      <DataDisplayWithClear
+        dataToGet={dataToGet}
+        onClear={() => setDataToGet(null)}
+      />
     </div>
   );
 };

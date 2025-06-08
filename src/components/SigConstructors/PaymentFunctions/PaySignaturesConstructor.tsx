@@ -3,9 +3,12 @@ import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import { useEVVMSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useEVVMSignatureBuilder";
-import { TitleAndLink } from "@/components/SigConstructors/TitleAndLink";
-import { DetailedData } from "@/components/DetailedData";
-import { NumberInputWithGenerator } from "@/components/SigConstructors/NumberInputWithGenerator";
+import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
+import { DetailedData } from "@/components/SigConstructors/InputsAndModules/DetailedData";
+import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
+import { AddressInputField } from "../InputsAndModules/AddressInputField";
+import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
+import { ExecutorSelector } from "../InputsAndModules/ExecutorSelector";
 
 type PayData = {
   from: `0x${string}`;
@@ -37,7 +40,7 @@ export const PaySignaturesConstructorComponent = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const nonce = getInputValue("nonceInput_Pay");
-    const tokenAddress = getInputValue("tokenAddress");
+    const tokenAddress = getInputValue("tokenAddress_Pay");
     const to = getInputValue(isUsingUsernames ? "toUsername" : "toAddress");
     const executor = isUsingExecutor
       ? getInputValue("executorInput_Pay")
@@ -120,26 +123,24 @@ export const PaySignaturesConstructorComponent = () => {
         placeholder="Enter nonce"
       />
 
+      <AddressInputField
+        label="Token address"
+        inputId="tokenAddress_Pay"
+        placeholder="Enter token address"
+        defaultValue="0x0000000000000000000000000000000000000000"
+      />
+
       {/* Basic input fields */}
       {[
-        {
-          label: "Token address",
-          id: "tokenAddress",
-          type: "text",
-          value: selectedToken,
-          onChange: setSelectedToken,
-        },
         { label: "Amount", id: "amountTokenInput_Pay", type: "number" },
         { label: "Priority fee", id: "priorityFeeInput_Pay", type: "number" },
-      ].map(({ label, id, type, value, onChange }) => (
+      ].map(({ label, id, type }) => (
         <div key={id} style={{ marginBottom: "1rem" }}>
           <p>{label}</p>
           <input
             type={type}
             placeholder={`Enter ${label.toLowerCase()}`}
             id={id}
-            value={value}
-            onChange={onChange ? (e) => onChange(e.target.value) : undefined}
             style={{
               color: "black",
               backgroundColor: "white",
@@ -151,54 +152,17 @@ export const PaySignaturesConstructorComponent = () => {
       ))}
 
       {/* Executor configuration */}
-      <div style={{ marginBottom: "1rem" }}>
-        <p>
-          Are you using an executor?{" "}
-          <select
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "5rem",
-              marginRight: "0.5rem",
-            }}
-            onChange={(e) => setIsUsingExecutor(e.target.value === "true")}
-          >
-            <option value="false">No</option>
-            <option value="true">Yes</option>
-          </select>
-          {isUsingExecutor && (
-            <input
-              type="text"
-              placeholder="Enter executor address"
-              id="executorInput_Pay"
-              style={{
-                color: "black",
-                backgroundColor: "white",
-                height: "2rem",
-                width: "25rem",
-              }}
-            />
-          )}
-        </p>
-      </div>
+
+      <ExecutorSelector
+        inputId="executorInput_Pay"
+        placeholder="Enter executor"
+        onExecutorToggle={setIsUsingExecutor}
+        isUsingExecutor={isUsingExecutor}
+      />
 
       {/* Priority configuration */}
-      <div style={{ marginBottom: "1rem" }}>
-        <p>Priority</p>
-        <select
-          style={{
-            color: "black",
-            backgroundColor: "white",
-            height: "2rem",
-            width: "12rem",
-          }}
-          onChange={(e) => setPriority(e.target.value)}
-        >
-          <option value="low">Low (synchronous nonce)</option>
-          <option value="high">High (asynchronous nonce)</option>
-        </select>
-      </div>
+
+      <PrioritySelector onPriorityChange={setPriority} />
 
       {/* Create signature button */}
       <button

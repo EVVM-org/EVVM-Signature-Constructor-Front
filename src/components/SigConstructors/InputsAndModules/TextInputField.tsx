@@ -1,0 +1,29 @@
+import React from "react";
+import styles from "@/components/SigConstructors/SignatureConstructor.module.css";
+
+interface TextInputFieldProps {
+  label: string;
+  inputId: string;
+  placeholder?: string;
+  defaultValue?: string;
+}
+
+export const TextInputField: React.FC<TextInputFieldProps> = ({
+  label,
+  inputId,
+  placeholder = "Enter text",
+  defaultValue,
+}) => {
+  return (
+    <div style={{ marginBottom: "1rem" }}>
+      <p>{label}</p>
+      <input
+        type="text"
+        placeholder={placeholder}
+        id={inputId}
+        className={styles.textInput}
+        defaultValue={defaultValue}
+      />
+    </div>
+  );
+};

@@ -3,10 +3,14 @@ import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import { useMnsSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useMnsSignatureBuilder";
-import { TitleAndLink } from "@/components/SigConstructors/TitleAndLink";
+import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { hashPreRegisteredUsername } from "@/utils/EVVMSignatureBuilder/hashTools";
-import { DetailedData } from "@/components/DetailedData";
-import { NumberInputWithGenerator } from "@/components/SigConstructors/NumberInputWithGenerator";
+import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
+import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
+import { NumberInputField } from "../InputsAndModules/NumberInputField";
+import { TextInputField } from "../InputsAndModules/TextInputField";
+import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
+import { AddressInputField } from "../InputsAndModules/AddressInputField";
 
 type PreRegistrationData = {
   user: `0x${string}`;
@@ -73,23 +77,12 @@ export const PreRegistrationUsernameConstructorComponent = () => {
 
       <br />
 
-      <div style={{ marginBottom: "1rem" }}>
-        <p>
-          MNS address:{" "}
-          <input
-            type="text"
-            placeholder="Enter MNS address"
-            id="mnsAddressInput_preRegistration"
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "25rem",
-              marginLeft: "0.5rem",
-            }}
-          />
-        </p>
-      </div>
+      {/* Address Input */}
+      <AddressInputField
+        label="MNS Address"
+        inputId="mnsAddressInput_preRegistration"
+        placeholder="Enter MNS address"
+      />
 
       {/* Nonce section with automatic generator */}
 
@@ -106,33 +99,18 @@ export const PreRegistrationUsernameConstructorComponent = () => {
       />
 
       {/* Basic input fields */}
-      {[
-        {
-          label: "Username",
-          id: "usernameInput_preRegistration",
-          type: "text",
-        },
-        {
-          label: "Priority fee",
-          id: "priorityFeeInput_preRegistration",
-          type: "number",
-        },
-      ].map(({ label, id, type }) => (
-        <div key={id} style={{ marginBottom: "1rem" }}>
-          <p>{label}</p>
-          <input
-            type={type}
-            placeholder={`Enter ${label.toLowerCase()}`}
-            id={id}
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "25rem",
-            }}
-          />
-        </div>
-      ))}
+
+      <TextInputField
+        label="Username"
+        inputId="usernameInput_preRegistration"
+        placeholder="Enter username"
+      />
+
+      <NumberInputField
+        label="Priority fee"
+        inputId="priorityFeeInput_preRegistration"
+        placeholder="Enter priority fee"
+      />
 
       <NumberInputWithGenerator
         label="EVVM Nonce"
@@ -141,21 +119,7 @@ export const PreRegistrationUsernameConstructorComponent = () => {
       />
 
       {/* Priority configuration */}
-      <div style={{ marginBottom: "1rem" }}>
-        <p>Priority</p>
-        <select
-          style={{
-            color: "black",
-            backgroundColor: "white",
-            height: "2rem",
-            width: "12rem",
-          }}
-          onChange={(e) => setPriority(e.target.value)}
-        >
-          <option value="low">Low (synchronous nonce)</option>
-          <option value="high">High (asynchronous nonce)</option>
-        </select>
-      </div>
+      <PrioritySelector onPriorityChange={setPriority} />
 
       {/* Create signature button */}
       <button
@@ -168,29 +132,10 @@ export const PreRegistrationUsernameConstructorComponent = () => {
         Make signature
       </button>
 
-      {dataToGet && (
-        <div style={{ marginTop: "2rem" }}>
-          <DetailedData dataToGet={dataToGet} />
-
-          {/* Action buttons */}
-          <div style={{ marginTop: "1rem" }}>
-            <button
-              style={{
-                backgroundColor: "red",
-                color: "white",
-                padding: "0.5rem",
-                margin: "0.5rem",
-                borderRadius: "5px",
-                border: "none",
-                cursor: "pointer",
-              }}
-              onClick={() => setDataToGet(null)}
-            >
-              Clear
-            </button>
-          </div>
-        </div>
-      )}
+      <DataDisplayWithClear
+        dataToGet={dataToGet}
+        onClear={() => setDataToGet(null)}
+      />
     </div>
   );
 };

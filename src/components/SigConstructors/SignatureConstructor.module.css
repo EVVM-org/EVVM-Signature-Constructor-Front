@@ -21,22 +21,22 @@
     margin: 0;
 }
 
-.nonceInput {
+.numberWithGeneratorInput {
     color: black;
     background-color: white;
     height: 2rem;
-    width: 15rem;
+    width: 10rem;
     padding: 0.5rem;
     -moz-appearance: textfield;
 }
 
-.nonceInput::-webkit-outer-spin-button,
-.nonceInput::-webkit-inner-spin-button {
+.numberWithGeneratorInput::-webkit-outer-spin-button,
+.numberWithGeneratorInput::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 
-.nonceButton {
+.numberWithGeneratorButton {
     color: white;
     background-color: #50aad4;
     border: none;

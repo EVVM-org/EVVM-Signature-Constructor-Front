@@ -2,10 +2,10 @@
 import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
-import mersenneTwister from "@/utils/mersenneTwister";
 import { useEVVMSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useEVVMSignatureBuilder";
-import { TitleAndLink } from "@/components/TitleAndLink";
+import { TitleAndLink } from "@/components/SigConstructors/TitleAndLink";
 import { DetailedData } from "@/components/DetailedData";
+import { NumberInputWithGenerator } from "@/components/SigConstructors/NumberInputWithGenerator";
 
 type PayData = {
   from: `0x${string}`;
@@ -113,44 +113,12 @@ export const PaySignaturesConstructorComponent = () => {
       </div>
 
       {/* Nonce section with automatic generator */}
-      <div style={{ marginBottom: "1rem" }}>
-        <p>
-          Nonce:{" "}
-          <button
-            style={{
-              color: "white",
-              backgroundColor: "#50aad4",
-              border: "none",
-              cursor: "pointer",
-              padding: "0.5rem",
-              height: "2rem",
-              textAlign: "center",
-              marginRight: "0.5rem",
-            }}
-            onClick={() => {
-              const seed = Math.floor(Math.random() + Date.now());
-              const mt = mersenneTwister(seed);
-              const nonce = mt.int32();
-              (
-                document.getElementById("nonceInput_Pay") as HTMLInputElement
-              ).value = nonce.toString();
-            }}
-          >
-            Generate random nonce
-          </button>
-          <input
-            type="number"
-            placeholder="Enter nonce"
-            id="nonceInput_Pay"
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "25rem",
-            }}
-          />
-        </p>
-      </div>
+
+      <NumberInputWithGenerator
+        label="Nonce"
+        inputId="nonceInput_Pay"
+        placeholder="Enter nonce"
+      />
 
       {/* Basic input fields */}
       {[

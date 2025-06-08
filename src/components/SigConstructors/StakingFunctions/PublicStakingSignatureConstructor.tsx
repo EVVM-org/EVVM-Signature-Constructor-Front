@@ -1,11 +1,9 @@
 "use client";
 import React from "react";
-import { getAccount } from "@wagmi/core";
-import { config } from "@/config/index";
-import mersenneTwister from "@/utils/mersenneTwister";
 import { useSMateSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useSMateSignatureBuilder";
-import { TitleAndLink } from "@/components/TitleAndLink";
+import { TitleAndLink } from "@/components/SigConstructors/TitleAndLink";
 import { DetailedData } from "@/components/DetailedData";
+import { NumberInputWithGenerator } from "@/components/SigConstructors/NumberInputWithGenerator";
 
 type PublicStakingData = {
   isStaking: string;
@@ -19,7 +17,6 @@ type PublicStakingData = {
 };
 
 export const PublicStakingSignatureConstructor = () => {
-  const account = getAccount(config);
   const { signPublicStaking } = useSMateSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
@@ -115,79 +112,18 @@ export const PublicStakingSignatureConstructor = () => {
       </div>
 
       {/* Nonce Generators */}
-      <div style={{ marginBottom: "1rem" }}>
-        <label>
-          EVVM Nonce:{" "}
-          <button
-            style={{
-              backgroundColor: "#50aad4",
-              color: "white",
-              border: "none",
-              padding: "0.5rem",
-              marginRight: "0.5rem",
-            }}
-            onClick={() => {
-              const nonce = mersenneTwister(
-                Math.floor(Math.random() + Date.now())
-              ).int32();
-              (
-                document.getElementById(
-                  "nonceEVVMInput_PublicStaking"
-                ) as HTMLInputElement
-              ).value = nonce.toString();
-            }}
-          >
-            Generate
-          </button>
-          <input
-            type="number"
-            id="nonceEVVMInput_PublicStaking"
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "20rem",
-            }}
-          />
-        </label>
-      </div>
 
-      <div style={{ marginBottom: "1rem" }}>
-        <label>
-          sMate Nonce:{" "}
-          <button
-            style={{
-              backgroundColor: "#50aad4",
-              color: "white",
-              border: "none",
-              padding: "0.5rem",
-              marginRight: "0.5rem",
-            }}
-            onClick={() => {
-              const nonce = mersenneTwister(
-                Math.floor(Math.random() + Date.now())
-              ).int32();
-              (
-                document.getElementById(
-                  "nonceSMATEInput_PublicStaking"
-                ) as HTMLInputElement
-              ).value = nonce.toString();
-            }}
-          >
-            Generate
-          </button>
-          <input
-            type="number"
-            id="nonceSMATEInput_PublicStaking"
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "20rem",
-            }}
-          />
-        </label>
-      </div>
+      <NumberInputWithGenerator
+        label="EVVM Nonce"
+        inputId="nonceEVVMInput_PublicStaking"
+        placeholder="Enter nonce"
+      />
+
+      <NumberInputWithGenerator
+        label="sMate Nonce"
+        inputId="nonceSMATEInput_PublicStaking"
+        placeholder="Enter nonce"
+      />
 
       {/* Amount Inputs */}
       <div style={{ marginBottom: "1rem" }}>

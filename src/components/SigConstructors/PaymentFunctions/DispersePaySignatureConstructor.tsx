@@ -3,12 +3,10 @@ import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import { useEVVMSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useEVVMSignatureBuilder";
-
-import mersenneTwister from "@/utils/mersenneTwister";
-import { TitleAndLink } from "@/components/TitleAndLink";
+import { TitleAndLink } from "@/components/SigConstructors/TitleAndLink";
 import { DetailedData } from "@/components/DetailedData";
-
 import styles from "@/components/SigConstructors/SignatureConstructor.module.css";
+import { NumberInputWithGenerator } from "@/components/SigConstructors/NumberInputWithGenerator";
 
 type DispersePayMetadata = {
   amount: string;
@@ -117,30 +115,12 @@ export const DispersePaySignatureConstructor = () => {
       <br />
 
       {/* Nonce input */}
-      <div style={{ marginBottom: "1rem" }}>
-        <p>Nonce:</p>
-        <button
-          className={styles.nonceButton}
-          onClick={() => {
-            const seed = Math.floor(Math.random() + Date.now());
-            const mt = mersenneTwister(seed);
-            const nonce = mt.int32();
-            (
-              document.getElementById(
-                "nonceInputDispersePay"
-              ) as HTMLInputElement
-            ).value = nonce.toString();
-          }}
-        >
-          Generate random nonce
-        </button>
-        <input
-          type="number"
-          placeholder="Enter nonce"
-          id="nonceInputDispersePay"
-          className={styles.nonceInput}
-        />
-      </div>
+
+      <NumberInputWithGenerator
+        label="Nonce"
+        inputId="nonceInputDispersePay"
+        placeholder="Enter nonce"
+      />
 
       {/* Token address */}
       <div style={{ marginBottom: "1rem" }}>

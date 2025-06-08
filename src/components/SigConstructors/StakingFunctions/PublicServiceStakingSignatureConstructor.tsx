@@ -2,10 +2,10 @@
 import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
-import mersenneTwister from "@/utils/mersenneTwister";
 import { useSMateSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useSMateSignatureBuilder";
-import { TitleAndLink } from "@/components/TitleAndLink";
+import { TitleAndLink } from "@/components/SigConstructors/TitleAndLink";
 import { DetailedData } from "@/components/DetailedData";
+import { NumberInputWithGenerator } from "@/components/SigConstructors/NumberInputWithGenerator";
 
 type PublicServiceStakingData = {
   isStaking: string;
@@ -28,12 +28,18 @@ export const PublicServiceStakingSignatureConstructor = () => {
   const [showData, setShowData] = React.useState(false);
 
   const makeSig = async () => {
-    const getInputValue = (id: string) => 
+    const getInputValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
-    const sMateAddress = getInputValue("sMateAddressInput_PublicServiceStaking");
-    const serviceAddress = getInputValue("serviceAddressInput_PublicServiceStaking");
-    const amount = Number(getInputValue("amountOfSMateInput_PublicServiceStaking"));
+    const sMateAddress = getInputValue(
+      "sMateAddressInput_PublicServiceStaking"
+    );
+    const serviceAddress = getInputValue(
+      "serviceAddressInput_PublicServiceStaking"
+    );
+    const amount = Number(
+      getInputValue("amountOfSMateInput_PublicServiceStaking")
+    );
     const priorityFee = getInputValue("priorityFeeInput_PublicServiceStaking");
     const nonceEVVM = getInputValue("nonceEVVMInput_PublicServiceStaking");
     const nonceSMATE = getInputValue("nonceSMATEInput_PublicServiceStaking");
@@ -125,79 +131,18 @@ export const PublicServiceStakingSignatureConstructor = () => {
       </div>
 
       {/* Nonce Generators */}
-      <div style={{ marginBottom: "1rem" }}>
-        <label>
-          EVVM Nonce:{" "}
-          <button
-            style={{
-              backgroundColor: "#50aad4",
-              color: "white",
-              border: "none",
-              padding: "0.5rem",
-              marginRight: "0.5rem",
-            }}
-            onClick={() => {
-              const nonce = mersenneTwister(
-                Math.floor(Math.random() + Date.now())
-              ).int32();
-              (
-                document.getElementById(
-                  "nonceEVVMInput_PublicServiceStaking"
-                ) as HTMLInputElement
-              ).value = nonce.toString();
-            }}
-          >
-            Generate
-          </button>
-          <input
-            type="number"
-            id="nonceEVVMInput_PublicServiceStaking"
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "20rem",
-            }}
-          />
-        </label>
-      </div>
 
-      <div style={{ marginBottom: "1rem" }}>
-        <label>
-          sMate Nonce:{" "}
-          <button
-            style={{
-              backgroundColor: "#50aad4",
-              color: "white",
-              border: "none",
-              padding: "0.5rem",
-              marginRight: "0.5rem",
-            }}
-            onClick={() => {
-              const nonce = mersenneTwister(
-                Math.floor(Math.random() + Date.now())
-              ).int32();
-              (
-                document.getElementById(
-                  "nonceSMATEInput_PublicServiceStaking"
-                ) as HTMLInputElement
-              ).value = nonce.toString();
-            }}
-          >
-            Generate
-          </button>
-          <input
-            type="number"
-            id="nonceSMATEInput_PublicServiceStaking"
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "20rem",
-            }}
-          />
-        </label>
-      </div>
+      <NumberInputWithGenerator
+        label="EVVM Nonce"
+        inputId="nonceEVVMInput_PublicServiceStaking"
+        placeholder="Enter nonce"
+      />
+
+      <NumberInputWithGenerator
+        label="sMate Nonce"
+        inputId="nonceSMATEInput_PublicServiceStaking"
+        placeholder="Enter nonce"
+      />
 
       {/* Amount Inputs */}
       <div style={{ marginBottom: "1rem" }}>

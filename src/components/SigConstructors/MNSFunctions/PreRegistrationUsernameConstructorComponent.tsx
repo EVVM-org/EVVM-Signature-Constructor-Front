@@ -2,11 +2,11 @@
 import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
-import mersenneTwister from "@/utils/mersenneTwister";
 import { useMnsSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useMnsSignatureBuilder";
-import { TitleAndLink } from "@/components/TitleAndLink";
+import { TitleAndLink } from "@/components/SigConstructors/TitleAndLink";
 import { hashPreRegisteredUsername } from "@/utils/EVVMSignatureBuilder/hashTools";
 import { DetailedData } from "@/components/DetailedData";
+import { NumberInputWithGenerator } from "@/components/SigConstructors/NumberInputWithGenerator";
 
 type PreRegistrationData = {
   user: `0x${string}`;
@@ -92,87 +92,18 @@ export const PreRegistrationUsernameConstructorComponent = () => {
       </div>
 
       {/* Nonce section with automatic generator */}
-      <div style={{ marginBottom: "1rem" }}>
-        <p>
-          MNS Nonce:{" "}
-          <button
-            style={{
-              color: "white",
-              backgroundColor: "#50aad4",
-              border: "none",
-              cursor: "pointer",
-              padding: "0.5rem",
-              height: "2rem",
-              textAlign: "center",
-              marginRight: "0.5rem",
-            }}
-            onClick={() => {
-              const seed = Math.floor(Math.random() + Date.now());
-              const mt = mersenneTwister(seed);
-              const nonce = mt.int32();
-              (
-                document.getElementById(
-                  "nonceMNSInput_preRegistration"
-                ) as HTMLInputElement
-              ).value = nonce.toString();
-            }}
-          >
-            Generate random nonce
-          </button>
-          <input
-            type="number"
-            placeholder="Enter nonce"
-            id="nonceMNSInput_preRegistration"
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "25rem",
-            }}
-          />
-        </p>
-      </div>
 
-      <div style={{ marginBottom: "1rem" }}>
-        <p>
-          Clow Number:{" "}
-          <button
-            style={{
-              color: "white",
-              backgroundColor: "#50aad4",
-              border: "none",
-              cursor: "pointer",
-              padding: "0.5rem",
-              height: "2rem",
-              textAlign: "center",
-              marginRight: "0.5rem",
-            }}
-            onClick={() => {
-              const seed = Math.floor(Math.random() + Date.now());
-              const mt = mersenneTwister(seed);
-              const nonce = mt.int32();
-              (
-                document.getElementById(
-                  "clowNumberInput_preRegistration"
-                ) as HTMLInputElement
-              ).value = nonce.toString();
-            }}
-          >
-            Generate random nonce
-          </button>
-          <input
-            type="number"
-            placeholder="Enter nonce"
-            id="clowNumberInput_preRegistration"
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "25rem",
-            }}
-          />
-        </p>
-      </div>
+      <NumberInputWithGenerator
+        label="MNS Nonce"
+        inputId="nonceMNSInput_preRegistration"
+        placeholder="Enter nonce"
+      />
+
+      <NumberInputWithGenerator
+        label="Clow Number"
+        inputId="clowNumberInput_preRegistration"
+        placeholder="Enter clow number"
+      />
 
       {/* Basic input fields */}
       {[
@@ -203,46 +134,11 @@ export const PreRegistrationUsernameConstructorComponent = () => {
         </div>
       ))}
 
-      <div style={{ marginBottom: "1rem" }}>
-        <p>
-          EVVM Nonce:{" "}
-          <button
-            style={{
-              color: "white",
-              backgroundColor: "#50aad4",
-              border: "none",
-              cursor: "pointer",
-              padding: "0.5rem",
-              height: "2rem",
-              textAlign: "center",
-              marginRight: "0.5rem",
-            }}
-            onClick={() => {
-              const seed = Math.floor(Math.random() + Date.now());
-              const mt = mersenneTwister(seed);
-              const nonce = mt.int32();
-              (
-                document.getElementById(
-                  "nonceEVVMInput_preRegistration"
-                ) as HTMLInputElement
-              ).value = nonce.toString();
-            }}
-          >
-            Generate random nonce
-          </button>
-          <input
-            type="number"
-            placeholder="Enter nonce"
-            id="nonceEVVMInput_preRegistration"
-            style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "25rem",
-            }}
-          />
-        </p>
-      </div>
+      <NumberInputWithGenerator
+        label="EVVM Nonce"
+        inputId="nonceEVVMInput_preRegistration"
+        placeholder="Enter nonce"
+      />
 
       {/* Priority configuration */}
       <div style={{ marginBottom: "1rem" }}>

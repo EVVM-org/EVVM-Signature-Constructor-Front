@@ -78,7 +78,7 @@ export const MakeOfferConstructorComponent = () => {
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Make offer of username"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/registrationUsernameStructure"
+        link="https://www.evvm.org/docs/SignatureStructures/MNS/makeOfferStructure"
       />
 
       <br />

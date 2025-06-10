@@ -1,5 +1,6 @@
 import { useSignMessage } from "wagmi";
 import {
+  buildMessageSignedForMakeOffer,
   buildMessageSignedForPay,
   buildMessageSignedForPreRegistrationUsername,
   buildMessageSignedForRegistrationUsername,
@@ -128,11 +129,60 @@ export const useMnsSignatureBuilder = () => {
     );
   };
 
+    const signMakeOffer = (
+    addressMNS: string,
+    nonceMNS: bigint,
+    username: string,
+    amount: bigint,
+    expirationDate: bigint,
+    priorityFeeForFisher: bigint,
+    nonceEVVM: bigint,
+    priorityFlag: boolean,
+    onSuccess?: (paySignature: string, makeOfferSignature: string) => void,
+    onError?: (error: Error) => void
+  ) => {
+    const makeOfferMessage = buildMessageSignedForMakeOffer(
+      username,
+      expirationDate,
+      amount,
+      nonceMNS
+    );
+
+    signMessage(
+      { message: makeOfferMessage },
+      {
+        onSuccess: (makeOfferSignature) => {
+          // Payment signature for priority fee
+          const payMessage = buildMessageSignedForPay(
+            addressMNS,
+            "0x0000000000000000000000000000000000000001",
+            amount.toString(),
+            priorityFeeForFisher.toString(),
+            nonceEVVM.toString(),
+            priorityFlag,
+            addressMNS
+          );
+
+          signMessage(
+            { message: payMessage },
+            {
+              onSuccess: (paySignature) =>
+                onSuccess?.(paySignature, makeOfferSignature),
+              onError: (error) => onError?.(error),
+            }
+          );
+        },
+        onError: (error) => onError?.(error),
+      }
+    );
+  };
+
   return {
     signMessage,
     signERC191Message,
     signPreRegistrationUsername,
     signRegistrationUsername,
+    signMakeOffer,
     ...rest,
   };
 };

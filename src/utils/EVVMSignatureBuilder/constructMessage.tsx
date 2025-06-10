@@ -184,7 +184,9 @@ function buildMessageSignedForPreRegistrationUsername(
   hashUsername: string,
   nonceMNS: bigint
 ): string {
-  return "393b9c6f," + `${hashUsername.toLowerCase()},` + `${nonceMNS.toString()}`;
+  return (
+    "393b9c6f," + `${hashUsername.toLowerCase()},` + `${nonceMNS.toString()}`
+  );
 }
 
 function buildMessageSignedForRegistrationUsername(
@@ -193,7 +195,25 @@ function buildMessageSignedForRegistrationUsername(
   nonceMNS: bigint
 ): string {
   return (
-    "d134f8b4," + `${username},` + `${clowNumber.toString()},` + `${nonceMNS.toString()}`
+    "d134f8b4," +
+    `${username},` +
+    `${clowNumber.toString()},` +
+    `${nonceMNS.toString()}`
+  );
+}
+
+function buildMessageSignedForMakeOffer(
+  username: string,
+  dateExpire: bigint,
+  amount: bigint,
+  nonceMNS: bigint
+): string {
+  return (
+    "52649c2e," +
+    `${username},` +
+    `${dateExpire.toString()},` +
+    `${amount.toString()},` +
+    `${nonceMNS.toString()}`
   );
 }
 
@@ -206,4 +226,5 @@ export {
   buildMessageSignedForPublicServiceStaking,
   buildMessageSignedForPreRegistrationUsername,
   buildMessageSignedForRegistrationUsername,
+  buildMessageSignedForMakeOffer,
 };

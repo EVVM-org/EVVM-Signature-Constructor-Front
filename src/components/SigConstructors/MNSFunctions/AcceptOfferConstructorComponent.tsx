@@ -10,10 +10,10 @@ import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { TextInputField } from "../InputsAndModules/TextInputField";
 import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
-import { off } from "process";
 
-type WithdrawOfferData = {
-  user: `0x${string}`;
+
+type AcceptOfferData = {
+  user: string;
   nonce: string;
   username: string;
   offerID: string;
@@ -24,11 +24,11 @@ type WithdrawOfferData = {
   signature_Evvm: string;
 };
 
-export const WithdrawOfferConstructorComponent = () => {
-  const { signWithdrawOffer } = useMnsSignatureBuilder();
+export const AcceptOfferConstructorComponent = () => {
+  const { signAcceptOffer } = useMnsSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
-  const [dataToGet, setDataToGet] = React.useState<WithdrawOfferData | null>(
+  const [dataToGet, setDataToGet] = React.useState<AcceptOfferData | null>(
     null
   );
 
@@ -36,15 +36,15 @@ export const WithdrawOfferConstructorComponent = () => {
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
-    const addressMNS = getValue("mnsAddressInput_withdrawOffer");
-    const nonceMNS = getValue("nonceMNSInput_withdrawOffer");
-    const username = getValue("usernameInput_withdrawOffer");
-    const offerId = getValue("offerIdInput_withdrawOffer");
-    const priorityFeeForFisher = getValue("priorityFeeInput_withdrawOffer");
-    const nonceEVVM = getValue("nonceEVVMInput_withdrawOffer");
+    const addressMNS = getValue("mnsAddressInput_acceptOffer");
+    const nonceMNS = getValue("nonceMNSInput_acceptOffer");
+    const username = getValue("usernameInput_acceptOffer");
+    const offerId = getValue("offerIdInput_acceptOffer");
+    const priorityFeeForFisher = getValue("priorityFeeInput_acceptOffer");
+    const nonceEVVM = getValue("nonceEVVMInput_acceptOffer");
     const priorityFlag = priority === "high";
 
-    signWithdrawOffer(
+    signAcceptOffer(
       addressMNS,
       BigInt(nonceMNS),
       username,
@@ -52,14 +52,14 @@ export const WithdrawOfferConstructorComponent = () => {
       BigInt(priorityFeeForFisher),
       BigInt(nonceEVVM),
       priorityFlag,
-      (paySignature, withdrawOfferSignature) => {
+      (paySignature, acceptOfferSignature) => {
         setDataToGet({
-          user: account.address as `0x${string}`,
+          user: account.address || "",
           nonce: nonceMNS,
           username: username,
           offerID: offerId,
           priorityFeeForFisher: priorityFeeForFisher,
-          signature: withdrawOfferSignature,
+          signature: acceptOfferSignature,
           nonce_Evvm: nonceEVVM,
           priority_Evvm: priorityFlag ? "high" : "low",
           signature_Evvm: paySignature,
@@ -72,45 +72,46 @@ export const WithdrawOfferConstructorComponent = () => {
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
-        title="Withdraw offer of username"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/withdrawOfferStructure"
+        title="Accept offer of username"
+        link="https://www.evvm.org/docs/SignatureStructures/MNS/acceptOfferStructure"
       />
 
+      
       <br />
 
       <AddressInputField
         label="MNS Address"
-        inputId="mnsAddressInput_withdrawOffer"
+        inputId="mnsAddressInput_acceptOffer"
         placeholder="Enter MNS address"
       />
 
       <NumberInputWithGenerator
         label="MNS Nonce"
-        inputId="nonceMNSInput_withdrawOffer"
+        inputId="nonceMNSInput_acceptOffer"
         placeholder="Enter nonce"
       />
 
       <TextInputField
         label="Username"
-        inputId="usernameInput_withdrawOffer"
+        inputId="usernameInput_acceptOffer"
         placeholder="Enter username"
       />
 
       <NumberInputField
         label="Offer ID"
-        inputId="offerIdInput_withdrawOffer"
+        inputId="offerIdInput_acceptOffer"
         placeholder="Enter offer ID"
       />
 
       <NumberInputField
         label="Priority fee"
-        inputId="priorityFeeInput_withdrawOffer"
+        inputId="priorityFeeInput_acceptOffer"
         placeholder="Enter priority fee"
       />
 
       <NumberInputWithGenerator
         label="EVVM Nonce"
-        inputId="nonceEVVMInput_withdrawOffer"
+        inputId="nonceEVVMInput_acceptOffer"
         placeholder="Enter nonce"
       />
 

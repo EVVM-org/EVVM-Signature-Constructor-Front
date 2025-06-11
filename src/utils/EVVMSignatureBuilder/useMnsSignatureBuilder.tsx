@@ -1,5 +1,6 @@
 import { useSignMessage } from "wagmi";
 import {
+  buildMessageSignedForAcceptOffer,
   buildMessageSignedForMakeOffer,
   buildMessageSignedForPay,
   buildMessageSignedForPreRegistrationUsername,
@@ -189,14 +190,14 @@ export const useMnsSignatureBuilder = () => {
     onSuccess?: (paySignature: string, makeOfferSignature: string) => void,
     onError?: (error: Error) => void
   ) => {
-    const makeOfferMessage = buildMessageSignedForWithdrawOffer(
+    const withdrawOfferMessage = buildMessageSignedForWithdrawOffer(
       username,
       offerId,
       nonceMNS
     );
 
     signMessage(
-      { message: makeOfferMessage },
+      { message: withdrawOfferMessage },
       {
         onSuccess: (makeOfferSignature) => {
           // Payment signature for priority fee
@@ -228,6 +229,58 @@ export const useMnsSignatureBuilder = () => {
       }
     );
   };
+
+  const signAcceptOffer = (
+    addressMNS: string,
+    nonceMNS: bigint,
+    username: string,
+    offerId: bigint,
+    priorityFeeForFisher: bigint,
+    nonceEVVM: bigint,
+    priorityFlag: boolean,
+    onSuccess?: (paySignature: string, makeOfferSignature: string) => void,
+    onError?: (error: Error) => void
+  ) => {
+    const acceptOfferMessage = buildMessageSignedForAcceptOffer(
+      username,
+      offerId,
+      nonceMNS
+    );
+    
+    signMessage(
+      { message: acceptOfferMessage },
+      {
+        onSuccess: (makeOfferSignature) => {
+          // Payment signature for priority fee
+          if (priorityFeeForFisher === BigInt(0)) {
+            onSuccess?.("", makeOfferSignature);
+            return;
+          }
+
+          const payMessage = buildMessageSignedForPay(
+            addressMNS,
+            "0x0000000000000000000000000000000000000001",
+            priorityFeeForFisher.toString(),
+            "0",
+            nonceEVVM.toString(),
+            priorityFlag,
+            addressMNS
+          );
+
+          signMessage(
+            { message: payMessage },
+            {
+              onSuccess: (paySignature) =>
+                onSuccess?.(paySignature, makeOfferSignature),
+              onError: (error) => onError?.(error),
+            }
+          );
+        },
+        onError: (error) => onError?.(error),
+      }
+    );
+  };
+
   return {
     signMessage,
     signERC191Message,
@@ -235,6 +288,7 @@ export const useMnsSignatureBuilder = () => {
     signRegistrationUsername,
     signMakeOffer,
     signWithdrawOffer,
+    signAcceptOffer,
     ...rest,
   };
 };

@@ -3,12 +3,14 @@ import { useState } from "react";
 import { PaySignaturesConstructorComponent } from "@/components/SigConstructors/PaymentFunctions/PaySignaturesConstructor";
 import { DispersePaySignatureConstructor } from "@/components/SigConstructors/PaymentFunctions/DispersePaySignatureConstructor";
 import { GoldenStakingSignatureConstructor } from "@/components/SigConstructors/StakingFunctions/GoldenStakingSignatureConstructor";
-import { PresaleStakingSignatureConstructor } from "./StakingFunctions/PresaleStakingSignatureConstructor";
-import { PublicStakingSignatureConstructor } from "./StakingFunctions/PublicStakingSignatureConstructor";
-import { PublicServiceStakingSignatureConstructor } from "./StakingFunctions/PublicServiceStakingSignatureConstructor";
-import { PreRegistrationUsernameConstructorComponent } from "./MNSFunctions/PreRegistrationUsernameConstructorComponent";
-import { RegistrationUsernameConstructorComponent } from "./MNSFunctions/RegistrationUsernameConstructorComponent";
-import { MakeOfferConstructorComponent } from "./MNSFunctions/MakeOfferConstructorComponent";
+import { PresaleStakingSignatureConstructor } from "@/components/SigConstructors/StakingFunctions/PresaleStakingSignatureConstructor";
+import { PublicStakingSignatureConstructor } from "@/components/SigConstructors/StakingFunctions/PublicStakingSignatureConstructor";
+import { PublicServiceStakingSignatureConstructor } from "@/components/SigConstructors/StakingFunctions/PublicServiceStakingSignatureConstructor";
+import { PreRegistrationUsernameConstructorComponent } from "@/components/SigConstructors/MNSFunctions/PreRegistrationUsernameConstructorComponent";
+import { RegistrationUsernameConstructorComponent } from "@/components/SigConstructors/MNSFunctions/RegistrationUsernameConstructorComponent";
+import { MakeOfferConstructorComponent } from "@/components/SigConstructors/MNSFunctions/MakeOfferConstructorComponent";
+import { WithdrawOfferConstructorComponent } from "@/components/SigConstructors/MNSFunctions/WithdrawOfferConstructorComponent";
+import { AcceptOfferConstructorComponent } from "@/components/SigConstructors/MNSFunctions/AcceptOfferConstructorComponent";
 
 const boxStyle = {
   display: "flex",
@@ -50,6 +52,8 @@ export const SigMenu = () => {
     <PreRegistrationUsernameConstructorComponent key="preReg" />,
     <RegistrationUsernameConstructorComponent key="reg" />,
     <MakeOfferConstructorComponent key="makeOffer" />,
+    <WithdrawOfferConstructorComponent key="withdrawOffer" />,
+    <AcceptOfferConstructorComponent key="acceptOffer" />,
   ];
 
   const components =

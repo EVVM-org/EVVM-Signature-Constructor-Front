@@ -4,6 +4,7 @@ import {
   buildMessageSignedForPay,
   buildMessageSignedForPreRegistrationUsername,
   buildMessageSignedForRegistrationUsername,
+  buildMessageSignedForWithdrawOffer,
 } from "./constructMessage";
 import { hashPreRegisteredUsername } from "./hashTools";
 
@@ -129,7 +130,7 @@ export const useMnsSignatureBuilder = () => {
     );
   };
 
-    const signMakeOffer = (
+  const signMakeOffer = (
     addressMNS: string,
     nonceMNS: bigint,
     username: string,
@@ -177,12 +178,63 @@ export const useMnsSignatureBuilder = () => {
     );
   };
 
+  const signWithdrawOffer = (
+    addressMNS: string,
+    nonceMNS: bigint,
+    username: string,
+    offerId: bigint,
+    priorityFeeForFisher: bigint,
+    nonceEVVM: bigint,
+    priorityFlag: boolean,
+    onSuccess?: (paySignature: string, makeOfferSignature: string) => void,
+    onError?: (error: Error) => void
+  ) => {
+    const makeOfferMessage = buildMessageSignedForWithdrawOffer(
+      username,
+      offerId,
+      nonceMNS
+    );
+
+    signMessage(
+      { message: makeOfferMessage },
+      {
+        onSuccess: (makeOfferSignature) => {
+          // Payment signature for priority fee
+          if (priorityFeeForFisher === BigInt(0)) {
+            onSuccess?.("", makeOfferSignature);
+            return;
+          }
+
+          const payMessage = buildMessageSignedForPay(
+            addressMNS,
+            "0x0000000000000000000000000000000000000001",
+            priorityFeeForFisher.toString(),
+            "0",
+            nonceEVVM.toString(),
+            priorityFlag,
+            addressMNS
+          );
+
+          signMessage(
+            { message: payMessage },
+            {
+              onSuccess: (paySignature) =>
+                onSuccess?.(paySignature, makeOfferSignature),
+              onError: (error) => onError?.(error),
+            }
+          );
+        },
+        onError: (error) => onError?.(error),
+      }
+    );
+  };
   return {
     signMessage,
     signERC191Message,
     signPreRegistrationUsername,
     signRegistrationUsername,
     signMakeOffer,
+    signWithdrawOffer,
     ...rest,
   };
 };

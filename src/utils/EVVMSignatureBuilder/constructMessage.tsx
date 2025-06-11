@@ -217,6 +217,33 @@ function buildMessageSignedForMakeOffer(
   );
 }
 
+
+function buildMessageSignedForWithdrawOffer(
+  username: string,
+  offerId: bigint,
+  mateNameServiceNonce: bigint
+): string {
+  return (
+    "21811609," +
+    `${username},` +
+    `${offerId.toString()},` +
+    `${mateNameServiceNonce.toString()}`
+  );
+}
+
+function buildMessageSignedForAcceptOffer(
+  username: string,
+  offerId: bigint,
+  mateNameServiceNonce: bigint
+): string {
+  return (
+    "ae36fe72," +
+    `${username},` +
+    `${offerId.toString()},` +
+    `${mateNameServiceNonce.toString()}`
+  );
+}
+
 export {
   constructMessageForDepositFisher,
   buildMessageSignedForPay,
@@ -227,4 +254,6 @@ export {
   buildMessageSignedForPreRegistrationUsername,
   buildMessageSignedForRegistrationUsername,
   buildMessageSignedForMakeOffer,
+  buildMessageSignedForWithdrawOffer,
+  buildMessageSignedForAcceptOffer,
 };

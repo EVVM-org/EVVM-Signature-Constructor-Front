@@ -217,7 +217,6 @@ function buildMessageSignedForMakeOffer(
   );
 }
 
-
 function buildMessageSignedForWithdrawOffer(
   username: string,
   offerId: bigint,
@@ -244,6 +243,13 @@ function buildMessageSignedForAcceptOffer(
   );
 }
 
+function buildMessageSignedForRenewUsername(
+  username: string,
+  mateNameServiceNonce: bigint
+): string {
+  return "f1747483," + `${username},` + `${mateNameServiceNonce.toString()}`;
+}
+
 export {
   constructMessageForDepositFisher,
   buildMessageSignedForPay,
@@ -256,4 +262,5 @@ export {
   buildMessageSignedForMakeOffer,
   buildMessageSignedForWithdrawOffer,
   buildMessageSignedForAcceptOffer,
+  buildMessageSignedForRenewUsername,
 };

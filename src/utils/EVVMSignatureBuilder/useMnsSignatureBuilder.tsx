@@ -5,6 +5,7 @@ import {
   buildMessageSignedForPay,
   buildMessageSignedForPreRegistrationUsername,
   buildMessageSignedForRegistrationUsername,
+  buildMessageSignedForRenewUsername,
   buildMessageSignedForWithdrawOffer,
 } from "./constructMessage";
 import { hashPreRegisteredUsername } from "./hashTools";
@@ -246,7 +247,7 @@ export const useMnsSignatureBuilder = () => {
       offerId,
       nonceMNS
     );
-    
+
     signMessage(
       { message: acceptOfferMessage },
       {
@@ -281,6 +282,50 @@ export const useMnsSignatureBuilder = () => {
     );
   };
 
+  const signRenewUsername = (
+    addressMNS: string,
+    nonceMNS: bigint,
+    username: string,
+    amountToRenew: bigint,
+    priorityFeeForFisher: bigint,
+    nonceEVVM: bigint,
+    priorityFlag: boolean,
+    onSuccess?: (paySignature: string, makeOfferSignature: string) => void,
+    onError?: (error: Error) => void
+  ) => {
+    const renewUsernameMessage = buildMessageSignedForRenewUsername(
+      username,
+      nonceMNS
+    );
+
+    signMessage(
+      { message: renewUsernameMessage },
+      {
+        onSuccess: (makeOfferSignature) => {
+          const payMessage = buildMessageSignedForPay(
+            addressMNS,
+            "0x0000000000000000000000000000000000000001",
+            amountToRenew.toString(),
+            priorityFeeForFisher.toString(),
+            nonceEVVM.toString(),
+            priorityFlag,
+            addressMNS
+          );
+
+          signMessage(
+            { message: payMessage },
+            {
+              onSuccess: (paySignature) =>
+                onSuccess?.(paySignature, makeOfferSignature),
+              onError: (error) => onError?.(error),
+            }
+          );
+        },
+        onError: (error) => onError?.(error),
+      }
+    );
+  };
+
   return {
     signMessage,
     signERC191Message,
@@ -289,6 +334,7 @@ export const useMnsSignatureBuilder = () => {
     signMakeOffer,
     signWithdrawOffer,
     signAcceptOffer,
+    signRenewUsername,
     ...rest,
   };
 };

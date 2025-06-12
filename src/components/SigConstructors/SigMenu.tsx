@@ -11,6 +11,7 @@ import { RegistrationUsernameConstructorComponent } from "@/components/SigConstr
 import { MakeOfferConstructorComponent } from "@/components/SigConstructors/MNSFunctions/MakeOfferConstructorComponent";
 import { WithdrawOfferConstructorComponent } from "@/components/SigConstructors/MNSFunctions/WithdrawOfferConstructorComponent";
 import { AcceptOfferConstructorComponent } from "@/components/SigConstructors/MNSFunctions/AcceptOfferConstructorComponent";
+import { RenewUsernameConstructorComponent } from "./MNSFunctions/RenewUsernameConstructorComponent";
 
 const boxStyle = {
   display: "flex",
@@ -54,6 +55,7 @@ export const SigMenu = () => {
     <MakeOfferConstructorComponent key="makeOffer" />,
     <WithdrawOfferConstructorComponent key="withdrawOffer" />,
     <AcceptOfferConstructorComponent key="acceptOffer" />,
+    <RenewUsernameConstructorComponent key="renewUsername" />,
   ];
 
   const components =

@@ -13,6 +13,7 @@ import { WithdrawOfferConstructorComponent } from "@/components/SigConstructors/
 import { AcceptOfferConstructorComponent } from "@/components/SigConstructors/MNSFunctions/AcceptOfferConstructorComponent";
 import { RenewUsernameConstructorComponent } from "./MNSFunctions/RenewUsernameConstructorComponent";
 import { AddCustomMetadataConstructorComponent } from "./MNSFunctions/AddCustomMetadataConstructorComponent";
+import { RemoveCustomMetadataConstructorComponent } from "./MNSFunctions/RemoveCustomMetadataConstructorComponent";
 
 const boxStyle = {
   display: "flex",
@@ -58,6 +59,7 @@ export const SigMenu = () => {
     <AcceptOfferConstructorComponent key="acceptOffer" />,
     <RenewUsernameConstructorComponent key="renewUsername" />,
     <AddCustomMetadataConstructorComponent key="addCustomMetadata" />,
+    <RemoveCustomMetadataConstructorComponent key="removeCustomMetadata" />,
   ];
 
   const components =

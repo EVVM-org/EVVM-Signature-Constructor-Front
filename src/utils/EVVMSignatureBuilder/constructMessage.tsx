@@ -263,7 +263,18 @@ function buildMessageSignedForAddCustomMetadata(
   );
 }
 
-
+function buildMessageSignedForRemoveCustomMetadata(
+  identity: string,
+  key: bigint,
+  nonceMNS: bigint
+): string {
+  return (
+    "8001a999," +
+    `${identity},` +
+    `${key.toString()},` +
+    `${nonceMNS.toString()}`
+  );
+}
 
 export {
   constructMessageForDepositFisher,
@@ -279,4 +290,5 @@ export {
   buildMessageSignedForAcceptOffer,
   buildMessageSignedForRenewUsername,
   buildMessageSignedForAddCustomMetadata,
+  buildMessageSignedForRemoveCustomMetadata,
 };

@@ -6,6 +6,7 @@ import {
   buildMessageSignedForPay,
   buildMessageSignedForPreRegistrationUsername,
   buildMessageSignedForRegistrationUsername,
+  buildMessageSignedForRemoveCustomMetadata,
   buildMessageSignedForRenewUsername,
   buildMessageSignedForWithdrawOffer,
 } from "./constructMessage";
@@ -375,6 +376,48 @@ export const useMnsSignatureBuilder = () => {
     );
   };
 
+  const signRemoveCustomMetadata = (
+    addressMNS: string,
+    nonceMNS: bigint,
+    identity: string,
+    key: bigint,
+    amountOfMateReward: bigint,
+    priorityFeeForFisher: bigint,
+    nonceEVVM: bigint,
+    priorityFlag: boolean,
+    onSuccess?: (paySignature: string, removeMetadataSignature: string) => void,
+    onError?: (error: Error) => void
+  ) => {
+    const removeCustomMetadataMessage =
+      buildMessageSignedForRemoveCustomMetadata(identity, key, nonceMNS);
+    signMessage(
+      { message: removeCustomMetadataMessage },
+      {
+        onSuccess: (makeOfferSignature) => {
+          const payMessage = buildMessageSignedForPay(
+            addressMNS,
+            "0x0000000000000000000000000000000000000001",
+            (BigInt(10) * amountOfMateReward).toString(),
+            priorityFeeForFisher.toString(),
+            nonceEVVM.toString(),
+            priorityFlag,
+            addressMNS
+          );
+
+          signMessage(
+            { message: payMessage },
+            {
+              onSuccess: (paySignature) =>
+                onSuccess?.(paySignature, makeOfferSignature),
+              onError: (error) => onError?.(error),
+            }
+          );
+        },
+        onError: (error) => onError?.(error),
+      }
+    );
+  };
+
   return {
     signMessage,
     signERC191Message,
@@ -385,6 +428,7 @@ export const useMnsSignatureBuilder = () => {
     signAcceptOffer,
     signRenewUsername,
     signAddCustomMetadata,
+    signRemoveCustomMetadata,
     ...rest,
   };
 };

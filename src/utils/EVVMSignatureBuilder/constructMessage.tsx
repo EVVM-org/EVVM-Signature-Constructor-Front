@@ -250,6 +250,21 @@ function buildMessageSignedForRenewUsername(
   return "f1747483," + `${username},` + `${mateNameServiceNonce.toString()}`;
 }
 
+function buildMessageSignedForAddCustomMetadata(
+  identity: string,
+  value: string,
+  mateNameServiceNonce: bigint
+): string {
+  return (
+    "e6efeffa," +
+    `${identity},` +
+    `${value},` +
+    `${mateNameServiceNonce.toString()}`
+  );
+}
+
+
+
 export {
   constructMessageForDepositFisher,
   buildMessageSignedForPay,
@@ -263,4 +278,5 @@ export {
   buildMessageSignedForWithdrawOffer,
   buildMessageSignedForAcceptOffer,
   buildMessageSignedForRenewUsername,
+  buildMessageSignedForAddCustomMetadata,
 };

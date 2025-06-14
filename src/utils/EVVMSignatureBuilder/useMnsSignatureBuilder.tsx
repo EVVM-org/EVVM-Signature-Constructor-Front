@@ -1,6 +1,7 @@
 import { useSignMessage } from "wagmi";
 import {
   buildMessageSignedForAcceptOffer,
+  buildMessageSignedForAddCustomMetadata,
   buildMessageSignedForMakeOffer,
   buildMessageSignedForPay,
   buildMessageSignedForPreRegistrationUsername,
@@ -326,6 +327,101 @@ export const useMnsSignatureBuilder = () => {
     );
   };
 
+  /*
+    * How to use identityCustomMetadata:
+    *
+    * identityCustomMetadata["username"][key] = "value";
+    *
+    * Parameters:
+    * 
+    * - key (numberKey):
+    *   Should be treated as a nonce (unique number) to avoid overwriting existing values.
+    *   The value 0 is used as a header to check for the absence of a value in case the user
+    *   does not enter one.
+    *
+    * - value (customValue):
+    *   Is a text string that allows storing any type of data.
+    *   The data follows a standard to facilitate reading, although it is not mandatory
+    *   to fully comply with it.
+    *
+    * Standard value format:
+    * [schema]:[subschema]>[value]
+    *
+    * Examples:
+    * memberOf:>EVVM
+    * socialMedia:x     >jistro       // LinkedIn without subschema
+    * email:dev   >jistro@evvm.org    // Email with "dev" subschema
+    * email:callme>contact@jistro.xyz  // Email with "callme" subschema
+    *
+    * Important notes:
+    * - 'schema' is based on https://schema.org/docs/schemas.html
+    * - ':' is the separator between schema and subschema
+    * - '>' is the separator between metadata and value
+    * - If 'schema' or 'subschema' have fewer than 5 characters, they should be padded with spaces:
+    *   Example: vk   :job  >jane-doe
+    * - In case of social networks, the 'schema' should be "socialMedia" and the 'subschema' should be the social network name
+    
+    function addCustomMetadata(
+        address _user,
+        uint256 _nonce,
+        string memory _identity,
+        string memory _value,
+        uint256 _priorityFeeForFisher,
+        bytes memory _signature,
+        uint256 _nonce_Evvm_forAddCustomMetadata,
+        bool _priority_Evvm_forAddCustomMetadata,
+        bytes memory _signature_Evvm_forAddCustomMetadata
+    )
+  */
+
+  const signAddCustomMetadata = (
+    addressMNS: string,
+    nonceMNS: bigint,
+    identity: string,
+    schema: string,
+    subschema: string,
+    value: string,
+    priorityFeeForFisher: bigint,
+    amountOfMateReward: bigint,
+    nonceEVVM: bigint,
+    priorityFlag: boolean,
+    onSuccess?: (paySignature: string, customMetadataSignature: string) => void,
+    onError?: (error: Error) => void
+  ) => {
+    const customMetadataMessage = buildMessageSignedForAddCustomMetadata(
+      identity,
+      `${schema}:${subschema}>${value}`,
+      nonceMNS
+    );
+
+    signMessage(
+      { message: customMetadataMessage },
+      {
+        onSuccess: (makeOfferSignature) => {
+          const payMessage = buildMessageSignedForPay(
+            addressMNS,
+            "0x0000000000000000000000000000000000000001",
+            (BigInt(10) * amountOfMateReward).toString(),
+            priorityFeeForFisher.toString(),
+            nonceEVVM.toString(),
+            priorityFlag,
+            addressMNS
+          );
+
+          signMessage(
+            { message: payMessage },
+            {
+              onSuccess: (paySignature) =>
+                onSuccess?.(paySignature, makeOfferSignature),
+              onError: (error) => onError?.(error),
+            }
+          );
+        },
+        onError: (error) => onError?.(error),
+      }
+    );
+  };
+
   return {
     signMessage,
     signERC191Message,
@@ -335,6 +431,7 @@ export const useMnsSignatureBuilder = () => {
     signWithdrawOffer,
     signAcceptOffer,
     signRenewUsername,
+    signAddCustomMetadata,
     ...rest,
   };
 };

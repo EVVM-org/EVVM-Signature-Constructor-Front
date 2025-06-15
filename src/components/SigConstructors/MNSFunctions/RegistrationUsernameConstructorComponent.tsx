@@ -4,9 +4,6 @@ import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import { useMnsSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useMnsSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
-import { DetailedData } from "@/components/SigConstructors/InputsAndModules/DetailedData";
-
-import styles from "@/components/SigConstructors/SignatureConstructor.module.css";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";

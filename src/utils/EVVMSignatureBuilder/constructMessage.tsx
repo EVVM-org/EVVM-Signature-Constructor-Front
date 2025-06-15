@@ -283,6 +283,13 @@ function buildMessageSignedForFlushCustomMetadata(
   return "3e7899a1," + `${identity},` + `${nonceMNS.toString()}`;
 }
 
+function buildMessageSignedForFlushUsername(
+  username: string,
+  nonceMNS: bigint
+): string {
+  return "d22c816c," + `${username},` + `${nonceMNS.toString()}`;
+}
+
 export {
   constructMessageForDepositFisher,
   buildMessageSignedForPay,
@@ -299,4 +306,5 @@ export {
   buildMessageSignedForAddCustomMetadata,
   buildMessageSignedForRemoveCustomMetadata,
   buildMessageSignedForFlushCustomMetadata,
+  buildMessageSignedForFlushUsername,
 };

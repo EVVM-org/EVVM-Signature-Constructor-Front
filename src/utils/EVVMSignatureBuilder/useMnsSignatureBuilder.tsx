@@ -2,6 +2,7 @@ import { useSignMessage } from "wagmi";
 import {
   buildMessageSignedForAcceptOffer,
   buildMessageSignedForAddCustomMetadata,
+  buildMessageSignedForFlushCustomMetadata,
   buildMessageSignedForMakeOffer,
   buildMessageSignedForPay,
   buildMessageSignedForPreRegistrationUsername,
@@ -418,6 +419,62 @@ export const useMnsSignatureBuilder = () => {
     );
   };
 
+  /*
+  function flushCustomMetadata(
+        address _user,
+        uint256 _nonce,
+        string memory _identity,
+        uint256 _priorityFeeForFisher,
+        bytes memory _signature,
+        uint256 _nonce_Evvm,
+        bool _priority_Evvm,
+        bytes memory _signature_Evvm
+    )
+  */
+
+  const signFlushCustomMetadata = (
+    addressMNS: string,
+    nonceMNS: bigint,
+    identity: string,
+    priceToFlushCustomMetadata: bigint,
+    priorityFeeForFisher: bigint,
+    nonceEVVM: bigint,
+    priorityFlag: boolean,
+    onSuccess?: (paySignature: string, flushSignature: string) => void,
+    onError?: (error: Error) => void
+  ) => {
+    const flushCustomMetadataMessage = buildMessageSignedForFlushCustomMetadata(
+      identity,
+      nonceMNS
+    );
+    signMessage(
+      { message: flushCustomMetadataMessage },
+      {
+        onSuccess: (flushSignature) => {
+          const payMessage = buildMessageSignedForPay(
+            addressMNS,
+            "0x0000000000000000000000000000000000000001",
+            priceToFlushCustomMetadata.toString(),
+            priorityFeeForFisher.toString(),
+            nonceEVVM.toString(),
+            priorityFlag,
+            addressMNS
+          );
+
+          signMessage(
+            { message: payMessage },
+            {
+              onSuccess: (paySignature) =>
+                onSuccess?.(paySignature, flushSignature),
+              onError: (error) => onError?.(error),
+            }
+          );
+        },
+        onError: (error) => onError?.(error),
+      }
+    );
+  };
+
   return {
     signMessage,
     signERC191Message,
@@ -429,6 +486,7 @@ export const useMnsSignatureBuilder = () => {
     signRenewUsername,
     signAddCustomMetadata,
     signRemoveCustomMetadata,
+    signFlushCustomMetadata,
     ...rest,
   };
 };

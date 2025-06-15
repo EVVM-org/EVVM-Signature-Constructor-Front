@@ -14,6 +14,7 @@ import { AcceptOfferConstructorComponent } from "@/components/SigConstructors/MN
 import { RenewUsernameConstructorComponent } from "./MNSFunctions/RenewUsernameConstructorComponent";
 import { AddCustomMetadataConstructorComponent } from "./MNSFunctions/AddCustomMetadataConstructorComponent";
 import { RemoveCustomMetadataConstructorComponent } from "./MNSFunctions/RemoveCustomMetadataConstructorComponent";
+import { FlushCustomMetadataConstructorComponent } from "./MNSFunctions/FlushCustomMetadataConstructorComponent";
 
 const boxStyle = {
   display: "flex",
@@ -60,6 +61,7 @@ export const SigMenu = () => {
     <RenewUsernameConstructorComponent key="renewUsername" />,
     <AddCustomMetadataConstructorComponent key="addCustomMetadata" />,
     <RemoveCustomMetadataConstructorComponent key="removeCustomMetadata" />,
+    <FlushCustomMetadataConstructorComponent key="flushCustomMetadata" />,
   ];
 
   const components =

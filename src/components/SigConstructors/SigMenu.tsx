@@ -16,6 +16,7 @@ import { AddCustomMetadataConstructorComponent } from "./MNSFunctions/AddCustomM
 import { RemoveCustomMetadataConstructorComponent } from "./MNSFunctions/RemoveCustomMetadataConstructorComponent";
 import { FlushCustomMetadataConstructorComponent } from "./MNSFunctions/FlushCustomMetadataConstructorComponent";
 import { FlushUsernameConstructorComponent } from "./MNSFunctions/FlushUsernameConstructorComponent";
+import { FaucetFunctionsComponent } from "./FaucetFunctions/FaucetFunctionsComponent";
 
 const boxStyle = {
   display: "flex",
@@ -39,7 +40,12 @@ const selectStyle = {
 } as const;
 
 export const SigMenu = () => {
-  const [menu, setMenu] = useState("pay");
+  const [menu, setMenu] = useState("faucet");
+
+  const FaucetFunctions = [
+    <FaucetFunctionsComponent key="faucet" />,
+    
+  ];
 
   const payComponents = [
     <PaySignaturesConstructorComponent key="pay" />,
@@ -67,7 +73,9 @@ export const SigMenu = () => {
   ];
 
   const components =
-    menu === "pay"
+    menu === "faucet"
+      ? FaucetFunctions
+      : menu === "pay"
       ? payComponents
       : menu === "staking"
       ? stakingComponents
@@ -78,6 +86,7 @@ export const SigMenu = () => {
   return (
     <>
       <select onChange={(e) => setMenu(e.target.value)} style={selectStyle}>
+        <option value="faucet">Faucet functions</option>
         <option value="pay">Payment signatures</option>
         <option value="staking">Staking signatures</option>
         <option value="mns">MNS signatures</option>

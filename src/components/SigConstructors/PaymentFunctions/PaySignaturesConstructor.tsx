@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { getAccount } from "@wagmi/core";
+import { getAccount, writeContract } from "@wagmi/core";
 import { config } from "@/config/index";
 import { useEVVMSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useEVVMSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
@@ -9,6 +9,9 @@ import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAnd
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { ExecutorSelector } from "../InputsAndModules/ExecutorSelector";
+import { address } from "../../../../constants/address";
+import Evvm from "../../../../constants/abi/Evvm.json";
+import { AsStakerSelector } from "../InputsAndModules/AsStakerSelector";
 
 type PayData = {
   from: `0x${string}`;
@@ -34,6 +37,7 @@ export const PaySignaturesConstructorComponent = () => {
   const [isUsingExecutor, setIsUsingExecutor] = React.useState(false);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<PayData | null>(null);
+  const [asStaker, setAsStaker] = React.useState(false);
 
   const makeSig = async () => {
     const getInputValue = (id: string) =>
@@ -74,6 +78,72 @@ export const PaySignaturesConstructorComponent = () => {
       },
       (error) => console.error("Error signing payment:", error)
     );
+  };
+
+  const executePayment = async () => {
+    if (!dataToGet) {
+      console.error("No data to execute payment");
+      return;
+    }
+    const account = getAccount(config);
+    const chainId = account.chain?.id;
+    if (!chainId) {
+      console.error("No chain ID available");
+      return;
+    }
+
+    if (dataToGet.priority) {
+      writeContract(config, {
+        abi: Evvm.abi,
+        address: address[chainId.toString() as keyof typeof address]
+          .evvm as `0x${string}`,
+        functionName: asStaker
+          ? "payMateStaking_async"
+          : "payNoMateStaking_async",
+        args: [
+          dataToGet.from,
+          dataToGet.to_address,
+          dataToGet.to_identity,
+          dataToGet.token,
+          dataToGet.amount,
+          dataToGet.priorityFee,
+          dataToGet.nonce,
+          dataToGet.executor,
+          dataToGet.signature,
+        ],
+      })
+        .then(() => {
+          console.log("Payment successful");
+        })
+        .catch((error) => {
+          console.error("Error executing payment:", error);
+        });
+    } else {
+      writeContract(config, {
+        abi: Evvm.abi,
+        address: address[chainId.toString() as keyof typeof address]
+          .evvm as `0x${string}`,
+        functionName: asStaker
+          ? "payMateStaking_sync"
+          : "payNoMateStaking_sync",
+        args: [
+          dataToGet.from,
+          dataToGet.to_address,
+          dataToGet.to_identity,
+          dataToGet.token,
+          dataToGet.amount,
+          dataToGet.priorityFee,
+          dataToGet.executor,
+          dataToGet.signature,
+        ],
+      })
+        .then(() => {
+          console.log("Payment successful");
+        })
+        .catch((error) => {
+          console.error("Error executing payment:", error);
+        });
+    }
   };
 
   return (
@@ -164,6 +234,9 @@ export const PaySignaturesConstructorComponent = () => {
 
       <PrioritySelector onPriorityChange={setPriority} />
 
+      {/* As Staker configuration */}
+      <AsStakerSelector onAsStakerChange={setAsStaker} />
+
       {/* Create signature button */}
       <button
         onClick={makeSig}
@@ -195,6 +268,20 @@ export const PaySignaturesConstructorComponent = () => {
               onClick={() => setDataToGet(null)}
             >
               Clear
+            </button>
+            <button
+              style={{
+                backgroundColor: "#4c5cafff",
+                color: "white",
+                padding: "0.5rem",
+                margin: "0.5rem",
+                borderRadius: "5px",
+                border: "none",
+                cursor: "pointer",
+              }}
+              onClick={executePayment}
+            >
+              Execute
             </button>
           </div>
         </div>

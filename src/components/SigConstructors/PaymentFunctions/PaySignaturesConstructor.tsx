@@ -11,7 +11,7 @@ import { ExecutorSelector } from "../InputsAndModules/ExecutorSelector";
 import { AsStakerSelector } from "../InputsAndModules/AsStakerSelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
 import { PayInputData } from "@/utils/evvmTypeInputStructure";
-import { executePay } from "@/utils/EVVMTransactionExecuter/useEVVMTransactionExecuter";
+import { executePay } from "@/utils/TransactionExecuter/useTransactionExecuter";
 import { address } from "@/constants/address";
 
 export const PaySignaturesConstructorComponent = () => {

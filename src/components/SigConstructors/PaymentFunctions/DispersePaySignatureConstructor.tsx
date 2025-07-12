@@ -14,7 +14,7 @@ import {
   DispersePayInputData,
   DispersePayMetadata,
 } from "@/utils/evvmTypeInputStructure";
-import { executeDispersePay } from "@/utils/EVVMTransactionExecuter/useEVVMTransactionExecuter";
+import { executeDispersePay } from "@/utils/TransactionExecuter/useTransactionExecuter";
 import { address } from "@/constants/address";
 
 export const DispersePaySignatureConstructor = () => {

@@ -95,4 +95,35 @@ const executeDispersePay = async (
     });
 };
 
-export { executePay, executeDispersePay };
+const executePayMultiple = async (
+  InputData: PayInputData[],
+  evvmAddress: `0x${string}`
+) => {
+  if (!InputData || InputData.length === 0) {
+    return Promise.reject("No data to execute multiple payments");
+  }
+  writeContract(config, {
+    abi: Evvm.abi,
+    address: evvmAddress,
+    functionName: "payMultiple",
+    args: InputData.map((data) => [
+      data.from,
+      data.to_address,
+      data.to_identity,
+      data.token,
+      data.amount,
+      data.priorityFee,
+      data.nonce,
+      data.executor,
+      data.signature,
+    ]),
+  })
+    .then(() => {
+      return Promise.resolve();
+    })
+    .catch((error) => {
+      return Promise.reject(error);
+    });
+};
+
+export { executePay, executeDispersePay, executePayMultiple };

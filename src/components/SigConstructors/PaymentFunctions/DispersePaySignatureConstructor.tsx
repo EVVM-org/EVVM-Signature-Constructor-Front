@@ -2,7 +2,7 @@
 import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useEVVMSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useEVVMSignatureBuilder";
+import { useSignatureBuilder } from "@/utils/SignatureBuilder/useSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
@@ -30,7 +30,7 @@ export const DispersePaySignatureConstructor = () => {
     null
   );
 
-  const { signDispersePay } = useEVVMSignatureBuilder();
+  const { signDispersePay } = useSignatureBuilder();
 
   const getValue = (id: string) =>
     (document.getElementById(id) as HTMLInputElement).value;

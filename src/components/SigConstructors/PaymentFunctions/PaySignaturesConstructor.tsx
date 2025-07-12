@@ -2,7 +2,7 @@
 import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useEVVMSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useEVVMSignatureBuilder";
+import { useSignatureBuilder } from "@/utils/SignatureBuilder/useSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
@@ -15,7 +15,7 @@ import { executePay } from "@/utils/EVVMTransactionExecuter/useEVVMTransactionEx
 import { address } from "@/constants/address";
 
 export const PaySignaturesConstructorComponent = () => {
-  const { signPay } = useEVVMSignatureBuilder();
+  const { signPay } = useSignatureBuilder();
 
   const [isUsingUsernames, setIsUsingUsernames] = React.useState(true);
   const [isUsingExecutor, setIsUsingExecutor] = React.useState(false);

@@ -2,9 +2,9 @@
 import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useMnsSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useMnsSignatureBuilder";
+import { useMnsSignatureBuilder } from "@/utils/SignatureBuilder/useMnsSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
-import { hashPreRegisteredUsername } from "@/utils/EVVMSignatureBuilder/hashTools";
+import { hashPreRegisteredUsername } from "@/utils/SignatureBuilder/hashTools";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
 import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";

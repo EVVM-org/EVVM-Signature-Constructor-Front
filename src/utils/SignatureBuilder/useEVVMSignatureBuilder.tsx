@@ -12,7 +12,7 @@ type DispersePayMetadata = {
   to_identity: string;
 };
 
-export const useEVVMSignatureBuilder = () => {
+export const useSignatureBuilder = () => {
   const { signMessage, ...rest } = useSignMessage();
 
   // Generic ERC191 message signing

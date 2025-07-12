@@ -1,7 +1,6 @@
 import { writeContract } from "@wagmi/core";
 import { DispersePayInputData, PayInputData } from "../evvmTypeInputStructure";
 import { config } from "@/config";
-import { address } from "@/constants/address";
 import Evvm from "@/constants/abi/Evvm.json";
 
 const executePay = async (

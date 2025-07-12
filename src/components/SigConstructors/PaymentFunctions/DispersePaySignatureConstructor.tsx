@@ -2,7 +2,7 @@
 import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useSignatureBuilder } from "@/utils/SignatureBuilder/useSignatureBuilder";
+import { useSignatureBuilder } from "@/utils/SignatureBuilder/useEVVMSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
@@ -13,8 +13,8 @@ import { ExecutorSelector } from "../InputsAndModules/ExecutorSelector";
 import {
   DispersePayInputData,
   DispersePayMetadata,
-} from "@/utils/evvmTypeInputStructure";
-import { executeDispersePay } from "@/utils/TransactionExecuter/useTransactionExecuter";
+} from "@/utils/TypeStructures/evvmTypeInputStructure";
+import { executeDispersePay } from "@/utils/TransactionExecuter/useEVVMTransactionExecuter";
 import { address } from "@/constants/address";
 
 export const DispersePaySignatureConstructor = () => {
@@ -68,7 +68,7 @@ export const DispersePaySignatureConstructor = () => {
       const amount = getValue(`amountTokenToGiveUser${i}`);
 
       toData.push({
-        amount,
+        amount: BigInt(amount),
         to_address: isUsingUsername
           ? "0x0000000000000000000000000000000000000000"
           : (to as `0x${string}`),
@@ -88,11 +88,11 @@ export const DispersePaySignatureConstructor = () => {
         setDataToGet({
           from: account.address as `0x${string}`,
           toData,
-          token: TokenAddress,
-          amount: Amount,
-          priorityFee: PriorityFee,
+          token: TokenAddress as `0x${string}`,
+          amount: BigInt(Amount),
+          priorityFee: BigInt(PriorityFee),
           priority: priorityDisperse === "high",
-          nonce: Nonce,
+          nonce: BigInt(Nonce),
           executor: Executor,
           signature: dispersePaySignature,
         });

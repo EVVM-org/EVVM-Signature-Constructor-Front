@@ -10,18 +10,12 @@ import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
 import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector";
+import { PayInputData } from "@/utils/TypeStructures/evvmTypeInputStructure";
+import { GoldenStakingInputData } from "@/utils/TypeStructures/sMateTypeInputStructure";
 
-type PayData = {
-  isStaking: string; // "true" for staking, "false" for unstaking
-  from: `0x${string}`;
-  to_address: `0x${string}`;
-  token: string;
-  amount: string;
-  priorityFee: string;
-  nonce: string;
-  priority: string;
-  executor: string;
-  signature: string;
+type InfoData = {
+  PayInputData: PayInputData;
+  GoldenStakingInputData: GoldenStakingInputData;
 };
 
 export const GoldenStakingSignatureConstructor = () => {
@@ -29,7 +23,7 @@ export const GoldenStakingSignatureConstructor = () => {
   const { signGoldenStaking } = useSMateSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
-  const [dataToGet, setDataToGet] = React.useState<PayData | null>(null);
+  const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
 
   const makeSig = async () => {
     // Get form values
@@ -38,30 +32,38 @@ export const GoldenStakingSignatureConstructor = () => {
 
     const nonce = getValue("nonceInput_GoldenStaking");
     const sMateAddress = getValue("sMateAddressInput_GoldenStaking");
-    const amount =
-      Number(getValue("amountOfSMateInput_GoldenStaking")) * (5083 * 10 ** 18);
+    const amountStaking = Number(getValue("amountOfSMateInput_GoldenStaking"));
+    const amountToken =
+      BigInt(getValue("amountOfSMateInput_GoldenStaking")) *
+      (BigInt(5083) * BigInt(10) ** BigInt(18));
 
     // Sign and set data
     signGoldenStaking(
       sMateAddress,
-      amount,
+      amountStaking,
       nonce,
       priority === "high",
       (signature) => {
         setDataToGet({
-          isStaking: isStaking.toString(),
-          from: account.address as `0x${string}`,
-          to_address: sMateAddress as `0x${string}`,
-          token: "0x0000000000000000000000000000000000000001",
-          amount: amount.toLocaleString("fullwide", { useGrouping: false }),
-          priorityFee: "0",
-          nonce,
-          priority,
-          executor: sMateAddress as `0x${string}`,
-          signature,
-        });
-      },
-      (error) => console.error("Error signing staking:", error)
+          PayInputData: {
+            from: account.address as `0x${string}`,
+            to_address: sMateAddress as `0x${string}`,
+            to_identity: "",
+            token: "0x0000000000000000000000000000000000000001",
+            amount: amountToken,
+            priorityFee: BigInt(0),
+            nonce: BigInt(nonce),
+            priority: priority === "high",
+            executor: sMateAddress as `0x${string}`,
+            signature,
+          },
+          GoldenStakingInputData: {
+            isStaking: isStaking,
+            amountOfSMate: BigInt(amountStaking),
+            signature,
+          },
+        } as InfoData);
+      }
     );
   };
 

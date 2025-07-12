@@ -4,8 +4,8 @@ import { getAccount, writeContract } from "@wagmi/core";
 import { config } from "@/config/index";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
-import { address } from "../../../../constants/address";
-import Evvm from "../../../../constants/abi/Evvm.json";
+import { address } from "@/constants/address";
+import Evvm from "@/constants/abi/Evvm.json";
 
 export const FaucetFunctionsComponent = () => {
   const executeFaucet = async () => {

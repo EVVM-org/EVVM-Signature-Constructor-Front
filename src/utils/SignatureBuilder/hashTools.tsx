@@ -1,11 +1,7 @@
 import { keccak256, encodePacked, encodeAbiParameters, sha256 } from "viem";
+import { DispersePayMetadata } from "../TypeStructures/evvmTypeInputStructure";
 
-// Type definition for disperse payment metadata
-type DispersePayMetadata = {
-  amount: string;
-  to_address: string;
-  to_identity: string;
-};
+
 
 // ABI parameters for encoding disperse payment data
 const abiDispersePayParameters = [

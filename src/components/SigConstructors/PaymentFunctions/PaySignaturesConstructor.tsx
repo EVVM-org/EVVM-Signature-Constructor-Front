@@ -2,7 +2,7 @@
 import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useSignatureBuilder } from "@/utils/SignatureBuilder/useSignatureBuilder";
+import { useSignatureBuilder } from "@/utils/SignatureBuilder/useEVVMSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
@@ -10,8 +10,8 @@ import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { ExecutorSelector } from "../InputsAndModules/ExecutorSelector";
 import { AsStakerSelector } from "../InputsAndModules/AsStakerSelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
-import { PayInputData } from "@/utils/evvmTypeInputStructure";
-import { executePay } from "@/utils/TransactionExecuter/useTransactionExecuter";
+import { PayInputData } from "@/utils/TypeStructures/evvmTypeInputStructure";
+import { executePay } from "@/utils/TransactionExecuter/useEVVMTransactionExecuter";
 import { address } from "@/constants/address";
 
 export const PaySignaturesConstructorComponent = () => {
@@ -65,11 +65,11 @@ export const PaySignaturesConstructorComponent = () => {
             ? to
             : "0x0000000000000000000000000000000000000000") as `0x${string}`,
           to_identity: to.startsWith("0x") ? "" : to,
-          token: tokenAddress,
-          amount,
-          priorityFee,
-          nonce,
-          priority: priority === "high" ? "true" : "false",
+          token: tokenAddress as `0x${string}`,
+          amount: BigInt(amount),
+          priorityFee: BigInt(priorityFee),
+          nonce: BigInt(nonce),
+          priority: priority === "high",
           executor,
           signature,
         });

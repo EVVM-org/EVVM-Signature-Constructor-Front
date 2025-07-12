@@ -2,17 +2,17 @@ type PayInputData = {
   from: `0x${string}`;
   to_address: `0x${string}`;
   to_identity: string;
-  token: string;
-  amount: string;
-  priorityFee: string;
-  nonce: string;
-  priority: string;
+  token: `0x${string}`;
+  amount: bigint;
+  priorityFee: bigint;
+  nonce: bigint;
+  priority: boolean;
   executor: string;
   signature: string;
 };
 
 type DispersePayMetadata = {
-  amount: string;
+  amount: bigint;
   to_address: `0x${string}`;
   to_identity: string;
 };
@@ -20,11 +20,11 @@ type DispersePayMetadata = {
 type DispersePayInputData = {
   from: `0x${string}`;
   toData: DispersePayMetadata[];
-  token: string;
-  amount: string;
-  priorityFee: string;
+  token: `0x${string}`;
+  amount: bigint;
+  priorityFee: bigint;
   priority: boolean;
-  nonce: string;
+  nonce: bigint;
   executor: string;
   signature: string;
 };

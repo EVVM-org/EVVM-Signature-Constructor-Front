@@ -23,27 +23,26 @@ export const DataDisplayWithClear: React.FC<DataDisplayWithClearProps> = ({
 
       {/* Action buttons */}
       <div style={{ marginTop: "1rem" }}>
-        <button
-          className={styles.clearButton}
-          onClick={onClear}
-        >
+        <button className={styles.clearButton} onClick={onClear}>
           Clear
         </button>
 
-        <button
-              style={{
-                backgroundColor: "#4c5cafff",
-                color: "white",
-                padding: "0.5rem",
-                margin: "0.5rem",
-                borderRadius: "5px",
-                border: "none",
-                cursor: "pointer",
-              }}
-              onClick={executeAction}
-            >
-              Execute
-            </button>
+        {executeAction && (
+          <button
+            style={{
+              backgroundColor: "#4c5cafff",
+              color: "white",
+              padding: "0.5rem",
+              margin: "0.5rem",
+              borderRadius: "5px",
+              border: "none",
+              cursor: "pointer",
+            }}
+            onClick={executeAction}
+          >
+            Execute
+          </button>
+        )}
       </div>
     </div>
   );

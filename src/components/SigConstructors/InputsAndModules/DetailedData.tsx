@@ -7,7 +7,7 @@ export const DetailedData = ({
 }) => {
   const [showData, setShowData] = useState(false);
   return (
-    <div >
+    <div>
       <h2>Ready</h2>
 
       <button
@@ -35,20 +35,15 @@ export const DetailedData = ({
         >
           {Object.entries(dataToGet).map(([key, value]) => (
             <div key={key} style={{ marginBottom: "0rem" }}>
-              {`${key}: ${typeof value === 'object' ? JSON.stringify(value, null, 2) : value} `}
-              <button
-                style={{
-                  color: "white",
-                  backgroundColor: "#637988",
-                  padding: "0.3rem",
-                  border: "none",
-                  cursor: "pointer",
-                  marginLeft: "0.5rem",
-                }}
-                onClick={() => navigator.clipboard.writeText(typeof value === 'object' ? JSON.stringify(value, null, 2) : value)}
-              >
-                Copy
-              </button>
+              {`${key}: ${
+                typeof value === "object"
+                  ? JSON.stringify(
+                      value,
+                      (k, v) => (typeof v === "bigint" ? v.toString() : v),
+                      2
+                    )
+                  : value
+              } `}
             </div>
           ))}
         </div>

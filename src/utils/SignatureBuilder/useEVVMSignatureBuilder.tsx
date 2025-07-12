@@ -4,13 +4,8 @@ import {
   buildMessageSignedForPay,
 } from "./constructMessage";
 import { hashDispersePaymentUsersToPay } from "./hashTools";
+import { DispersePayMetadata } from "../TypeStructures/evvmTypeInputStructure";
 
-// Type definition for disperse payment metadata
-type DispersePayMetadata = {
-  amount: string;
-  to_address: string;
-  to_identity: string;
-};
 
 export const useSignatureBuilder = () => {
   const { signMessage, ...rest } = useSignMessage();

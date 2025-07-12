@@ -15,6 +15,7 @@ import {
   DispersePayMetadata,
 } from "@/utils/evvmTypeInputStructure";
 import { executeDispersePay } from "@/utils/EVVMTransactionExecuter/useEVVMTransactionExecuter";
+import { address } from "@/constants/address";
 
 export const DispersePaySignatureConstructor = () => {
   const [isUsingExecutorDisperse, setIsUsingExecutorDisperse] =
@@ -127,7 +128,11 @@ export const DispersePaySignatureConstructor = () => {
       return;
     }
 
-    executeDispersePay(dataToGet, account.chain.id)
+    executeDispersePay(
+      dataToGet,
+      address[account.chain.id.toString() as keyof typeof address]
+        .evvm as `0x${string}`
+    )
       .then(() => {
         console.log("Disperse payment executed successfully");
       })

@@ -12,6 +12,7 @@ import { AsStakerSelector } from "../InputsAndModules/AsStakerSelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
 import { PayInputData } from "@/utils/evvmTypeInputStructure";
 import { executePay } from "@/utils/EVVMTransactionExecuter/useEVVMTransactionExecuter";
+import { address } from "@/constants/address";
 
 export const PaySignaturesConstructorComponent = () => {
   const { signPay } = useEVVMSignatureBuilder();
@@ -102,7 +103,12 @@ export const PaySignaturesConstructorComponent = () => {
       return;
     }
 
-    executePay(dataToGet, account.chain.id, asStaker)
+    executePay(
+      dataToGet,
+      address[account.chain.id.toString() as keyof typeof address]
+        .evvm as `0x${string}`,
+      asStaker
+    )
       .then(() => {
         console.log("Payment executed successfully");
       })

@@ -6,7 +6,7 @@ import Evvm from "@/constants/abi/Evvm.json";
 
 const executePay = async (
   InputData: PayInputData,
-  chainId: number,
+  evvmAddress: `0x${string}`,
   asStaker: boolean
 ) => {
   if (!InputData) {
@@ -16,8 +16,7 @@ const executePay = async (
   if (InputData.priority) {
     writeContract(config, {
       abi: Evvm.abi,
-      address: address[chainId.toString() as keyof typeof address]
-        .evvm as `0x${string}`,
+      address: evvmAddress,
       functionName: asStaker
         ? "payMateStaking_async"
         : "payNoMateStaking_async",
@@ -42,8 +41,7 @@ const executePay = async (
   } else {
     writeContract(config, {
       abi: Evvm.abi,
-      address: address[chainId.toString() as keyof typeof address]
-        .evvm as `0x${string}`,
+      address: evvmAddress,
       functionName: asStaker ? "payMateStaking_sync" : "payNoMateStaking_sync",
       args: [
         InputData.from,
@@ -67,7 +65,7 @@ const executePay = async (
 
 const executeDispersePay = async (
   InputData: DispersePayInputData,
-  chainId: number
+  evvmAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No data to execute payment");
@@ -75,8 +73,7 @@ const executeDispersePay = async (
 
   writeContract(config, {
     abi: Evvm.abi,
-    address: address[chainId.toString() as keyof typeof address]
-      .evvm as `0x${string}`,
+    address: evvmAddress,
     functionName: "dispersePay",
     args: [
       InputData.from,

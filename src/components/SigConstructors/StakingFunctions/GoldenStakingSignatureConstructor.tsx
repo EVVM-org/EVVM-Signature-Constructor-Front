@@ -12,6 +12,8 @@ import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
 import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector";
 import { PayInputData } from "@/utils/TypeStructures/evvmTypeInputStructure";
 import { GoldenStakingInputData } from "@/utils/TypeStructures/sMateTypeInputStructure";
+import { address } from "@/constants/address";
+import { executeGoldenStaking } from "@/utils/TransactionExecuter/useSMateTransactionExecuter";
 
 type InfoData = {
   PayInputData: PayInputData;
@@ -67,6 +69,44 @@ export const GoldenStakingSignatureConstructor = () => {
     );
   };
 
+  const execute = async () => {
+    if (!dataToGet) {
+      console.error("No data to execute payment");
+      return;
+    }
+
+    let account = getAccount(config);
+
+    if (!account.chain?.id) {
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        console.error("Account chain ID is undefined, retrying...");
+        account = getAccount(config);
+        if (account.chain?.id || attempts >= 10) {
+          clearInterval(interval);
+        }
+      }, 200);
+    }
+
+    if (!account.chain?.id) {
+      console.error("Chain ID is still undefined after retries");
+      return;
+    }
+
+    const sMateAddress = address[
+      account.chain.id.toString() as keyof typeof address
+    ].sMate as `0x${string}`;
+
+    executeGoldenStaking(dataToGet.GoldenStakingInputData, sMateAddress)
+      .then(() => {
+        console.log("Golden staking executed successfully");
+      })
+      .catch((error) => {
+        console.error("Error executing golden staking:", error);
+      });
+  };
+
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <h1>Golden staking</h1>
@@ -115,6 +155,7 @@ export const GoldenStakingSignatureConstructor = () => {
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
+        executeAction={execute}
       />
     </div>
   );

@@ -1,32 +1,23 @@
 import { writeContract } from "@wagmi/core";
-import {
-  DispersePayInputData,
-  PayInputData,
-} from "../TypeStructures/evvmTypeInputStructure";
 import { config } from "@/config";
-import Evvm from "@/constants/abi/Evvm.json";
+import SMate from "@/constants/abi/SMate.json";
+import { GoldenStakingInputData } from "../TypeStructures/sMateTypeInputStructure";
 
-const executeDispersePay = async (
-  InputData: DispersePayInputData,
-  evvmAddress: `0x${string}`
+const executeGoldenStaking = async (
+  InputData: GoldenStakingInputData,
+  sMateAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No data to execute payment");
   }
 
   writeContract(config, {
-    abi: Evvm.abi,
-    address: evvmAddress,
-    functionName: "dispersePay",
+    abi: SMate.abi,
+    address: sMateAddress,
+    functionName: "goldenStaking",
     args: [
-      InputData.from,
-      InputData.toData,
-      InputData.token,
-      InputData.amount,
-      InputData.priorityFee,
-      InputData.nonce,
-      InputData.priority,
-      InputData.executor,
+      InputData.isStaking,
+      InputData.amountOfSMate,
       InputData.signature,
     ],
   })
@@ -38,4 +29,4 @@ const executeDispersePay = async (
     });
 };
 
-export { executeDispersePay };
+export { executeGoldenStaking };

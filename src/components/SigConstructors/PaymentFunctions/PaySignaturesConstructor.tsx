@@ -103,12 +103,11 @@ export const PaySignaturesConstructorComponent = () => {
       return;
     }
 
-    executePay(
-      dataToGet,
-      address[account.chain.id.toString() as keyof typeof address]
-        .evvm as `0x${string}`,
-      asStaker
-    )
+    const evvmAddress = address[
+      account.chain.id.toString() as keyof typeof address
+    ].evvm as `0x${string}`;
+
+    executePay(dataToGet, evvmAddress, asStaker)
       .then(() => {
         console.log("Payment executed successfully");
       })

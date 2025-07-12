@@ -1,42 +1,25 @@
 "use client";
 import React from "react";
-import { getAccount, writeContract } from "@wagmi/core";
+import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import { useEVVMSignatureBuilder } from "@/utils/EVVMSignatureBuilder/useEVVMSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
-import { DetailedData } from "@/components/SigConstructors/InputsAndModules/DetailedData";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { ExecutorSelector } from "../InputsAndModules/ExecutorSelector";
-import { address } from "../../../../constants/address";
-import Evvm from "../../../../constants/abi/Evvm.json";
 import { AsStakerSelector } from "../InputsAndModules/AsStakerSelector";
-
-type PayData = {
-  from: `0x${string}`;
-  to_address: `0x${string}`;
-  to_identity: string;
-  token: string;
-  amount: string;
-  priorityFee: string;
-  nonce: string;
-  priority: string;
-  executor: string;
-  signature: string;
-};
+import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
+import { PayInputData } from "@/utils/evvmTypeInputStructure";
+import { executePay } from "@/utils/EVVMTransactionExecuter/useEVVMTransactionExecuter";
 
 export const PaySignaturesConstructorComponent = () => {
   const { signPay } = useEVVMSignatureBuilder();
-  const account = getAccount(config);
 
-  const [selectedToken, setSelectedToken] = React.useState(
-    "0x0000000000000000000000000000000000000000"
-  );
   const [isUsingUsernames, setIsUsingUsernames] = React.useState(true);
   const [isUsingExecutor, setIsUsingExecutor] = React.useState(false);
   const [priority, setPriority] = React.useState("low");
-  const [dataToGet, setDataToGet] = React.useState<PayData | null>(null);
+  const [dataToGet, setDataToGet] = React.useState<PayInputData | null>(null);
   const [asStaker, setAsStaker] = React.useState(false);
 
   const makeSig = async () => {
@@ -51,6 +34,20 @@ export const PaySignaturesConstructorComponent = () => {
       : "0x0000000000000000000000000000000000000000";
     const amount = getInputValue("amountTokenInput_Pay");
     const priorityFee = getInputValue("priorityFeeInput_Pay");
+
+    let account = getAccount(config);
+
+    if (!account.address) {
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        console.error("Account address is undefined, retrying...");
+        account = getAccount(config);
+        if (account.address || attempts >= 10) {
+          clearInterval(interval);
+        }
+      }, 200);
+    }
 
     signPay(
       to,
@@ -85,65 +82,33 @@ export const PaySignaturesConstructorComponent = () => {
       console.error("No data to execute payment");
       return;
     }
-    const account = getAccount(config);
-    const chainId = account.chain?.id;
-    if (!chainId) {
-      console.error("No chain ID available");
+
+    let account = getAccount(config);
+
+    if (!account.chain?.id) {
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        console.error("Account chain ID is undefined, retrying...");
+        account = getAccount(config);
+        if (account.chain?.id || attempts >= 10) {
+          clearInterval(interval);
+        }
+      }, 200);
+    }
+
+    if (!account.chain?.id) {
+      console.error("Chain ID is still undefined after retries");
       return;
     }
 
-    if (dataToGet.priority) {
-      writeContract(config, {
-        abi: Evvm.abi,
-        address: address[chainId.toString() as keyof typeof address]
-          .evvm as `0x${string}`,
-        functionName: asStaker
-          ? "payMateStaking_async"
-          : "payNoMateStaking_async",
-        args: [
-          dataToGet.from,
-          dataToGet.to_address,
-          dataToGet.to_identity,
-          dataToGet.token,
-          dataToGet.amount,
-          dataToGet.priorityFee,
-          dataToGet.nonce,
-          dataToGet.executor,
-          dataToGet.signature,
-        ],
+    executePay(dataToGet, account.chain.id, asStaker)
+      .then(() => {
+        console.log("Payment executed successfully");
       })
-        .then(() => {
-          console.log("Payment successful");
-        })
-        .catch((error) => {
-          console.error("Error executing payment:", error);
-        });
-    } else {
-      writeContract(config, {
-        abi: Evvm.abi,
-        address: address[chainId.toString() as keyof typeof address]
-          .evvm as `0x${string}`,
-        functionName: asStaker
-          ? "payMateStaking_sync"
-          : "payNoMateStaking_sync",
-        args: [
-          dataToGet.from,
-          dataToGet.to_address,
-          dataToGet.to_identity,
-          dataToGet.token,
-          dataToGet.amount,
-          dataToGet.priorityFee,
-          dataToGet.executor,
-          dataToGet.signature,
-        ],
-      })
-        .then(() => {
-          console.log("Payment successful");
-        })
-        .catch((error) => {
-          console.error("Error executing payment:", error);
-        });
-    }
+      .catch((error) => {
+        console.error("Error executing payment:", error);
+      });
   };
 
   return (
@@ -249,43 +214,11 @@ export const PaySignaturesConstructorComponent = () => {
       </button>
 
       {/* Results section */}
-      {dataToGet && (
-        <div style={{ marginTop: "2rem" }}>
-          <DetailedData dataToGet={dataToGet} />
-
-          {/* Action buttons */}
-          <div style={{ marginTop: "1rem" }}>
-            <button
-              style={{
-                backgroundColor: "red",
-                color: "white",
-                padding: "0.5rem",
-                margin: "0.5rem",
-                borderRadius: "5px",
-                border: "none",
-                cursor: "pointer",
-              }}
-              onClick={() => setDataToGet(null)}
-            >
-              Clear
-            </button>
-            <button
-              style={{
-                backgroundColor: "#4c5cafff",
-                color: "white",
-                padding: "0.5rem",
-                margin: "0.5rem",
-                borderRadius: "5px",
-                border: "none",
-                cursor: "pointer",
-              }}
-              onClick={executePayment}
-            >
-              Execute
-            </button>
-          </div>
-        </div>
-      )}
+      <DataDisplayWithClear
+        dataToGet={dataToGet}
+        onClear={() => setDataToGet(null)}
+        executeAction={executePayment}
+      />
     </div>
   );
 };

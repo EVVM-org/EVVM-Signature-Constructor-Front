@@ -10,24 +10,11 @@ import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
 import { ExecutorSelector } from "../InputsAndModules/ExecutorSelector";
-
-type DispersePayMetadata = {
-  amount: string;
-  to_address: string;
-  to_identity: string;
-};
-
-type DispersePayData = {
-  from: `0x${string}`;
-  toData: DispersePayMetadata[];
-  token: string;
-  amount: string;
-  priorityFee: string;
-  priority: boolean;
-  nonce: string;
-  executor: string;
-  signature: string;
-};
+import {
+  DispersePayInputData,
+  DispersePayMetadata,
+} from "@/utils/evvmTypeInputStructure";
+import { executeDispersePay } from "@/utils/EVVMTransactionExecuter/useEVVMTransactionExecuter";
 
 export const DispersePaySignatureConstructor = () => {
   const [isUsingExecutorDisperse, setIsUsingExecutorDisperse] =
@@ -38,7 +25,7 @@ export const DispersePaySignatureConstructor = () => {
   const [numberOfUsersToDisperse, setNumberOfUsersToDisperse] =
     React.useState(1);
 
-  const [dataToGet, setDataToGet] = React.useState<DispersePayData | null>(
+  const [dataToGet, setDataToGet] = React.useState<DispersePayInputData | null>(
     null
   );
 
@@ -48,7 +35,20 @@ export const DispersePaySignatureConstructor = () => {
     (document.getElementById(id) as HTMLInputElement).value;
 
   const makeSig = async () => {
-    const account = getAccount(config);
+    let account = getAccount(config);
+
+    if (!account.address) {
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        console.error("Account address is undefined, retrying...");
+        account = getAccount(config);
+        if (account.address || attempts >= 10) {
+          clearInterval(interval);
+        }
+      }, 200);
+    }
+
     const TokenAddress = getValue("tokenAddressDispersePay");
     const Amount = getValue("amountTokenInputSplit");
     const PriorityFee = getValue("priorityFeeInputSplit");
@@ -70,7 +70,7 @@ export const DispersePaySignatureConstructor = () => {
         amount,
         to_address: isUsingUsername
           ? "0x0000000000000000000000000000000000000000"
-          : to,
+          : (to as `0x${string}`),
         to_identity: isUsingUsername ? to : "",
       });
     }
@@ -100,6 +100,40 @@ export const DispersePaySignatureConstructor = () => {
         console.error("Error signing disperse payment:", error);
       }
     );
+  };
+
+  const executeDispersePayment = async () => {
+    if (!dataToGet) {
+      console.error("No data to execute payment");
+      return;
+    }
+
+    let account = getAccount(config);
+
+    if (!account.chain?.id) {
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        console.error("Account chain ID is undefined, retrying...");
+        account = getAccount(config);
+        if (account.chain?.id || attempts >= 10) {
+          clearInterval(interval);
+        }
+      }, 200);
+    }
+
+    if (!account.chain?.id) {
+      console.error("Chain ID is still undefined after retries");
+      return;
+    }
+
+    executeDispersePay(dataToGet, account.chain.id)
+      .then(() => {
+        console.log("Disperse payment executed successfully");
+      })
+      .catch((error) => {
+        console.error("Error executing disperse payment:", error);
+      });
   };
 
   return (
@@ -244,6 +278,7 @@ export const DispersePaySignatureConstructor = () => {
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
+        executeAction={executeDispersePayment}
       />
     </div>
   );

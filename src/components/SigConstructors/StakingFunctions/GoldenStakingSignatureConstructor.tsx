@@ -12,7 +12,7 @@ import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
 import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector";
 import { PayInputData } from "@/utils/TypeStructures/evvmTypeInputStructure";
 import { GoldenStakingInputData } from "@/utils/TypeStructures/sMateTypeInputStructure";
-import { address } from "@/constants/address";
+import { contractAddress, tokenAddress } from "@/constants/address";
 import { executeGoldenStaking } from "@/utils/TransactionExecuter/useSMateTransactionExecuter";
 
 type InfoData = {
@@ -21,7 +21,7 @@ type InfoData = {
 };
 
 export const GoldenStakingSignatureConstructor = () => {
-  const account = getAccount(config);
+  let account = getAccount(config);
   const { signGoldenStaking } = useSMateSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
@@ -29,6 +29,25 @@ export const GoldenStakingSignatureConstructor = () => {
 
   const makeSig = async () => {
     // Get form values
+    let walletData = getAccount(config);
+
+    if (!walletData.address) {
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        console.error("Account address is undefined, retrying...");
+        walletData = getAccount(config);
+        if (walletData.address || attempts >= 10) {
+          clearInterval(interval);
+        }
+      }, 200);
+    }
+
+    if (!walletData.address) {
+      console.error("Account address is still undefined after retries");
+      return;
+    }
+
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
@@ -48,10 +67,10 @@ export const GoldenStakingSignatureConstructor = () => {
       (signature) => {
         setDataToGet({
           PayInputData: {
-            from: account.address as `0x${string}`,
+            from: walletData.address as `0x${string}`,
             to_address: sMateAddress as `0x${string}`,
             to_identity: "",
-            token: "0x0000000000000000000000000000000000000001",
+            token: tokenAddress.mate as `0x${string}`,
             amount: amountToken,
             priorityFee: BigInt(0),
             nonce: BigInt(nonce),
@@ -74,29 +93,7 @@ export const GoldenStakingSignatureConstructor = () => {
       console.error("No data to execute payment");
       return;
     }
-
-    let account = getAccount(config);
-
-    if (!account.chain?.id) {
-      let attempts = 0;
-      const interval = setInterval(() => {
-        attempts++;
-        console.error("Account chain ID is undefined, retrying...");
-        account = getAccount(config);
-        if (account.chain?.id || attempts >= 10) {
-          clearInterval(interval);
-        }
-      }, 200);
-    }
-
-    if (!account.chain?.id) {
-      console.error("Chain ID is still undefined after retries");
-      return;
-    }
-
-    const sMateAddress = address[
-      account.chain.id.toString() as keyof typeof address
-    ].sMate as `0x${string}`;
+    const sMateAddress = dataToGet.PayInputData.to_address;
 
     executeGoldenStaking(dataToGet.GoldenStakingInputData, sMateAddress)
       .then(() => {
@@ -112,15 +109,19 @@ export const GoldenStakingSignatureConstructor = () => {
       <h1>Golden staking</h1>
       <br />
 
-      {/* Configuration Section */}
-      <StakingActionSelector onChange={setIsStaking} />
-
       {/* Recipient configuration section */}
       <AddressInputField
         label="sMate Address"
         inputId="sMateAddressInput_GoldenStaking"
         placeholder="Enter sMate address"
+        defaultValue={
+          (account.chain?.id && contractAddress[account.chain.id as keyof typeof contractAddress]?.sMate) || ""
+        }
       />
+      <br />
+
+      {/* Configuration Section */}
+      <StakingActionSelector onChange={setIsStaking} />
 
       {/* Nonce section with automatic generator */}
 

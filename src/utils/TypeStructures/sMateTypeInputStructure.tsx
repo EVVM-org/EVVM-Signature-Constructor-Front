@@ -11,6 +11,7 @@ type PresaleStakingInputData = {
   signature: string;
   priorityFee_Evvm: bigint;
   priority_Evvm: boolean;
+  nonce_Evvm: bigint;
   signature_Evvm: string;
 };
 

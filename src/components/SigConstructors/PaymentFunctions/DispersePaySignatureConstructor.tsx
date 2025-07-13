@@ -15,9 +15,10 @@ import {
   DispersePayMetadata,
 } from "@/utils/TypeStructures/evvmTypeInputStructure";
 import { executeDispersePay } from "@/utils/TransactionExecuter/useEVVMTransactionExecuter";
-import { address } from "@/constants/address";
+import { contractAddress } from "@/constants/address";
 
 export const DispersePaySignatureConstructor = () => {
+  let account = getAccount(config);
   const [isUsingExecutorDisperse, setIsUsingExecutorDisperse] =
     React.useState(false);
   const [priorityDisperse, setPriorityDisperse] = React.useState("low");
@@ -36,18 +37,23 @@ export const DispersePaySignatureConstructor = () => {
     (document.getElementById(id) as HTMLInputElement).value;
 
   const makeSig = async () => {
-    let account = getAccount(config);
+    let walletData = getAccount(config);
 
-    if (!account.address) {
+    if (!walletData.address) {
       let attempts = 0;
       const interval = setInterval(() => {
         attempts++;
         console.error("Account address is undefined, retrying...");
-        account = getAccount(config);
-        if (account.address || attempts >= 10) {
+        walletData = getAccount(config);
+        if (walletData.address || attempts >= 10) {
           clearInterval(interval);
         }
       }, 200);
+    }
+
+    if (!walletData.address) {
+      console.error("Account address is still undefined after retries");
+      return;
     }
 
     const TokenAddress = getValue("tokenAddressDispersePay");
@@ -86,7 +92,7 @@ export const DispersePaySignatureConstructor = () => {
       Executor,
       (dispersePaySignature) => {
         setDataToGet({
-          from: account.address as `0x${string}`,
+          from: walletData.address as `0x${string}`,
           toData,
           token: TokenAddress as `0x${string}`,
           amount: BigInt(Amount),
@@ -109,30 +115,18 @@ export const DispersePaySignatureConstructor = () => {
       return;
     }
 
-    let account = getAccount(config);
+    const evvmAddress = (
+      document.getElementById(
+        "evvmAddressInput_DispersePay"
+      ) as HTMLInputElement
+    ).value as `0x${string}`;
 
-    if (!account.chain?.id) {
-      let attempts = 0;
-      const interval = setInterval(() => {
-        attempts++;
-        console.error("Account chain ID is undefined, retrying...");
-        account = getAccount(config);
-        if (account.chain?.id || attempts >= 10) {
-          clearInterval(interval);
-        }
-      }, 200);
-    }
-
-    if (!account.chain?.id) {
-      console.error("Chain ID is still undefined after retries");
+    if (!evvmAddress) {
+      console.error("EVVM address is not provided");
       return;
     }
 
-    executeDispersePay(
-      dataToGet,
-      address[account.chain.id.toString() as keyof typeof address]
-        .evvm as `0x${string}`
-    )
+    executeDispersePay(dataToGet, evvmAddress)
       .then(() => {
         console.log("Disperse payment executed successfully");
       })
@@ -146,6 +140,18 @@ export const DispersePaySignatureConstructor = () => {
       <TitleAndLink
         title="Disperse payment"
         link="https://www.evvm.org/docs/SignatureStructures/EVVM/DispersePaySignatureStructure"
+      />
+      <br />
+
+      {/* Address Input */}
+      <AddressInputField
+        label="EVVM Address"
+        inputId="evvmAddressInput_DispersePay"
+        placeholder="Enter EVVM address"
+        defaultValue={
+          contractAddress[account.chain?.id as keyof typeof contractAddress]
+            ?.evvm || ""
+        }
       />
       <br />
 

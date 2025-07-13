@@ -12,10 +12,11 @@ import { AsStakerSelector } from "../InputsAndModules/AsStakerSelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
 import { PayInputData } from "@/utils/TypeStructures/evvmTypeInputStructure";
 import { executePay } from "@/utils/TransactionExecuter/useEVVMTransactionExecuter";
-import { address } from "@/constants/address";
+import { contractAddress } from "@/constants/address";
 
 export const PaySignaturesConstructorComponent = () => {
   const { signPay } = useSignatureBuilder();
+  let account = getAccount(config);
 
   const [isUsingUsernames, setIsUsingUsernames] = React.useState(true);
   const [isUsingExecutor, setIsUsingExecutor] = React.useState(false);
@@ -24,6 +25,25 @@ export const PaySignaturesConstructorComponent = () => {
   const [asStaker, setAsStaker] = React.useState(false);
 
   const makeSig = async () => {
+    let walletData = getAccount(config);
+
+    if (!walletData.address) {
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        console.error("Account address is undefined, retrying...");
+        walletData = getAccount(config);
+        if (walletData.address || attempts >= 10) {
+          clearInterval(interval);
+        }
+      }, 200);
+    }
+
+    if (!walletData.address) {
+      console.error("Account address is still undefined after retries");
+      return;
+    }
+
     const getInputValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
@@ -36,20 +56,6 @@ export const PaySignaturesConstructorComponent = () => {
     const amount = getInputValue("amountTokenInput_Pay");
     const priorityFee = getInputValue("priorityFeeInput_Pay");
 
-    let account = getAccount(config);
-
-    if (!account.address) {
-      let attempts = 0;
-      const interval = setInterval(() => {
-        attempts++;
-        console.error("Account address is undefined, retrying...");
-        account = getAccount(config);
-        if (account.address || attempts >= 10) {
-          clearInterval(interval);
-        }
-      }, 200);
-    }
-
     signPay(
       to,
       tokenAddress,
@@ -60,7 +66,7 @@ export const PaySignaturesConstructorComponent = () => {
       executor,
       (signature) => {
         setDataToGet({
-          from: account.address as `0x${string}`,
+          from: walletData.address as `0x${string}`,
           to_address: (to.startsWith("0x")
             ? to
             : "0x0000000000000000000000000000000000000000") as `0x${string}`,
@@ -84,28 +90,14 @@ export const PaySignaturesConstructorComponent = () => {
       return;
     }
 
-    let account = getAccount(config);
+    const evvmAddress = (
+      document.getElementById("evvmAddressInput_Pay") as HTMLInputElement
+    ).value as `0x${string}`;
 
-    if (!account.chain?.id) {
-      let attempts = 0;
-      const interval = setInterval(() => {
-        attempts++;
-        console.error("Account chain ID is undefined, retrying...");
-        account = getAccount(config);
-        if (account.chain?.id || attempts >= 10) {
-          clearInterval(interval);
-        }
-      }, 200);
-    }
-
-    if (!account.chain?.id) {
-      console.error("Chain ID is still undefined after retries");
+    if (!evvmAddress) {
+      console.error("EVVM address is not provided");
       return;
     }
-
-    const evvmAddress = address[
-      account.chain.id.toString() as keyof typeof address
-    ].evvm as `0x${string}`;
 
     executePay(dataToGet, evvmAddress, asStaker)
       .then(() => {
@@ -121,6 +113,18 @@ export const PaySignaturesConstructorComponent = () => {
       <TitleAndLink
         title="Single payment"
         link="https://www.evvm.org/docs/SignatureStructures/EVVM/SinglePaymentSignatureStructure"
+      />
+      <br />
+
+      {/* Address Input */}
+      <AddressInputField
+        label="EVVM Address"
+        inputId="evvmAddressInput_Pay"
+        placeholder="Enter EVVM address"
+        defaultValue={
+          contractAddress[account.chain?.id as keyof typeof contractAddress]
+            ?.evvm || ""
+        }
       />
       <br />
 

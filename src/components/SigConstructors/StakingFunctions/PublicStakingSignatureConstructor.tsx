@@ -1,5 +1,7 @@
 "use client";
 import React from "react";
+import { getAccount } from "@wagmi/core";
+import { config } from "@/config/index";
 import { useSMateSignatureBuilder } from "@/utils/SignatureBuilder/useSMateSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
@@ -8,27 +10,43 @@ import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
+import { contractAddress, tokenAddress } from "@/constants/address";
+import { executePublicStaking } from "@/utils/TransactionExecuter/useSMateTransactionExecuter";
+import { PublicStakingInputData } from "@/utils/TypeStructures/sMateTypeInputStructure";
+import { PayInputData } from "@/utils/TypeStructures/evvmTypeInputStructure";
 
-type PublicStakingData = {
-  isStaking: string;
-  amount: string;
-  nonce: string;
-  signature: string;
-  priorityFee_Evvm: string;
-  nonce_Evvm: string;
-  priority_Evvm: string;
-  signature_Evvm: string;
+type InputData = {
+  PublicStakingInputData: PublicStakingInputData;
+  PayInputData: PayInputData;
 };
 
 export const PublicStakingSignatureConstructor = () => {
+  let account = getAccount(config);
   const { signPublicStaking } = useSMateSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
-  const [dataToGet, setDataToGet] = React.useState<PublicStakingData | null>(
-    null
-  );
+  const [dataToGet, setDataToGet] = React.useState<InputData | null>(null);
 
   const makeSig = async () => {
+    let walletData = getAccount(config);
+
+    if (!walletData.address) {
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        console.error("Account address is undefined, retrying...");
+        walletData = getAccount(config);
+        if (walletData.address || attempts >= 10) {
+          clearInterval(interval);
+        }
+      }, 200);
+    }
+
+    if (!walletData.address) {
+      console.error("Account address is still undefined after retries");
+      return;
+    }
+
     // Get form values
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
@@ -42,14 +60,21 @@ export const PublicStakingSignatureConstructor = () => {
     const formData = {
       nonceEVVM: getValue("nonceEVVMInput_PublicStaking"),
       nonceSMATE: getValue("nonceSMATEInput_PublicStaking"),
-      amount: Number(getValue("amountOfSMateInput_PublicStaking")),
+      amountOfSMate: Number(getValue("amountOfSMateInput_PublicStaking")),
       priorityFee: getValue("priorityFeeInput_PublicStaking"),
     };
+
+    const amountOfToken = (formData.amountOfSMate * 10 ** 18).toLocaleString(
+      "fullwide",
+      {
+        useGrouping: false,
+      }
+    );
 
     // Sign message
     signPublicStaking(
       sMateAddress,
-      formData.amount,
+      formData.amountOfSMate,
       formData.priorityFee,
       formData.nonceEVVM,
       priority === "high",
@@ -57,18 +82,50 @@ export const PublicStakingSignatureConstructor = () => {
       formData.nonceSMATE,
       (paySignature, stakingSignature) => {
         setDataToGet({
-          isStaking: isStaking.toString(),
-          amount: formData.amount.toString(),
-          nonce: formData.nonceSMATE,
-          signature: stakingSignature,
-          priorityFee_Evvm: formData.priorityFee,
-          nonce_Evvm: formData.nonceEVVM,
-          priority_Evvm: priority,
-          signature_Evvm: paySignature,
+          PublicStakingInputData: {
+            isStaking: isStaking,
+            user: walletData.address as `0x${string}`,
+            nonce: BigInt(formData.nonceSMATE),
+            amountOfSMate: BigInt(formData.amountOfSMate),
+            signature: stakingSignature,
+            priorityFee_Evvm: BigInt(formData.priorityFee),
+            priority_Evvm: priority === "high",
+            nonce_Evvm: BigInt(formData.nonceEVVM),
+            signature_Evvm: paySignature,
+          },
+          PayInputData: {
+            from: walletData.address as `0x${string}`,
+            to_address: sMateAddress as `0x${string}`,
+            to_identity: "",
+            token: tokenAddress.mate as `0x${string}`,
+            amount: BigInt(amountOfToken),
+            priorityFee: BigInt(formData.priorityFee),
+            nonce: BigInt(formData.nonceEVVM),
+            priority: priority === "high",
+            executor: sMateAddress as `0x${string}`,
+            signature: paySignature,
+          },
         });
       },
       (error) => console.error("Error signing presale staking:", error)
     );
+  };
+
+  const execute = async () => {
+    if (!dataToGet) {
+      console.error("No data to execute payment");
+      return;
+    }
+
+    const sMateAddress = dataToGet.PayInputData.to_address;
+
+    executePublicStaking(dataToGet.PublicStakingInputData, sMateAddress)
+      .then(() => {
+        console.log("Public staking executed successfully");
+      })
+      .catch((error) => {
+        console.error("Error executing public staking:", error);
+      });
   };
 
   return (
@@ -78,15 +135,19 @@ export const PublicStakingSignatureConstructor = () => {
         link="https://www.evvm.org/docs/SignatureStructures/SMate/StakingUnstakingStructure"
       />
       <br />
-      {/* Configuration Section */}
-      <StakingActionSelector onChange={setIsStaking} />
-
-      {/* Address Input */}
       <AddressInputField
         label="sMate Address"
-        inputId="sMateAddressInput_PublicStaking"
+        inputId="sMateAddressInput_publicStaking"
         placeholder="Enter sMate address"
+        defaultValue={
+          contractAddress[account.chain?.id as keyof typeof contractAddress]
+            ?.sMate || ""
+        }
       />
+      <br />
+
+      {/* Configuration Section */}
+      <StakingActionSelector onChange={setIsStaking} />
 
       {/* Nonce Generators */}
       <NumberInputWithGenerator
@@ -135,6 +196,7 @@ export const PublicStakingSignatureConstructor = () => {
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
+        onExecute={execute}
       />
     </div>
   );

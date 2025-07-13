@@ -6,14 +6,14 @@ interface DataDisplayWithClearProps {
   dataToGet: any;
   onClear: () => void;
   marginTop?: string;
-  executeAction?: () => void;
+  onExecute?: () => void;
 }
 
 export const DataDisplayWithClear: React.FC<DataDisplayWithClearProps> = ({
   dataToGet,
   onClear,
   marginTop = "2rem",
-  executeAction,
+  onExecute,
 }) => {
   if (!dataToGet) return null;
 
@@ -27,7 +27,7 @@ export const DataDisplayWithClear: React.FC<DataDisplayWithClearProps> = ({
           Clear
         </button>
 
-        {executeAction && (
+        {onExecute && (
           <button
             style={{
               backgroundColor: "#4c5cafff",
@@ -38,7 +38,7 @@ export const DataDisplayWithClear: React.FC<DataDisplayWithClearProps> = ({
               border: "none",
               cursor: "pointer",
             }}
-            onClick={executeAction}
+            onClick={onExecute}
           >
             Execute
           </button>

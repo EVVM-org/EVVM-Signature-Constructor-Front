@@ -4,6 +4,7 @@ import SMate from "@/constants/abi/SMate.json";
 import {
   GoldenStakingInputData,
   PresaleStakingInputData,
+  PublicStakingInputData,
 } from "../TypeStructures/sMateTypeInputStructure";
 
 const executeGoldenStaking = async (
@@ -59,4 +60,36 @@ const executePresaleStaking = async (
     });
 };
 
-export { executeGoldenStaking, executePresaleStaking };
+const executePublicStaking = async (
+  InputData: PublicStakingInputData,
+  sMateAddress: `0x${string}`
+) => {
+  if (!InputData) {
+    return Promise.reject("No data to execute payment");
+  }
+
+  writeContract(config, {
+    abi: SMate.abi,
+    address: sMateAddress,
+    functionName: "publicStaking",
+    args: [
+      InputData.isStaking,
+      InputData.user,
+      InputData.nonce,
+      InputData.amountOfSMate,
+      InputData.signature,
+      InputData.priorityFee_Evvm,
+      InputData.nonce_Evvm,
+      InputData.priority_Evvm,
+      InputData.signature_Evvm,
+    ],
+  })
+    .then(() => {
+      return Promise.resolve();
+    })
+    .catch((error) => {
+      return Promise.reject(error);
+    });
+};
+
+export { executeGoldenStaking, executePresaleStaking, executePublicStaking };

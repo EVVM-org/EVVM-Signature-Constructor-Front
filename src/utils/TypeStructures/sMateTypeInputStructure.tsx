@@ -15,4 +15,20 @@ type PresaleStakingInputData = {
   signature_Evvm: string;
 };
 
-export type { GoldenStakingInputData, PresaleStakingInputData };
+type PublicStakingInputData = {
+  isStaking: boolean;
+  user: `0x${string}`;
+  nonce: bigint;
+  amountOfSMate: bigint;
+  signature: string;
+  priorityFee_Evvm: bigint;
+  priority_Evvm: boolean;
+  nonce_Evvm: bigint;
+  signature_Evvm: string;
+};
+
+export type {
+  GoldenStakingInputData,
+  PresaleStakingInputData,
+  PublicStakingInputData,
+};

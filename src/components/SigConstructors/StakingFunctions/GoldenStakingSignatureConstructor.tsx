@@ -156,7 +156,7 @@ export const GoldenStakingSignatureConstructor = () => {
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
-        executeAction={execute}
+        onExecute={execute}
       />
     </div>
   );

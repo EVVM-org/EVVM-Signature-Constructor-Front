@@ -191,7 +191,7 @@ export const PresaleStakingSignatureConstructor = () => {
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
-        executeAction={execute}
+        onExecute={execute}
       />
     </div>
   );

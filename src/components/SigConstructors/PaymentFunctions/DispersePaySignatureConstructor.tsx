@@ -289,7 +289,7 @@ export const DispersePaySignatureConstructor = () => {
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
-        executeAction={executeDispersePayment}
+        onExecute={executeDispersePayment}
       />
     </div>
   );

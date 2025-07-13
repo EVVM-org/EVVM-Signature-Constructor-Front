@@ -226,7 +226,7 @@ export const PaySignaturesConstructorComponent = () => {
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
-        executeAction={executePayment}
+        onExecute={executePayment}
       />
     </div>
   );

@@ -20,7 +20,7 @@ type InfoData = {
   GoldenStakingInputData: GoldenStakingInputData;
 };
 
-export const GoldenStakingSignatureConstructor = () => {
+export const GoldenStakingComponent = () => {
   let account = getAccount(config);
   const { signGoldenStaking } = useSMateSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);

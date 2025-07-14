@@ -11,11 +11,12 @@ import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { TextInputField } from "../InputsAndModules/TextInputField";
 import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
 
-type AddCustomMetadataData = {
+
+type RemoveCustomMetadataData = {
   user: string;
   nonce: string;
   identity: string;
-  value: string;
+  key: string;
   priorityFeeForFisher: string;
   signature: string;
   nonce_Evvm: string;
@@ -23,47 +24,43 @@ type AddCustomMetadataData = {
   signature_Evvm: string;
 };
 
-export const AddCustomMetadataConstructorComponent = () => {
-  const { signAddCustomMetadata } = useMnsSignatureBuilder();
+export const RemoveCustomMetadataComponent = () => {
+  const { signRemoveCustomMetadata } = useMnsSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] =
-    React.useState<AddCustomMetadataData | null>(null);
+    React.useState<RemoveCustomMetadataData | null>(null);
 
   const makeSig = async () => {
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
-    const addressMNS = getValue("mnsAddressInput_addCustomMetadata");
-    const nonceMNS = getValue("nonceMNSInput_addCustomMetadata");
-    const identity = getValue("identityInput_addCustomMetadata");
-    const schema = getValue("schemaInput_addCustomMetadata");
-    const subschema = getValue("subschemaInput_addCustomMetadata");
-    const value = getValue("valueInput_addCustomMetadata");
-    const priorityFeeForFisher = getValue("priorityFeeInput_addCustomMetadata");
-    const amountOfMateReward = getValue("amountOfMateRewardInput_addCustomMetadata");
-    const nonceEVVM = getValue("nonceEVVMInput_addCustomMetadata");
+    const addressMNS = getValue("mnsAddressInput_removeCustomMetadata");
+    const nonceMNS = getValue("nonceMNSInput_removeCustomMetadata");
+    const identity = getValue("identityInput_removeCustomMetadata");
+    const key = getValue("keyInput_removeCustomMetadata");
+    const priorityFeeForFisher = getValue("priorityFeeInput_removeCustomMetadata");
+    const amountOfMateReward = getValue("amountOfMateRewardInput_removeCustomMetadata");
+    const nonceEVVM = getValue("nonceEVVMInput_removeCustomMetadata");
     const priorityFlag = priority === "high";
     
-    signAddCustomMetadata(
+    signRemoveCustomMetadata(
       addressMNS,
       BigInt(nonceMNS),
       identity,
-      schema,
-      subschema,
-      value,
+      BigInt(key),
       BigInt(amountOfMateReward),
       BigInt(priorityFeeForFisher),
       BigInt(nonceEVVM),
       priorityFlag,
-      (paySignature, addCustomMetadataSignature) => {
+      (paySignature, removeCustomMetadataSignature) => {
         setDataToGet({
           user: account.address || "",
           nonce: nonceMNS,
           identity: identity,
-          value: `${schema}:${subschema}>${value}`,
+          key: key,
           priorityFeeForFisher: priorityFeeForFisher,
-          signature: addCustomMetadataSignature,
+          signature: removeCustomMetadataSignature,
           nonce_Evvm: nonceEVVM,
           priority_Evvm: priorityFlag ? "high" : "low",
           signature_Evvm: paySignature,
@@ -77,63 +74,51 @@ export const AddCustomMetadataConstructorComponent = () => {
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
-        title="Add custom metadata of identity"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/addCustomMetadataStructure"
+        title="Remove custom metadata of identity"
+        link="https://www.evvm.org/docs/SignatureStructures/MNS/removeCustomMetadataStructure"
       />
 
       <br />
 
       <AddressInputField
         label="MNS Address"
-        inputId="mnsAddressInput_addCustomMetadata"
+        inputId="mnsAddressInput_removeCustomMetadata"
         placeholder="Enter MNS address"
       />
 
       <NumberInputWithGenerator
         label="MNS Nonce"
-        inputId="nonceMNSInput_addCustomMetadata"
+        inputId="nonceMNSInput_removeCustomMetadata"
         placeholder="Enter nonce"
       />
 
       <TextInputField
         label="Identity"
-        inputId="identityInput_addCustomMetadata"
+        inputId="identityInput_removeCustomMetadata"
         placeholder="Enter identity"
       />
 
       <TextInputField
-        label="Schema"
-        inputId="schemaInput_addCustomMetadata"
-        placeholder="Enter schema"
-      />
-
-      <TextInputField
-        label="Subschema"
-        inputId="subschemaInput_addCustomMetadata"
-        placeholder="Enter subschema"
-      />
-
-      <TextInputField
-        label="Value"
-        inputId="valueInput_addCustomMetadata"
-        placeholder="Enter value"
+        label="Key"
+        inputId="keyInput_removeCustomMetadata"
+        placeholder="Enter key"
       />
 
       <NumberInputField
         label="Priority fee"
-        inputId="priorityFeeInput_addCustomMetadata"
+        inputId="priorityFeeInput_removeCustomMetadata"
         placeholder="Enter priority fee"
       />
 
       <NumberInputField
         label="Amount of MATE reward"
-        inputId="amountOfMateRewardInput_addCustomMetadata"
+        inputId="amountOfMateRewardInput_removeCustomMetadata"
         placeholder="Enter amount of MATE reward"
       />
 
       <NumberInputWithGenerator
         label="EVVM Nonce"
-        inputId="nonceEVVMInput_addCustomMetadata"
+        inputId="nonceEVVMInput_removeCustomMetadata"
         placeholder="Enter nonce"
       />
 

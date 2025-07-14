@@ -22,7 +22,7 @@ type InfoData = {
   PreRegistrationUsernameInputData: PreRegistrationUsernameInputData;
 };
 
-export const PreRegistrationUsernameConstructorComponent = () => {
+export const PreRegistrationUsernameComponent = () => {
   const { signPreRegistrationUsername } = useMnsSignatureBuilder();
   let account = getAccount(config);
 

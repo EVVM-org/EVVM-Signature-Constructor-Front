@@ -11,11 +11,11 @@ import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { TextInputField } from "../InputsAndModules/TextInputField";
 import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
 
-
-type FlushUsernameData = {
-  user: `0x${string}`;
+type AddCustomMetadataData = {
+  user: string;
   nonce: string;
-  username: string;
+  identity: string;
+  value: string;
   priorityFeeForFisher: string;
   signature: string;
   nonce_Evvm: string;
@@ -23,94 +23,117 @@ type FlushUsernameData = {
   signature_Evvm: string;
 };
 
-export const FlushUsernameConstructorComponent = () => {
-  const { signFlushUsername } = useMnsSignatureBuilder();
+export const AddCustomMetadataComponent = () => {
+  const { signAddCustomMetadata } = useMnsSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
-  const [dataToGet, setDataToGet] = React.useState<FlushUsernameData | null>(
-    null
-  );
+  const [dataToGet, setDataToGet] =
+    React.useState<AddCustomMetadataData | null>(null);
 
   const makeSig = async () => {
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
-    const addressMNS = getValue("mnsAddressInput_flushUsername");
-    const nonceMNS = getValue("nonceMNSInput_flushUsername");
-    const username = getValue("usernameInput_flushUsername");
-    const priceToFlushUsername = getValue("priceForFlushInput_flushUsername");
-    const priorityFeeForFisher = getValue("priorityFeeInput_flushUsername");
-    const nonceEVVM = getValue("nonceEVVMInput_flushUsername");
+    const addressMNS = getValue("mnsAddressInput_addCustomMetadata");
+    const nonceMNS = getValue("nonceMNSInput_addCustomMetadata");
+    const identity = getValue("identityInput_addCustomMetadata");
+    const schema = getValue("schemaInput_addCustomMetadata");
+    const subschema = getValue("subschemaInput_addCustomMetadata");
+    const value = getValue("valueInput_addCustomMetadata");
+    const priorityFeeForFisher = getValue("priorityFeeInput_addCustomMetadata");
+    const amountOfMateReward = getValue("amountOfMateRewardInput_addCustomMetadata");
+    const nonceEVVM = getValue("nonceEVVMInput_addCustomMetadata");
     const priorityFlag = priority === "high";
-
-    signFlushUsername(
+    
+    signAddCustomMetadata(
       addressMNS,
       BigInt(nonceMNS),
-      username,
-      BigInt(priceToFlushUsername),
+      identity,
+      schema,
+      subschema,
+      value,
+      BigInt(amountOfMateReward),
       BigInt(priorityFeeForFisher),
       BigInt(nonceEVVM),
       priorityFlag,
-      (paySignature, flushUsernameSignature) => {
+      (paySignature, addCustomMetadataSignature) => {
         setDataToGet({
-          user: (account.address || "0x0") as `0x${string}`,
+          user: account.address || "",
           nonce: nonceMNS,
-          username: username,
+          identity: identity,
+          value: `${schema}:${subschema}>${value}`,
           priorityFeeForFisher: priorityFeeForFisher,
-          signature: paySignature,
+          signature: addCustomMetadataSignature,
           nonce_Evvm: nonceEVVM,
-          priority_Evvm: priorityFlag.toString(),
-          signature_Evvm: flushUsernameSignature,
+          priority_Evvm: priorityFlag ? "high" : "low",
+          signature_Evvm: paySignature,
         });
       },
       (error) => console.error("Error signing payment:", error)
     );
+    
   };
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
-        title="Flush Username"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/flushUsernameStructure"
+        title="Add custom metadata of identity"
+        link="https://www.evvm.org/docs/SignatureStructures/MNS/addCustomMetadataStructure"
       />
 
       <br />
 
       <AddressInputField
         label="MNS Address"
-        inputId="mnsAddressInput_flushUsername"
+        inputId="mnsAddressInput_addCustomMetadata"
         placeholder="Enter MNS address"
       />
 
-      {/* Nonce section with automatic generator */}
-
       <NumberInputWithGenerator
         label="MNS Nonce"
-        inputId="nonceMNSInput_flushUsername"
+        inputId="nonceMNSInput_addCustomMetadata"
         placeholder="Enter nonce"
       />
 
       <TextInputField
         label="Identity"
-        inputId="usernameInput_flushUsername"
-        placeholder="Enter username"
+        inputId="identityInput_addCustomMetadata"
+        placeholder="Enter identity"
       />
 
-      <NumberInputField
-        label="Price for flush"
-        inputId="priceForFlushInput_flushUsername"
-        placeholder="Enter price for flush"
+      <TextInputField
+        label="Schema"
+        inputId="schemaInput_addCustomMetadata"
+        placeholder="Enter schema"
+      />
+
+      <TextInputField
+        label="Subschema"
+        inputId="subschemaInput_addCustomMetadata"
+        placeholder="Enter subschema"
+      />
+
+      <TextInputField
+        label="Value"
+        inputId="valueInput_addCustomMetadata"
+        placeholder="Enter value"
       />
 
       <NumberInputField
         label="Priority fee"
-        inputId="priorityFeeInput_flushUsername"
+        inputId="priorityFeeInput_addCustomMetadata"
         placeholder="Enter priority fee"
+      />
+
+      <NumberInputField
+        label="Amount of MATE reward"
+        inputId="amountOfMateRewardInput_addCustomMetadata"
+        placeholder="Enter amount of MATE reward"
       />
 
       <NumberInputWithGenerator
         label="EVVM Nonce"
-        inputId="nonceEVVMInput_flushUsername"
+        inputId="nonceEVVMInput_addCustomMetadata"
         placeholder="Enter nonce"
       />
 

@@ -10,20 +10,20 @@ import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
-import { contractAddress, tokenAddress } from "@/constants/address";
-import { executePublicStaking } from "@/utils/TransactionExecuter/useSMateTransactionExecuter";
-import { PublicStakingInputData } from "@/utils/TypeStructures/sMateTypeInputStructure";
+import { PublicServiceStakingInputData } from "@/utils/TypeStructures/sMateTypeInputStructure";
 import { PayInputData } from "@/utils/TypeStructures/evvmTypeInputStructure";
+import { contractAddress, tokenAddress } from "@/constants/address";
+import { executePublicServiceStaking } from "@/utils/TransactionExecuter/useSMateTransactionExecuter";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 
 type InputData = {
-  PublicStakingInputData: PublicStakingInputData;
+  PublicServiceStakingInputData: PublicServiceStakingInputData;
   PayInputData: PayInputData;
 };
 
-export const PublicStakingSignatureConstructor = () => {
+export const PublicServiceStakingComponent = () => {
   let account = getAccount(config);
-  const { signPublicStaking } = useSMateSignatureBuilder();
+  const { signPublicServiceStaking } = useSMateSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null);
@@ -36,24 +36,26 @@ export const PublicStakingSignatureConstructor = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
-      sMateAddress: getValue("sMateAddressInput_PublicStaking"),
-      nonceEVVM: getValue("nonceEVVMInput_PublicStaking"),
-      nonceSMATE: getValue("nonceSMATEInput_PublicStaking"),
-      amountOfSMate: Number(getValue("amountOfSMateInput_PublicStaking")),
-      priorityFee: getValue("priorityFeeInput_PublicStaking"),
+      sMateAddress: getValue("sMateAddressInput_PublicServiceStaking"),
+      serviceAddress: getValue("serviceAddressInput_PublicServiceStaking"),
+      amountOfSMate: Number(
+        getValue("amountOfSMateInput_PublicServiceStaking")
+      ),
+      priorityFee: getValue("priorityFeeInput_PublicServiceStaking"),
+      nonceEVVM: getValue("nonceEVVMInput_PublicServiceStaking"),
+      nonceSMATE: getValue("nonceSMATEInput_PublicServiceStaking"),
     };
 
-    if (!formData.sMateAddress) {
-      alert("Please enter a sMate address");
-      return;
-    }
+    const amountOfToken = (formData.amountOfSMate * 10 ** 18).toLocaleString(
+      "fullwide",
+      {
+        useGrouping: false,
+      }
+    );
 
-    const amountOfToken = BigInt(formData.amountOfSMate) *
-      (BigInt(5083) * BigInt(10) ** BigInt(18));
-
-    // Sign message
-    signPublicStaking(
+    signPublicServiceStaking(
       formData.sMateAddress,
+      formData.serviceAddress,
       formData.amountOfSMate,
       formData.priorityFee,
       formData.nonceEVVM,
@@ -62,9 +64,10 @@ export const PublicStakingSignatureConstructor = () => {
       formData.nonceSMATE,
       (paySignature, stakingSignature) => {
         setDataToGet({
-          PublicStakingInputData: {
+          PublicServiceStakingInputData: {
             isStaking: isStaking,
             user: walletData.address as `0x${string}`,
+            service: formData.serviceAddress as `0x${string}`,
             nonce: BigInt(formData.nonceSMATE),
             amountOfSMate: BigInt(formData.amountOfSMate),
             signature: stakingSignature,
@@ -99,7 +102,10 @@ export const PublicStakingSignatureConstructor = () => {
 
     const sMateAddress = dataToGet.PayInputData.to_address;
 
-    executePublicStaking(dataToGet.PublicStakingInputData, sMateAddress)
+    executePublicServiceStaking(
+      dataToGet.PublicServiceStakingInputData,
+      sMateAddress
+    )
       .then(() => {
         console.log("Public staking executed successfully");
       })
@@ -111,13 +117,15 @@ export const PublicStakingSignatureConstructor = () => {
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
-        title="Public Staking"
+        title="Service Staking"
         link="https://www.evvm.org/docs/SignatureStructures/SMate/StakingUnstakingStructure"
       />
       <br />
+
+      {/* Address Input */}
       <AddressInputField
         label="sMate Address"
-        inputId="sMateAddressInput_publicStaking"
+        inputId="sMateAddressInput_PublicServiceStaking"
         placeholder="Enter sMate address"
         defaultValue={
           contractAddress[account.chain?.id as keyof typeof contractAddress]
@@ -129,29 +137,36 @@ export const PublicStakingSignatureConstructor = () => {
       {/* Configuration Section */}
       <StakingActionSelector onChange={setIsStaking} />
 
+      <AddressInputField
+        label="Service Address"
+        inputId="serviceAddressInput_PublicServiceStaking"
+        placeholder="Enter service address"
+      />
+
       {/* Nonce Generators */}
+
       <NumberInputWithGenerator
         label="EVVM Nonce"
-        inputId="nonceEVVMInput_PublicStaking"
+        inputId="nonceEVVMInput_PublicServiceStaking"
         placeholder="Enter nonce"
       />
 
       <NumberInputWithGenerator
         label="sMate Nonce"
-        inputId="nonceSMATEInput_PublicStaking"
+        inputId="nonceSMATEInput_PublicServiceStaking"
         placeholder="Enter nonce"
       />
 
       {/* Amount Inputs */}
       <NumberInputField
         label="Amount of sMate"
-        inputId="amountOfSMateInput_PublicStaking"
+        inputId="amountOfSMateInput_PublicServiceStaking"
         placeholder="Enter amount of sMate"
       />
 
       <NumberInputField
         label="Priority fee"
-        inputId="priorityFeeInput_PublicStaking"
+        inputId="priorityFeeInput_PublicServiceStaking"
         placeholder="Enter priority fee"
       />
 

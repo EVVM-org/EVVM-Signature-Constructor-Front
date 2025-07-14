@@ -12,11 +12,10 @@ import { TextInputField } from "../InputsAndModules/TextInputField";
 import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
 
 
-type WithdrawOfferData = {
-  user: string;
+type FlushCustomMetadataData = {
+  user: `0x${string}`;
   nonce: string;
-  username: string;
-  offerID: string;
+  identity: string;
   priorityFeeForFisher: string;
   signature: string;
   nonce_Evvm: string;
@@ -24,11 +23,11 @@ type WithdrawOfferData = {
   signature_Evvm: string;
 };
 
-export const WithdrawOfferConstructorComponent = () => {
-  const { signWithdrawOffer } = useMnsSignatureBuilder();
+export const FlushCustomMetadataComponent = () => {
+  const { signFlushCustomMetadata } = useMnsSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
-  const [dataToGet, setDataToGet] = React.useState<WithdrawOfferData | null>(
+  const [dataToGet, setDataToGet] = React.useState<FlushCustomMetadataData | null>(
     null
   );
 
@@ -36,33 +35,32 @@ export const WithdrawOfferConstructorComponent = () => {
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
-    const addressMNS = getValue("mnsAddressInput_withdrawOffer");
-    const nonceMNS = getValue("nonceMNSInput_withdrawOffer");
-    const username = getValue("usernameInput_withdrawOffer");
-    const offerId = getValue("offerIdInput_withdrawOffer");
-    const priorityFeeForFisher = getValue("priorityFeeInput_withdrawOffer");
-    const nonceEVVM = getValue("nonceEVVMInput_withdrawOffer");
+    const addressMNS = getValue("mnsAddressInput_flushCustomMetadata");
+    const nonceMNS = getValue("nonceMNSInput_flushCustomMetadata");
+    const identity = getValue("identityInput_flushCustomMetadata");
+    const priceToFlushCustomMetadata = getValue("priceForFlushInput_flushCustomMetadata");
+    const priorityFeeForFisher = getValue("priorityFeeInput_flushCustomMetadata");
+    const nonceEVVM = getValue("nonceEVVMInput_flushCustomMetadata");
     const priorityFlag = priority === "high";
 
-    signWithdrawOffer(
+    signFlushCustomMetadata(
       addressMNS,
       BigInt(nonceMNS),
-      username,
-      BigInt(offerId),
+      identity,
+      BigInt(priceToFlushCustomMetadata),
       BigInt(priorityFeeForFisher),
       BigInt(nonceEVVM),
       priorityFlag,
-      (paySignature, withdrawOfferSignature) => {
+      (paySignature, flushCustomMetadataSignature) => {
         setDataToGet({
-          user: account.address || "",
+          user: (account.address || "0x0") as `0x${string}`,
           nonce: nonceMNS,
-          username: username,
-          offerID: offerId,
+          identity: identity,
           priorityFeeForFisher: priorityFeeForFisher,
-          signature: withdrawOfferSignature,
+          signature: paySignature,
           nonce_Evvm: nonceEVVM,
-          priority_Evvm: priorityFlag ? "high" : "low",
-          signature_Evvm: paySignature,
+          priority_Evvm: priorityFlag.toString(),
+          signature_Evvm: flushCustomMetadataSignature,
         });
       },
       (error) => console.error("Error signing payment:", error)
@@ -72,46 +70,47 @@ export const WithdrawOfferConstructorComponent = () => {
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
-        title="Withdraw offer of username"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/withdrawOfferStructure"
+        title="Flush Custom Metadata of Identity"
+        link="https://www.evvm.org/docs/SignatureStructures/MNS/flushCustomMetadataStructure"
       />
 
-      
       <br />
 
       <AddressInputField
         label="MNS Address"
-        inputId="mnsAddressInput_withdrawOffer"
+        inputId="mnsAddressInput_flushCustomMetadata"
         placeholder="Enter MNS address"
       />
 
+      {/* Nonce section with automatic generator */}
+
       <NumberInputWithGenerator
         label="MNS Nonce"
-        inputId="nonceMNSInput_withdrawOffer"
+        inputId="nonceMNSInput_flushCustomMetadata"
         placeholder="Enter nonce"
       />
 
       <TextInputField
-        label="Username"
-        inputId="usernameInput_withdrawOffer"
-        placeholder="Enter username"
+        label="Identity"
+        inputId="identityInput_flushCustomMetadata"
+        placeholder="Enter identity"
       />
 
       <NumberInputField
-        label="Offer ID"
-        inputId="offerIdInput_withdrawOffer"
-        placeholder="Enter offer ID"
+        label="Price for flush"
+        inputId="priceForFlushInput_flushCustomMetadata"
+        placeholder="Enter price for flush"
       />
 
       <NumberInputField
         label="Priority fee"
-        inputId="priorityFeeInput_withdrawOffer"
+        inputId="priorityFeeInput_flushCustomMetadata"
         placeholder="Enter priority fee"
       />
 
       <NumberInputWithGenerator
         label="EVVM Nonce"
-        inputId="nonceEVVMInput_withdrawOffer"
+        inputId="nonceEVVMInput_flushCustomMetadata"
         placeholder="Enter nonce"
       />
 

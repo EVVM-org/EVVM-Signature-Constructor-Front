@@ -12,10 +12,10 @@ import { TextInputField } from "../InputsAndModules/TextInputField";
 import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
 
 
-type FlushCustomMetadataData = {
-  user: `0x${string}`;
+type RenewUsernameData = {
+  user: string;
   nonce: string;
-  identity: string;
+  username: string;
   priorityFeeForFisher: string;
   signature: string;
   nonce_Evvm: string;
@@ -23,11 +23,11 @@ type FlushCustomMetadataData = {
   signature_Evvm: string;
 };
 
-export const FlushCustomMetadataConstructorComponent = () => {
-  const { signFlushCustomMetadata } = useMnsSignatureBuilder();
+export const RenewUsernameComponent = () => {
+  const { signRenewUsername } = useMnsSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
-  const [dataToGet, setDataToGet] = React.useState<FlushCustomMetadataData | null>(
+  const [dataToGet, setDataToGet] = React.useState<RenewUsernameData | null>(
     null
   );
 
@@ -35,32 +35,32 @@ export const FlushCustomMetadataConstructorComponent = () => {
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
-    const addressMNS = getValue("mnsAddressInput_flushCustomMetadata");
-    const nonceMNS = getValue("nonceMNSInput_flushCustomMetadata");
-    const identity = getValue("identityInput_flushCustomMetadata");
-    const priceToFlushCustomMetadata = getValue("priceForFlushInput_flushCustomMetadata");
-    const priorityFeeForFisher = getValue("priorityFeeInput_flushCustomMetadata");
-    const nonceEVVM = getValue("nonceEVVMInput_flushCustomMetadata");
+    const addressMNS = getValue("mnsAddressInput_renewUsername");
+    const nonceMNS = getValue("nonceMNSInput_renewUsername");
+    const username = getValue("usernameInput_renewUsername");
+    const amountToRenew = getValue("amountToRenew_renewUsername");
+    const priorityFeeForFisher = getValue("priorityFeeInput_renewUsername");
+    const nonceEVVM = getValue("nonceEVVMInput_renewUsername");
     const priorityFlag = priority === "high";
 
-    signFlushCustomMetadata(
+    signRenewUsername(
       addressMNS,
       BigInt(nonceMNS),
-      identity,
-      BigInt(priceToFlushCustomMetadata),
+      username,
+      BigInt(amountToRenew),
       BigInt(priorityFeeForFisher),
       BigInt(nonceEVVM),
       priorityFlag,
-      (paySignature, flushCustomMetadataSignature) => {
+      (paySignature, renewUsernameSignature) => {
         setDataToGet({
-          user: (account.address || "0x0") as `0x${string}`,
+          user: account.address || "",
           nonce: nonceMNS,
-          identity: identity,
+          username: username,
           priorityFeeForFisher: priorityFeeForFisher,
-          signature: paySignature,
+          signature: renewUsernameSignature,
           nonce_Evvm: nonceEVVM,
-          priority_Evvm: priorityFlag.toString(),
-          signature_Evvm: flushCustomMetadataSignature,
+          priority_Evvm: priorityFlag ? "high" : "low",
+          signature_Evvm: paySignature,
         });
       },
       (error) => console.error("Error signing payment:", error)
@@ -70,47 +70,46 @@ export const FlushCustomMetadataConstructorComponent = () => {
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
-        title="Flush Custom Metadata of Identity"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/flushCustomMetadataStructure"
+        title="Renewal of username"
+        link="https://www.evvm.org/docs/SignatureStructures/MNS/renewUsernameStructure"
       />
 
+      
       <br />
 
       <AddressInputField
         label="MNS Address"
-        inputId="mnsAddressInput_flushCustomMetadata"
+        inputId="mnsAddressInput_renewUsername"
         placeholder="Enter MNS address"
       />
 
-      {/* Nonce section with automatic generator */}
-
       <NumberInputWithGenerator
         label="MNS Nonce"
-        inputId="nonceMNSInput_flushCustomMetadata"
+        inputId="nonceMNSInput_renewUsername"
         placeholder="Enter nonce"
       />
 
       <TextInputField
-        label="Identity"
-        inputId="identityInput_flushCustomMetadata"
-        placeholder="Enter identity"
+        label="Username"
+        inputId="usernameInput_renewUsername"
+        placeholder="Enter username"
       />
 
       <NumberInputField
-        label="Price for flush"
-        inputId="priceForFlushInput_flushCustomMetadata"
-        placeholder="Enter price for flush"
+        label="Amount to Renew"
+        inputId="amountToRenew_renewUsername"
+        placeholder="Enter amount to renew"
       />
 
       <NumberInputField
         label="Priority fee"
-        inputId="priorityFeeInput_flushCustomMetadata"
+        inputId="priorityFeeInput_renewUsername"
         placeholder="Enter priority fee"
       />
 
       <NumberInputWithGenerator
         label="EVVM Nonce"
-        inputId="nonceEVVMInput_flushCustomMetadata"
+        inputId="nonceEVVMInput_renewUsername"
         placeholder="Enter nonce"
       />
 

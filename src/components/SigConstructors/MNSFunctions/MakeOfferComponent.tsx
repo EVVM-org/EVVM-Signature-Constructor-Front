@@ -10,13 +10,15 @@ import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { TextInputField } from "../InputsAndModules/TextInputField";
 import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
+import { DateInputField } from "../InputsAndModules/DateInputField";
+import { dateToUnixTimestamp } from "@/utils/dateToUnixTimestamp";
 
-
-type RemoveCustomMetadataData = {
-  user: string;
+type MakeOfferData = {
+  user: `0x${string}`;
   nonce: string;
-  identity: string;
-  key: string;
+  username: string;
+  amount: string;
+  expireDate: string;
   priorityFeeForFisher: string;
   signature: string;
   nonce_Evvm: string;
@@ -24,45 +26,46 @@ type RemoveCustomMetadataData = {
   signature_Evvm: string;
 };
 
-export const RemoveCustomMetadataConstructorComponent = () => {
-  const { signRemoveCustomMetadata } = useMnsSignatureBuilder();
+export const MakeOfferComponent = () => {
+  const { signMakeOffer } = useMnsSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
-  const [dataToGet, setDataToGet] =
-    React.useState<RemoveCustomMetadataData | null>(null);
+  const [dataToGet, setDataToGet] = React.useState<MakeOfferData | null>(null);
 
   const makeSig = async () => {
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
-    const addressMNS = getValue("mnsAddressInput_removeCustomMetadata");
-    const nonceMNS = getValue("nonceMNSInput_removeCustomMetadata");
-    const identity = getValue("identityInput_removeCustomMetadata");
-    const key = getValue("keyInput_removeCustomMetadata");
-    const priorityFeeForFisher = getValue("priorityFeeInput_removeCustomMetadata");
-    const amountOfMateReward = getValue("amountOfMateRewardInput_removeCustomMetadata");
-    const nonceEVVM = getValue("nonceEVVMInput_removeCustomMetadata");
+    const addressMNS = getValue("mnsAddressInput_makeOffer");
+    const nonceMNS = getValue("nonceMNSInput_makeOffer");
+    const username = getValue("usernameInput_makeOffer");
+    const amount = getValue("amountInput_makeOffer");
+    const expireDate = dateToUnixTimestamp(getValue("expireDateInput_makeOffer"));
+    const priorityFeeForFisher = getValue("priorityFeeInput_makeOffer");
+    const nonceEVVM = getValue("nonceEVVMInput_makeOffer");
     const priorityFlag = priority === "high";
+
     
-    signRemoveCustomMetadata(
+    signMakeOffer(
       addressMNS,
       BigInt(nonceMNS),
-      identity,
-      BigInt(key),
-      BigInt(amountOfMateReward),
+      username,
+      BigInt(amount),
+      BigInt(expireDate),
       BigInt(priorityFeeForFisher),
       BigInt(nonceEVVM),
       priorityFlag,
-      (paySignature, removeCustomMetadataSignature) => {
+      (paySignature, registrationSignature) => {
         setDataToGet({
-          user: account.address || "",
+          user: account.address as `0x${string}`,
           nonce: nonceMNS,
-          identity: identity,
-          key: key,
-          priorityFeeForFisher: priorityFeeForFisher,
-          signature: removeCustomMetadataSignature,
+          username: username,
+          amount: amount,
+          expireDate: expireDate.toString(),
+          signature: registrationSignature,
+          priorityFeeForFisher,
           nonce_Evvm: nonceEVVM,
-          priority_Evvm: priorityFlag ? "high" : "low",
+          priority_Evvm: priorityFlag ? "true" : "false",
           signature_Evvm: paySignature,
         });
       },
@@ -74,51 +77,51 @@ export const RemoveCustomMetadataConstructorComponent = () => {
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
-        title="Remove custom metadata of identity"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/removeCustomMetadataStructure"
+        title="Make offer of username"
+        link="https://www.evvm.org/docs/SignatureStructures/MNS/makeOfferStructure"
       />
 
       <br />
 
       <AddressInputField
         label="MNS Address"
-        inputId="mnsAddressInput_removeCustomMetadata"
+        inputId="mnsAddressInput_makeOffer"
         placeholder="Enter MNS address"
       />
 
       <NumberInputWithGenerator
         label="MNS Nonce"
-        inputId="nonceMNSInput_removeCustomMetadata"
+        inputId="nonceMNSInput_makeOffer"
         placeholder="Enter nonce"
       />
 
       <TextInputField
-        label="Identity"
-        inputId="identityInput_removeCustomMetadata"
-        placeholder="Enter identity"
+        label="Username"
+        inputId="usernameInput_makeOffer"
+        placeholder="Enter username"
       />
 
-      <TextInputField
-        label="Key"
-        inputId="keyInput_removeCustomMetadata"
-        placeholder="Enter key"
+      <NumberInputField
+        label="Amount to offer"
+        inputId="amountInput_makeOffer"
+        placeholder="Enter amount to offer"
+      />
+      
+      <DateInputField
+        label="Expiration Date"
+        inputId="expireDateInput_makeOffer"
+        defaultValue="2025-12-31"
       />
 
       <NumberInputField
         label="Priority fee"
-        inputId="priorityFeeInput_removeCustomMetadata"
+        inputId="priorityFeeInput_makeOffer"
         placeholder="Enter priority fee"
-      />
-
-      <NumberInputField
-        label="Amount of MATE reward"
-        inputId="amountOfMateRewardInput_removeCustomMetadata"
-        placeholder="Enter amount of MATE reward"
       />
 
       <NumberInputWithGenerator
         label="EVVM Nonce"
-        inputId="nonceEVVMInput_removeCustomMetadata"
+        inputId="nonceEVVMInput_makeOffer"
         placeholder="Enter nonce"
       />
 

@@ -1,35 +1,32 @@
 "use client";
 import React from "react";
+import { getAccount } from "@wagmi/core";
+import { config } from "@/config/index";
 import { useSMateSignatureBuilder } from "@/utils/SignatureBuilder/useSMateSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
+import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector";
+import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
-import { AddressInputField } from "../InputsAndModules/AddressInputField";
-import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
-import { PresaleStakingInputData } from "@/utils/TypeStructures/sMateTypeInputStructure";
-import { PayInputData } from "@/utils/TypeStructures/evvmTypeInputStructure";
-import { getAccount } from "@wagmi/core";
-import { config } from "@/config/index";
-import { executePresaleStaking } from "@/utils/TransactionExecuter/useSMateTransactionExecuter";
 import { contractAddress, tokenAddress } from "@/constants/address";
+import { executePublicStaking } from "@/utils/TransactionExecuter/useSMateTransactionExecuter";
+import { PublicStakingInputData } from "@/utils/TypeStructures/sMateTypeInputStructure";
+import { PayInputData } from "@/utils/TypeStructures/evvmTypeInputStructure";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 
 type InputData = {
-  PresaleStakingInputData: PresaleStakingInputData;
+  PublicStakingInputData: PublicStakingInputData;
   PayInputData: PayInputData;
 };
 
-export const PresaleStakingSignatureConstructor = () => {
-  const { signPresaleStaking } = useSMateSignatureBuilder();
-
+export const PublicStakingComponent = () => {
+  let account = getAccount(config);
+  const { signPublicStaking } = useSMateSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
-
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null);
-
-  let account = getAccount(config);
 
   const makeSig = async () => {
     const walletData = await getAccountWithRetry(config);
@@ -39,21 +36,23 @@ export const PresaleStakingSignatureConstructor = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
-      sMateAddress: getValue("sMateAddressInput_presaleStaking"),
-      amountOfSMate: Number(getValue("amountOfSMateInput_presaleStaking")),
-      priorityFee: getValue("priorityFeeInput_presaleStaking"),
-      nonceEVVM: getValue("nonceEVVMInput_presaleStaking"),
-      nonceSMATE: getValue("nonceSMATEInput_presaleStaking"),
+      sMateAddress: getValue("sMateAddressInput_PublicStaking"),
+      nonceEVVM: getValue("nonceEVVMInput_PublicStaking"),
+      nonceSMATE: getValue("nonceSMATEInput_PublicStaking"),
+      amountOfSMate: Number(getValue("amountOfSMateInput_PublicStaking")),
+      priorityFee: getValue("priorityFeeInput_PublicStaking"),
     };
 
-    const amountOfToken = (formData.amountOfSMate * 10 ** 18).toLocaleString(
-      "fullwide",
-      {
-        useGrouping: false,
-      }
-    );
+    if (!formData.sMateAddress) {
+      alert("Please enter a sMate address");
+      return;
+    }
 
-    signPresaleStaking(
+    const amountOfToken = BigInt(formData.amountOfSMate) *
+      (BigInt(5083) * BigInt(10) ** BigInt(18));
+
+    // Sign message
+    signPublicStaking(
       formData.sMateAddress,
       formData.amountOfSMate,
       formData.priorityFee,
@@ -63,10 +62,11 @@ export const PresaleStakingSignatureConstructor = () => {
       formData.nonceSMATE,
       (paySignature, stakingSignature) => {
         setDataToGet({
-          PresaleStakingInputData: {
+          PublicStakingInputData: {
             isStaking: isStaking,
             user: walletData.address as `0x${string}`,
             nonce: BigInt(formData.nonceSMATE),
+            amountOfSMate: BigInt(formData.amountOfSMate),
             signature: stakingSignature,
             priorityFee_Evvm: BigInt(formData.priorityFee),
             priority_Evvm: priority === "high",
@@ -99,27 +99,25 @@ export const PresaleStakingSignatureConstructor = () => {
 
     const sMateAddress = dataToGet.PayInputData.to_address;
 
-    executePresaleStaking(dataToGet.PresaleStakingInputData, sMateAddress)
+    executePublicStaking(dataToGet.PublicStakingInputData, sMateAddress)
       .then(() => {
-        console.log("Presale staking executed successfully");
+        console.log("Public staking executed successfully");
       })
       .catch((error) => {
-        console.error("Error executing presale staking:", error);
+        console.error("Error executing public staking:", error);
       });
   };
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
-        title="Presale Staking"
+        title="Public Staking"
         link="https://www.evvm.org/docs/SignatureStructures/SMate/StakingUnstakingStructure"
       />
       <br />
-
-      {/* Address Input */}
       <AddressInputField
         label="sMate Address"
-        inputId="sMateAddressInput_presaleStaking"
+        inputId="sMateAddressInput_publicStaking"
         placeholder="Enter sMate address"
         defaultValue={
           contractAddress[account.chain?.id as keyof typeof contractAddress]
@@ -132,29 +130,28 @@ export const PresaleStakingSignatureConstructor = () => {
       <StakingActionSelector onChange={setIsStaking} />
 
       {/* Nonce Generators */}
-
       <NumberInputWithGenerator
         label="EVVM Nonce"
-        inputId="nonceEVVMInput_presaleStaking"
+        inputId="nonceEVVMInput_PublicStaking"
         placeholder="Enter nonce"
       />
 
       <NumberInputWithGenerator
         label="sMate Nonce"
-        inputId="nonceSMATEInput_presaleStaking"
+        inputId="nonceSMATEInput_PublicStaking"
         placeholder="Enter nonce"
       />
 
       {/* Amount Inputs */}
       <NumberInputField
         label="Amount of sMate"
-        inputId="amountOfSMateInput_presaleStaking"
+        inputId="amountOfSMateInput_PublicStaking"
         placeholder="Enter amount of sMate"
       />
 
       <NumberInputField
         label="Priority fee"
-        inputId="priorityFeeInput_presaleStaking"
+        inputId="priorityFeeInput_PublicStaking"
         placeholder="Enter priority fee"
       />
 

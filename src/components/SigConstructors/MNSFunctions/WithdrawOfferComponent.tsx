@@ -11,23 +11,24 @@ import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { TextInputField } from "../InputsAndModules/TextInputField";
 import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
 
-type RegistrationData = {
-  user: `0x${string}`;
+
+type WithdrawOfferData = {
+  user: string;
   nonce: string;
   username: string;
-  clowNumber: string;
-  signature: string;
+  offerID: string;
   priorityFeeForFisher: string;
+  signature: string;
   nonce_Evvm: string;
   priority_Evvm: string;
   signature_Evvm: string;
 };
 
-export const RegistrationUsernameConstructorComponent = () => {
-  const { signRegistrationUsername } = useMnsSignatureBuilder();
+export const WithdrawOfferComponent = () => {
+  const { signWithdrawOffer } = useMnsSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
-  const [dataToGet, setDataToGet] = React.useState<RegistrationData | null>(
+  const [dataToGet, setDataToGet] = React.useState<WithdrawOfferData | null>(
     null
   );
 
@@ -35,34 +36,32 @@ export const RegistrationUsernameConstructorComponent = () => {
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
-    const addressMNS = getValue("mnsAddressInput_registration");
-    const nonceMNS = getValue("nonceMNSInput_registration");
-    const username = getValue("usernameInput_registration");
-    const clowNumber = getValue("clowNumberInput_registration");
-    const mateRewardAmount = getValue("mateRewardInput_registration");
-    const priorityFeeForFisher = getValue("priorityFeeInput_registration");
-    const nonceEVVM = getValue("nonceEVVMInput_registration");
+    const addressMNS = getValue("mnsAddressInput_withdrawOffer");
+    const nonceMNS = getValue("nonceMNSInput_withdrawOffer");
+    const username = getValue("usernameInput_withdrawOffer");
+    const offerId = getValue("offerIdInput_withdrawOffer");
+    const priorityFeeForFisher = getValue("priorityFeeInput_withdrawOffer");
+    const nonceEVVM = getValue("nonceEVVMInput_withdrawOffer");
     const priorityFlag = priority === "high";
 
-    signRegistrationUsername(
+    signWithdrawOffer(
       addressMNS,
       BigInt(nonceMNS),
       username,
-      BigInt(clowNumber),
-      BigInt(mateRewardAmount),
+      BigInt(offerId),
       BigInt(priorityFeeForFisher),
       BigInt(nonceEVVM),
       priorityFlag,
-      (paySignature, registrationSignature) => {
+      (paySignature, withdrawOfferSignature) => {
         setDataToGet({
-          user: account.address as `0x${string}`,
+          user: account.address || "",
           nonce: nonceMNS,
-          username,
-          clowNumber,
-          signature: registrationSignature,
-          priorityFeeForFisher,
+          username: username,
+          offerID: offerId,
+          priorityFeeForFisher: priorityFeeForFisher,
+          signature: withdrawOfferSignature,
           nonce_Evvm: nonceEVVM,
-          priority_Evvm: priorityFlag ? "true" : "false",
+          priority_Evvm: priorityFlag ? "high" : "low",
           signature_Evvm: paySignature,
         });
       },
@@ -73,53 +72,46 @@ export const RegistrationUsernameConstructorComponent = () => {
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
-        title="Registration of username"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/registrationUsernameStructure"
+        title="Withdraw offer of username"
+        link="https://www.evvm.org/docs/SignatureStructures/MNS/withdrawOfferStructure"
       />
 
+      
       <br />
 
       <AddressInputField
         label="MNS Address"
-        inputId="mnsAddressInput_registration"
+        inputId="mnsAddressInput_withdrawOffer"
         placeholder="Enter MNS address"
       />
 
-      {/* Nonce section with automatic generator */}
-
       <NumberInputWithGenerator
         label="MNS Nonce"
-        inputId="nonceMNSInput_registration"
+        inputId="nonceMNSInput_withdrawOffer"
         placeholder="Enter nonce"
-      />
-
-      <NumberInputField
-        label="Clow Number"
-        inputId="clowNumberInput_registration"
-        placeholder="Enter clow number"
       />
 
       <TextInputField
         label="Username"
-        inputId="usernameInput_registration"
+        inputId="usernameInput_withdrawOffer"
         placeholder="Enter username"
       />
 
       <NumberInputField
-        label="Mate reward amount"
-        inputId="mateRewardInput_registration"
-        placeholder="Enter mate reward amount"
+        label="Offer ID"
+        inputId="offerIdInput_withdrawOffer"
+        placeholder="Enter offer ID"
       />
 
       <NumberInputField
         label="Priority fee"
-        inputId="priorityFeeInput_registration"
+        inputId="priorityFeeInput_withdrawOffer"
         placeholder="Enter priority fee"
       />
 
       <NumberInputWithGenerator
         label="EVVM Nonce"
-        inputId="nonceEVVMInput_registration"
+        inputId="nonceEVVMInput_withdrawOffer"
         placeholder="Enter nonce"
       />
 

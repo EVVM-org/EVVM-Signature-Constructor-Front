@@ -1,22 +1,22 @@
 "use client";
 import { useState } from "react";
-import { PaySignaturesConstructorComponent } from "@/components/SigConstructors/PaymentFunctions/PaySignaturesConstructor";
-import { DispersePaySignatureConstructor } from "@/components/SigConstructors/PaymentFunctions/DispersePaySignatureConstructor";
-import { GoldenStakingSignatureConstructor } from "@/components/SigConstructors/StakingFunctions/GoldenStakingSignatureConstructor";
-import { PresaleStakingSignatureConstructor } from "@/components/SigConstructors/StakingFunctions/PresaleStakingSignatureConstructor";
-import { PublicStakingSignatureConstructor } from "@/components/SigConstructors/StakingFunctions/PublicStakingSignatureConstructor";
-import { PublicServiceStakingSignatureConstructor } from "@/components/SigConstructors/StakingFunctions/PublicServiceStakingSignatureConstructor";
-import { PreRegistrationUsernameConstructorComponent } from "@/components/SigConstructors/MNSFunctions/PreRegistrationUsernameConstructorComponent";
-import { RegistrationUsernameConstructorComponent } from "@/components/SigConstructors/MNSFunctions/RegistrationUsernameConstructorComponent";
-import { MakeOfferConstructorComponent } from "@/components/SigConstructors/MNSFunctions/MakeOfferConstructorComponent";
-import { WithdrawOfferConstructorComponent } from "@/components/SigConstructors/MNSFunctions/WithdrawOfferConstructorComponent";
-import { AcceptOfferConstructorComponent } from "@/components/SigConstructors/MNSFunctions/AcceptOfferConstructorComponent";
-import { RenewUsernameConstructorComponent } from "./MNSFunctions/RenewUsernameConstructorComponent";
-import { AddCustomMetadataConstructorComponent } from "./MNSFunctions/AddCustomMetadataConstructorComponent";
-import { RemoveCustomMetadataConstructorComponent } from "./MNSFunctions/RemoveCustomMetadataConstructorComponent";
-import { FlushCustomMetadataConstructorComponent } from "./MNSFunctions/FlushCustomMetadataConstructorComponent";
-import { FlushUsernameConstructorComponent } from "./MNSFunctions/FlushUsernameConstructorComponent";
 import { FaucetFunctionsComponent } from "./FaucetFunctions/FaucetFunctionsComponent";
+import { PaySignaturesComponent } from "./PaymentFunctions/PaySignaturesComponent";
+import { DispersePayComponent } from "./PaymentFunctions/DispersePayComponent";
+import { GoldenStakingComponent } from "./StakingFunctions/GoldenStakingComponent";
+import { PresaleStakingComponent } from "./StakingFunctions/PresaleStakingComponent";
+import { PublicStakingComponent } from "./StakingFunctions/PublicStakingComponent";
+import { PublicServiceStakingComponent } from "./StakingFunctions/PublicServiceStakingComponent";
+import { PreRegistrationUsernameComponent } from "./MNSFunctions/PreRegistrationUsernameComponent";
+import { RegistrationUsernameComponent } from "./MNSFunctions/RegistrationUsernameComponent";
+import { MakeOfferComponent } from "./MNSFunctions/MakeOfferComponent";
+import { WithdrawOfferComponent } from "./MNSFunctions/WithdrawOfferComponent";
+import { AcceptOfferComponent } from "./MNSFunctions/AcceptOfferComponent";
+import { RenewUsernameComponent } from "./MNSFunctions/RenewUsernameComponent";
+import { AddCustomMetadataComponent } from "./MNSFunctions/AddCustomMetadataComponent";
+import { RemoveCustomMetadataComponent } from "./MNSFunctions/RemoveCustomMetadataComponent";
+import { FlushCustomMetadataComponent } from "./MNSFunctions/FlushCustomMetadataComponent";
+import { FlushUsernameComponent } from "./MNSFunctions/FlushUsernameComponent";
 
 const boxStyle = {
   display: "flex",
@@ -48,28 +48,28 @@ export const SigMenu = () => {
   ];
 
   const payComponents = [
-    <PaySignaturesConstructorComponent key="pay" />,
-    <DispersePaySignatureConstructor key="disperse" />,
+    <PaySignaturesComponent key="pay" />,
+    <DispersePayComponent key="disperse" />,
   ];
 
   const stakingComponents = [
-    <GoldenStakingSignatureConstructor key="golden" />,
-    <PresaleStakingSignatureConstructor key="presale" />,
-    <PublicStakingSignatureConstructor key="public" />,
-    <PublicServiceStakingSignatureConstructor key="publicService" />,
+    <GoldenStakingComponent key="golden" />,
+    <PresaleStakingComponent key="presale" />,
+    <PublicStakingComponent key="public" />,
+    <PublicServiceStakingComponent key="publicService" />,
   ];
 
   const mnsComponents = [
-    <PreRegistrationUsernameConstructorComponent key="preReg" />,
-    <RegistrationUsernameConstructorComponent key="reg" />,
-    <MakeOfferConstructorComponent key="makeOffer" />,
-    <WithdrawOfferConstructorComponent key="withdrawOffer" />,
-    <AcceptOfferConstructorComponent key="acceptOffer" />,
-    <RenewUsernameConstructorComponent key="renewUsername" />,
-    <AddCustomMetadataConstructorComponent key="addCustomMetadata" />,
-    <RemoveCustomMetadataConstructorComponent key="removeCustomMetadata" />,
-    <FlushCustomMetadataConstructorComponent key="flushCustomMetadata" />,
-    <FlushUsernameConstructorComponent key="flushUsername" />,
+    <PreRegistrationUsernameComponent key="preReg" />,
+    <RegistrationUsernameComponent key="reg" />,
+    <MakeOfferComponent key="makeOffer" />,
+    <WithdrawOfferComponent key="withdrawOffer" />,
+    <AcceptOfferComponent key="acceptOffer" />,
+    <RenewUsernameComponent key="renewUsername" />,
+    <AddCustomMetadataComponent key="addCustomMetadata" />,
+    <RemoveCustomMetadataComponent key="removeCustomMetadata" />,
+    <FlushCustomMetadataComponent key="flushCustomMetadata" />,
+    <FlushUsernameComponent key="flushUsername" />,
   ];
 
   const components =

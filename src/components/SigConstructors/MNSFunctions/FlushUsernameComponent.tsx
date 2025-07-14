@@ -12,11 +12,10 @@ import { TextInputField } from "../InputsAndModules/TextInputField";
 import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
 
 
-type AcceptOfferData = {
-  user: string;
+type FlushUsernameData = {
+  user: `0x${string}`;
   nonce: string;
   username: string;
-  offerID: string;
   priorityFeeForFisher: string;
   signature: string;
   nonce_Evvm: string;
@@ -24,11 +23,11 @@ type AcceptOfferData = {
   signature_Evvm: string;
 };
 
-export const AcceptOfferConstructorComponent = () => {
-  const { signAcceptOffer } = useMnsSignatureBuilder();
+export const FlushUsernameComponent = () => {
+  const { signFlushUsername } = useMnsSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
-  const [dataToGet, setDataToGet] = React.useState<AcceptOfferData | null>(
+  const [dataToGet, setDataToGet] = React.useState<FlushUsernameData | null>(
     null
   );
 
@@ -36,33 +35,32 @@ export const AcceptOfferConstructorComponent = () => {
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
-    const addressMNS = getValue("mnsAddressInput_acceptOffer");
-    const nonceMNS = getValue("nonceMNSInput_acceptOffer");
-    const username = getValue("usernameInput_acceptOffer");
-    const offerId = getValue("offerIdInput_acceptOffer");
-    const priorityFeeForFisher = getValue("priorityFeeInput_acceptOffer");
-    const nonceEVVM = getValue("nonceEVVMInput_acceptOffer");
+    const addressMNS = getValue("mnsAddressInput_flushUsername");
+    const nonceMNS = getValue("nonceMNSInput_flushUsername");
+    const username = getValue("usernameInput_flushUsername");
+    const priceToFlushUsername = getValue("priceForFlushInput_flushUsername");
+    const priorityFeeForFisher = getValue("priorityFeeInput_flushUsername");
+    const nonceEVVM = getValue("nonceEVVMInput_flushUsername");
     const priorityFlag = priority === "high";
 
-    signAcceptOffer(
+    signFlushUsername(
       addressMNS,
       BigInt(nonceMNS),
       username,
-      BigInt(offerId),
+      BigInt(priceToFlushUsername),
       BigInt(priorityFeeForFisher),
       BigInt(nonceEVVM),
       priorityFlag,
-      (paySignature, acceptOfferSignature) => {
+      (paySignature, flushUsernameSignature) => {
         setDataToGet({
-          user: account.address || "",
+          user: (account.address || "0x0") as `0x${string}`,
           nonce: nonceMNS,
           username: username,
-          offerID: offerId,
           priorityFeeForFisher: priorityFeeForFisher,
-          signature: acceptOfferSignature,
+          signature: paySignature,
           nonce_Evvm: nonceEVVM,
-          priority_Evvm: priorityFlag ? "high" : "low",
-          signature_Evvm: paySignature,
+          priority_Evvm: priorityFlag.toString(),
+          signature_Evvm: flushUsernameSignature,
         });
       },
       (error) => console.error("Error signing payment:", error)
@@ -72,46 +70,47 @@ export const AcceptOfferConstructorComponent = () => {
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
-        title="Accept offer of username"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/acceptOfferStructure"
+        title="Flush Username"
+        link="https://www.evvm.org/docs/SignatureStructures/MNS/flushUsernameStructure"
       />
 
-      
       <br />
 
       <AddressInputField
         label="MNS Address"
-        inputId="mnsAddressInput_acceptOffer"
+        inputId="mnsAddressInput_flushUsername"
         placeholder="Enter MNS address"
       />
 
+      {/* Nonce section with automatic generator */}
+
       <NumberInputWithGenerator
         label="MNS Nonce"
-        inputId="nonceMNSInput_acceptOffer"
+        inputId="nonceMNSInput_flushUsername"
         placeholder="Enter nonce"
       />
 
       <TextInputField
-        label="Username"
-        inputId="usernameInput_acceptOffer"
+        label="Identity"
+        inputId="usernameInput_flushUsername"
         placeholder="Enter username"
       />
 
       <NumberInputField
-        label="Offer ID"
-        inputId="offerIdInput_acceptOffer"
-        placeholder="Enter offer ID"
+        label="Price for flush"
+        inputId="priceForFlushInput_flushUsername"
+        placeholder="Enter price for flush"
       />
 
       <NumberInputField
         label="Priority fee"
-        inputId="priorityFeeInput_acceptOffer"
+        inputId="priorityFeeInput_flushUsername"
         placeholder="Enter priority fee"
       />
 
       <NumberInputWithGenerator
         label="EVVM Nonce"
-        inputId="nonceEVVMInput_acceptOffer"
+        inputId="nonceEVVMInput_flushUsername"
         placeholder="Enter nonce"
       />
 

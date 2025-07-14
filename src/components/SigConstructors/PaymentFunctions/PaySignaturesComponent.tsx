@@ -15,7 +15,7 @@ import { executePay } from "@/utils/TransactionExecuter/useEVVMTransactionExecut
 import { contractAddress } from "@/constants/address";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 
-export const PaySignaturesConstructorComponent = () => {
+export const PaySignaturesComponent = () => {
   const { signPay } = useSignatureBuilder();
   let account = getAccount(config);
 

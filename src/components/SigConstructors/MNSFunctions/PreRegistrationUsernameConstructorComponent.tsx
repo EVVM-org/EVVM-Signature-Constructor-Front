@@ -11,61 +11,100 @@ import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { TextInputField } from "../InputsAndModules/TextInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
+import { PayInputData } from "@/utils/TypeStructures/evvmTypeInputStructure";
+import { PreRegistrationUsernameInputData } from "@/utils/TypeStructures/mnsTypeInputStructure";
+import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
+import { contractAddress, tokenAddress } from "@/constants/address";
+import { executePreRegistrationUsername } from "@/utils/TransactionExecuter/useMNSTransactionExecuter";
 
-type PreRegistrationData = {
-  user: `0x${string}`;
-  nonce: string;
-  hashUsername: string;
-  priorityFeeForFisher: string;
-  signature: string;
-  nonce_Evvm: string;
-  priority_Evvm: string;
-  signature_Evvm: string;
+type InfoData = {
+  PayInputData: PayInputData;
+  PreRegistrationUsernameInputData: PreRegistrationUsernameInputData;
 };
 
 export const PreRegistrationUsernameConstructorComponent = () => {
   const { signPreRegistrationUsername } = useMnsSignatureBuilder();
-  const account = getAccount(config);
+  let account = getAccount(config);
 
   const [priority, setPriority] = React.useState("low");
-  const [dataToGet, setDataToGet] = React.useState<PreRegistrationData | null>(
-    null
-  );
+  const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
 
   const makeSig = async () => {
+    const walletData = await getAccountWithRetry(config);
+    if (!walletData) return;
+
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
-    const addressMNS = getValue("mnsAddressInput_preRegistration");
-    const nonceMNS = getValue("nonceMNSInput_preRegistration");
-    const username = getValue("usernameInput_preRegistration");
-    const clowNumber = getValue("clowNumberInput_preRegistration");
-    const priorityFeeForFisher = getValue("priorityFeeInput_preRegistration");
-    const nonceEVVM = getValue("nonceEVVMInput_preRegistration");
+    const formData = {
+      addressMNS: getValue("mnsAddressInput_preRegistration"),
+      nonceMNS: getValue("nonceMNSInput_preRegistration"),
+      username: getValue("usernameInput_preRegistration"),
+      clowNumber: getValue("clowNumberInput_preRegistration"),
+      priorityFeeForFisher: getValue("priorityFeeInput_preRegistration"),
+      nonceEVVM: getValue("nonceEVVMInput_preRegistration"),
+    };
+
     const priorityFlag = priority === "high";
 
     signPreRegistrationUsername(
-      addressMNS,
-      BigInt(nonceMNS),
-      username,
-      BigInt(clowNumber),
-      BigInt(priorityFeeForFisher),
-      BigInt(nonceEVVM),
+      formData.addressMNS,
+      BigInt(formData.nonceMNS),
+      formData.username,
+      BigInt(formData.clowNumber),
+      BigInt(formData.priorityFeeForFisher),
+      BigInt(formData.nonceEVVM),
       priorityFlag,
       (paySignature, preRegistrationSignature) => {
         setDataToGet({
-          user: account.address as `0x${string}`,
-          nonce: nonceMNS,
-          hashUsername: hashPreRegisteredUsername(username, BigInt(clowNumber)),
-          priorityFeeForFisher: priorityFeeForFisher,
-          signature: preRegistrationSignature,
-          nonce_Evvm: nonceEVVM,
-          priority_Evvm: priorityFlag ? "true" : "false",
-          signature_Evvm: paySignature,
+          PayInputData: {
+            from: walletData.address as `0x${string}`,
+            to_address: formData.addressMNS as `0x${string}`,
+            to_identity: "",
+            token: tokenAddress.mate as `0x${string}`,
+            amount: BigInt(formData.priorityFeeForFisher),
+            priorityFee: BigInt(0),
+            nonce: BigInt(formData.nonceEVVM),
+            priority: priority === "high",
+            executor: formData.addressMNS as `0x${string}`,
+            signature: paySignature,
+          },
+          PreRegistrationUsernameInputData: {
+            user: walletData.address as `0x${string}`,
+            nonce: BigInt(formData.nonceMNS),
+            hashUsername: hashPreRegisteredUsername(
+              formData.username,
+              BigInt(formData.clowNumber)
+            ),
+            priorityFeeForFisher: BigInt(formData.priorityFeeForFisher),
+            signature: preRegistrationSignature,
+            nonce_Evvm: BigInt(formData.nonceEVVM),
+            priority_Evvm: priorityFlag,
+            signature_Evvm: paySignature,
+          },
         });
       },
       (error) => console.error("Error signing payment:", error)
     );
+  };
+
+  const execute = async () => {
+    if (!dataToGet) {
+      console.error("No data to execute payment");
+      return;
+    }
+    const mnsAddress = dataToGet.PayInputData.to_address;
+
+    executePreRegistrationUsername(
+      dataToGet.PreRegistrationUsernameInputData,
+      mnsAddress
+    )
+      .then(() => {
+        console.log("Pre-registration username executed successfully");
+      })
+      .catch((error) => {
+        console.error("Error executing pre-registration username:", error);
+      });
   };
 
   return (
@@ -82,7 +121,13 @@ export const PreRegistrationUsernameConstructorComponent = () => {
         label="MNS Address"
         inputId="mnsAddressInput_preRegistration"
         placeholder="Enter MNS address"
+        defaultValue={
+          contractAddress[account.chain?.id as keyof typeof contractAddress]
+            ?.mns || ""
+        }
       />
+
+      <br />
 
       {/* Nonce section with automatic generator */}
 
@@ -135,6 +180,7 @@ export const PreRegistrationUsernameConstructorComponent = () => {
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
+        onExecute={execute}
       />
     </div>
   );

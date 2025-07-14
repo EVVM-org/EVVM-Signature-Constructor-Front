@@ -3,7 +3,6 @@ import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import { useSMateSignatureBuilder } from "@/utils/SignatureBuilder/useSMateSignatureBuilder";
-import { DetailedData } from "@/components/SigConstructors/InputsAndModules/DetailedData";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
@@ -14,6 +13,7 @@ import { PayInputData } from "@/utils/TypeStructures/evvmTypeInputStructure";
 import { GoldenStakingInputData } from "@/utils/TypeStructures/sMateTypeInputStructure";
 import { contractAddress, tokenAddress } from "@/constants/address";
 import { executeGoldenStaking } from "@/utils/TransactionExecuter/useSMateTransactionExecuter";
+import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 
 type InfoData = {
   PayInputData: PayInputData;
@@ -28,59 +28,45 @@ export const GoldenStakingSignatureConstructor = () => {
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
 
   const makeSig = async () => {
-    // Get form values
-    let walletData = getAccount(config);
-
-    if (!walletData.address) {
-      let attempts = 0;
-      const interval = setInterval(() => {
-        attempts++;
-        console.error("Account address is undefined, retrying...");
-        walletData = getAccount(config);
-        if (walletData.address || attempts >= 10) {
-          clearInterval(interval);
-        }
-      }, 200);
-    }
-
-    if (!walletData.address) {
-      console.error("Account address is still undefined after retries");
-      return;
-    }
+    const walletData = await getAccountWithRetry(config);
+    if (!walletData) return;
 
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
-    const nonce = getValue("nonceInput_GoldenStaking");
-    const sMateAddress = getValue("sMateAddressInput_GoldenStaking");
-    const amountStaking = Number(getValue("amountOfSMateInput_GoldenStaking"));
-    const amountToken =
-      BigInt(getValue("amountOfSMateInput_GoldenStaking")) *
+    const formData = {
+      nonce: getValue("nonceInput_GoldenStaking"),
+      sMateAddress: getValue("sMateAddressInput_GoldenStaking"),
+      amountOfSMate: Number(getValue("amountOfSMateInput_GoldenStaking")),
+    };
+
+    const amountOfToken =
+      BigInt(formData.amountOfSMate) *
       (BigInt(5083) * BigInt(10) ** BigInt(18));
 
     // Sign and set data
     signGoldenStaking(
-      sMateAddress,
-      amountStaking,
-      nonce,
+      formData.sMateAddress,
+      formData.amountOfSMate,
+      formData.nonce,
       priority === "high",
       (signature) => {
         setDataToGet({
           PayInputData: {
             from: walletData.address as `0x${string}`,
-            to_address: sMateAddress as `0x${string}`,
+            to_address: formData.sMateAddress as `0x${string}`,
             to_identity: "",
             token: tokenAddress.mate as `0x${string}`,
-            amount: amountToken,
+            amount: amountOfToken,
             priorityFee: BigInt(0),
-            nonce: BigInt(nonce),
+            nonce: BigInt(formData.nonce),
             priority: priority === "high",
-            executor: sMateAddress as `0x${string}`,
+            executor: formData.sMateAddress as `0x${string}`,
             signature,
           },
           GoldenStakingInputData: {
             isStaking: isStaking,
-            amountOfSMate: BigInt(amountStaking),
+            amountOfSMate: BigInt(formData.amountOfSMate),
             signature,
           },
         } as InfoData);
@@ -115,7 +101,10 @@ export const GoldenStakingSignatureConstructor = () => {
         inputId="sMateAddressInput_GoldenStaking"
         placeholder="Enter sMate address"
         defaultValue={
-          (account.chain?.id && contractAddress[account.chain.id as keyof typeof contractAddress]?.sMate) || ""
+          (account.chain?.id &&
+            contractAddress[account.chain.id as keyof typeof contractAddress]
+              ?.sMate) ||
+          ""
         }
       />
       <br />

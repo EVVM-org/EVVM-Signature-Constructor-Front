@@ -13,6 +13,7 @@ import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
 import { PayInputData } from "@/utils/TypeStructures/evvmTypeInputStructure";
 import { executePay } from "@/utils/TransactionExecuter/useEVVMTransactionExecuter";
 import { contractAddress } from "@/constants/address";
+import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 
 export const PaySignaturesConstructorComponent = () => {
   const { signPay } = useSignatureBuilder();
@@ -25,58 +26,45 @@ export const PaySignaturesConstructorComponent = () => {
   const [asStaker, setAsStaker] = React.useState(false);
 
   const makeSig = async () => {
-    let walletData = getAccount(config);
+    const walletData = await getAccountWithRetry(config);
+    if (!walletData) return;
 
-    if (!walletData.address) {
-      let attempts = 0;
-      const interval = setInterval(() => {
-        attempts++;
-        console.error("Account address is undefined, retrying...");
-        walletData = getAccount(config);
-        if (walletData.address || attempts >= 10) {
-          clearInterval(interval);
-        }
-      }, 200);
-    }
-
-    if (!walletData.address) {
-      console.error("Account address is still undefined after retries");
-      return;
-    }
-
-    const getInputValue = (id: string) =>
+    const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
-    const nonce = getInputValue("nonceInput_Pay");
-    const tokenAddress = getInputValue("tokenAddress_Pay");
-    const to = getInputValue(isUsingUsernames ? "toUsername" : "toAddress");
-    const executor = isUsingExecutor
-      ? getInputValue("executorInput_Pay")
-      : "0x0000000000000000000000000000000000000000";
-    const amount = getInputValue("amountTokenInput_Pay");
-    const priorityFee = getInputValue("priorityFeeInput_Pay");
+    const formData = {
+      nonce: getValue("nonceInput_Pay"),
+      tokenAddress: getValue("tokenAddress_Pay"),
+      to: getValue(isUsingUsernames ? "toUsername" : "toAddress"),
+      executor: isUsingExecutor
+        ? getValue("executorInput_Pay")
+        : "0x0000000000000000000000000000000000000000",
+      amount: getValue("amountTokenInput_Pay"),
+      priorityFee: getValue("priorityFeeInput_Pay"),
+    };
+
 
     signPay(
-      to,
-      tokenAddress,
-      amount,
-      priorityFee,
-      nonce,
+      formData.amount,
+      formData.to,
+      formData.tokenAddress,
+      formData.priorityFee,
+      formData.nonce,
       priority === "high",
-      executor,
+      formData.executor,
       (signature) => {
         setDataToGet({
           from: walletData.address as `0x${string}`,
-          to_address: (to.startsWith("0x")
-            ? to
+          to_address: (formData.to.startsWith("0x")
+            ? formData.to
             : "0x0000000000000000000000000000000000000000") as `0x${string}`,
-          to_identity: to.startsWith("0x") ? "" : to,
-          token: tokenAddress as `0x${string}`,
-          amount: BigInt(amount),
-          priorityFee: BigInt(priorityFee),
-          nonce: BigInt(nonce),
+          to_identity: formData.to.startsWith("0x") ? "" : formData.to,
+          token: formData.tokenAddress as `0x${string}`,
+          amount: BigInt(formData.amount),
+          priorityFee: BigInt(formData.priorityFee),
+          nonce: BigInt(formData.nonce),
           priority: priority === "high",
-          executor,
+          executor: formData.executor,
           signature,
         });
       },

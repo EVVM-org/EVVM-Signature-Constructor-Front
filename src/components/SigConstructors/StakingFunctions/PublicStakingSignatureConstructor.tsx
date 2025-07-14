@@ -14,6 +14,7 @@ import { contractAddress, tokenAddress } from "@/constants/address";
 import { executePublicStaking } from "@/utils/TransactionExecuter/useSMateTransactionExecuter";
 import { PublicStakingInputData } from "@/utils/TypeStructures/sMateTypeInputStructure";
 import { PayInputData } from "@/utils/TypeStructures/evvmTypeInputStructure";
+import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 
 type InputData = {
   PublicStakingInputData: PublicStakingInputData;
@@ -28,52 +29,31 @@ export const PublicStakingSignatureConstructor = () => {
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null);
 
   const makeSig = async () => {
-    let walletData = getAccount(config);
+    const walletData = await getAccountWithRetry(config);
+    if (!walletData) return;
 
-    if (!walletData.address) {
-      let attempts = 0;
-      const interval = setInterval(() => {
-        attempts++;
-        console.error("Account address is undefined, retrying...");
-        walletData = getAccount(config);
-        if (walletData.address || attempts >= 10) {
-          clearInterval(interval);
-        }
-      }, 200);
-    }
-
-    if (!walletData.address) {
-      console.error("Account address is still undefined after retries");
-      return;
-    }
-
-    // Get form values
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
-    const sMateAddress = getValue("sMateAddressInput_PublicStaking");
-    if (!sMateAddress) {
-      alert("Please enter a sMate address");
-      return;
-    }
-
     const formData = {
+      sMateAddress: getValue("sMateAddressInput_PublicStaking"),
       nonceEVVM: getValue("nonceEVVMInput_PublicStaking"),
       nonceSMATE: getValue("nonceSMATEInput_PublicStaking"),
       amountOfSMate: Number(getValue("amountOfSMateInput_PublicStaking")),
       priorityFee: getValue("priorityFeeInput_PublicStaking"),
     };
 
-    const amountOfToken = (formData.amountOfSMate * 10 ** 18).toLocaleString(
-      "fullwide",
-      {
-        useGrouping: false,
-      }
-    );
+    if (!formData.sMateAddress) {
+      alert("Please enter a sMate address");
+      return;
+    }
+
+    const amountOfToken = BigInt(formData.amountOfSMate) *
+      (BigInt(5083) * BigInt(10) ** BigInt(18));
 
     // Sign message
     signPublicStaking(
-      sMateAddress,
+      formData.sMateAddress,
       formData.amountOfSMate,
       formData.priorityFee,
       formData.nonceEVVM,
@@ -95,14 +75,14 @@ export const PublicStakingSignatureConstructor = () => {
           },
           PayInputData: {
             from: walletData.address as `0x${string}`,
-            to_address: sMateAddress as `0x${string}`,
+            to_address: formData.sMateAddress as `0x${string}`,
             to_identity: "",
             token: tokenAddress.mate as `0x${string}`,
             amount: BigInt(amountOfToken),
             priorityFee: BigInt(formData.priorityFee),
             nonce: BigInt(formData.nonceEVVM),
             priority: priority === "high",
-            executor: sMateAddress as `0x${string}`,
+            executor: formData.sMateAddress as `0x${string}`,
             signature: paySignature,
           },
         });

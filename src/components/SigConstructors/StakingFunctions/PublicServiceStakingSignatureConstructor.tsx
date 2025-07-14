@@ -14,6 +14,7 @@ import { PublicServiceStakingInputData } from "@/utils/TypeStructures/sMateTypeI
 import { PayInputData } from "@/utils/TypeStructures/evvmTypeInputStructure";
 import { contractAddress, tokenAddress } from "@/constants/address";
 import { executePublicServiceStaking } from "@/utils/TransactionExecuter/useSMateTransactionExecuter";
+import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 
 type InputData = {
   PublicServiceStakingInputData: PublicServiceStakingInputData;
@@ -28,42 +29,24 @@ export const PublicServiceStakingSignatureConstructor = () => {
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null);
 
   const makeSig = async () => {
-    let walletData = getAccount(config);
+    const walletData = await getAccountWithRetry(config);
+    if (!walletData) return;
 
-    if (!walletData.address) {
-      let attempts = 0;
-      const interval = setInterval(() => {
-        attempts++;
-        console.error("Account address is undefined, retrying...");
-        walletData = getAccount(config);
-        if (walletData.address || attempts >= 10) {
-          clearInterval(interval);
-        }
-      }, 200);
-    }
-
-    if (!walletData.address) {
-      console.error("Account address is still undefined after retries");
-      return;
-    }
-
-    const getInputValue = (id: string) =>
+    const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
-    const sMateAddress = getInputValue(
-      "sMateAddressInput_PublicServiceStaking"
-    );
-    const serviceAddress = getInputValue(
-      "serviceAddressInput_PublicServiceStaking"
-    );
-    const amountOfSMate = Number(
-      getInputValue("amountOfSMateInput_PublicServiceStaking")
-    );
-    const priorityFee = getInputValue("priorityFeeInput_PublicServiceStaking");
-    const nonceEVVM = getInputValue("nonceEVVMInput_PublicServiceStaking");
-    const nonceSMATE = getInputValue("nonceSMATEInput_PublicServiceStaking");
+    const formData = {
+      sMateAddress: getValue("sMateAddressInput_PublicServiceStaking"),
+      serviceAddress: getValue("serviceAddressInput_PublicServiceStaking"),
+      amountOfSMate: Number(
+        getValue("amountOfSMateInput_PublicServiceStaking")
+      ),
+      priorityFee: getValue("priorityFeeInput_PublicServiceStaking"),
+      nonceEVVM: getValue("nonceEVVMInput_PublicServiceStaking"),
+      nonceSMATE: getValue("nonceSMATEInput_PublicServiceStaking"),
+    };
 
-    const amountOfToken = (amountOfSMate * 10 ** 18).toLocaleString(
+    const amountOfToken = (formData.amountOfSMate * 10 ** 18).toLocaleString(
       "fullwide",
       {
         useGrouping: false,
@@ -71,38 +54,38 @@ export const PublicServiceStakingSignatureConstructor = () => {
     );
 
     signPublicServiceStaking(
-      sMateAddress,
-      serviceAddress,
-      amountOfSMate,
-      priorityFee,
-      nonceEVVM,
+      formData.sMateAddress,
+      formData.serviceAddress,
+      formData.amountOfSMate,
+      formData.priorityFee,
+      formData.nonceEVVM,
       priority === "high",
       isStaking,
-      nonceSMATE,
+      formData.nonceSMATE,
       (paySignature, stakingSignature) => {
         setDataToGet({
           PublicServiceStakingInputData: {
             isStaking: isStaking,
             user: walletData.address as `0x${string}`,
-            service: serviceAddress as `0x${string}`,
-            nonce: BigInt(nonceSMATE),
-            amountOfSMate: BigInt(amountOfSMate),
+            service: formData.serviceAddress as `0x${string}`,
+            nonce: BigInt(formData.nonceSMATE),
+            amountOfSMate: BigInt(formData.amountOfSMate),
             signature: stakingSignature,
-            priorityFee_Evvm: BigInt(priorityFee),
+            priorityFee_Evvm: BigInt(formData.priorityFee),
             priority_Evvm: priority === "high",
-            nonce_Evvm: BigInt(nonceEVVM),
+            nonce_Evvm: BigInt(formData.nonceEVVM),
             signature_Evvm: paySignature,
           },
           PayInputData: {
             from: walletData.address as `0x${string}`,
-            to_address: sMateAddress as `0x${string}`,
+            to_address: formData.sMateAddress as `0x${string}`,
             to_identity: "",
             token: tokenAddress.mate as `0x${string}`,
             amount: BigInt(amountOfToken),
-            priorityFee: BigInt(priorityFee),
-            nonce: BigInt(nonceEVVM),
+            priorityFee: BigInt(formData.priorityFee),
+            nonce: BigInt(formData.nonceEVVM),
             priority: priority === "high",
-            executor: sMateAddress as `0x${string}`,
+            executor: formData.sMateAddress as `0x${string}`,
             signature: paySignature,
           },
         });

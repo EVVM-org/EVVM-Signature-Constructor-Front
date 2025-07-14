@@ -16,6 +16,7 @@ import {
 } from "@/utils/TypeStructures/evvmTypeInputStructure";
 import { executeDispersePay } from "@/utils/TransactionExecuter/useEVVMTransactionExecuter";
 import { contractAddress } from "@/constants/address";
+import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 
 export const DispersePaySignatureConstructor = () => {
   let account = getAccount(config);
@@ -33,36 +34,22 @@ export const DispersePaySignatureConstructor = () => {
 
   const { signDispersePay } = useSignatureBuilder();
 
-  const getValue = (id: string) =>
-    (document.getElementById(id) as HTMLInputElement).value;
-
   const makeSig = async () => {
-    let walletData = getAccount(config);
+    const walletData = await getAccountWithRetry(config);
+    if (!walletData) return;
 
-    if (!walletData.address) {
-      let attempts = 0;
-      const interval = setInterval(() => {
-        attempts++;
-        console.error("Account address is undefined, retrying...");
-        walletData = getAccount(config);
-        if (walletData.address || attempts >= 10) {
-          clearInterval(interval);
-        }
-      }, 200);
-    }
+    const getValue = (id: string) =>
+      (document.getElementById(id) as HTMLInputElement).value;
 
-    if (!walletData.address) {
-      console.error("Account address is still undefined after retries");
-      return;
-    }
-
-    const TokenAddress = getValue("tokenAddressDispersePay");
-    const Amount = getValue("amountTokenInputSplit");
-    const PriorityFee = getValue("priorityFeeInputSplit");
-    const Nonce = getValue("nonceInputDispersePay");
-    const Executor = isUsingExecutorDisperse
-      ? getValue("executorInputSplit")
-      : "0x0000000000000000000000000000000000000000";
+    const formData = {
+      tokenAddress: getValue("tokenAddressDispersePay"),
+      amount: getValue("amountTokenInputSplit"),
+      priorityFee: getValue("priorityFeeInputSplit"),
+      nonce: getValue("nonceInputDispersePay"),
+      executor: isUsingExecutorDisperse
+        ? getValue("executorInputSplit")
+        : "0x0000000000000000000000000000000000000000",
+    };
 
     const toData: DispersePayMetadata[] = [];
     for (let i = 0; i < numberOfUsersToDisperse; i++) {
@@ -84,22 +71,22 @@ export const DispersePaySignatureConstructor = () => {
 
     signDispersePay(
       toData,
-      TokenAddress,
-      Amount,
-      PriorityFee,
-      Nonce,
+      formData.tokenAddress,
+      formData.amount,
+      formData.priorityFee,
+      formData.nonce,
       priorityDisperse === "high",
-      Executor,
+      formData.executor,
       (dispersePaySignature) => {
         setDataToGet({
           from: walletData.address as `0x${string}`,
           toData,
-          token: TokenAddress as `0x${string}`,
-          amount: BigInt(Amount),
-          priorityFee: BigInt(PriorityFee),
+          token: formData.tokenAddress as `0x${string}`,
+          amount: BigInt(formData.amount),
+          priorityFee: BigInt(formData.priorityFee),
           priority: priorityDisperse === "high",
-          nonce: BigInt(Nonce),
-          executor: Executor,
+          nonce: BigInt(formData.nonce),
+          executor: formData.executor,
           signature: dispersePaySignature,
         });
       },

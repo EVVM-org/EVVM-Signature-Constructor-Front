@@ -10,11 +10,13 @@ import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
-import { PublicServiceStakingInputData } from "@/utils/TypeStructures/sMateTypeInputStructure";
-import { PayInputData } from "@/utils/TypeStructures/evvmTypeInputStructure";
 import { contractAddress, tokenAddress } from "@/constants/address";
 import { executePublicServiceStaking } from "@/utils/TransactionExecuter/useSMateTransactionExecuter";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
+import {
+  PayInputData,
+  PublicServiceStakingInputData,
+} from "@/utils/TypeInputStructures";
 
 type InputData = {
   PublicServiceStakingInputData: PublicServiceStakingInputData;

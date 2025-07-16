@@ -2,9 +2,10 @@ import { writeContract } from "@wagmi/core";
 import { config } from "@/config";
 import MateNameService from "@/constants/abi/MateNameService.json";
 import {
+  MakeOfferInputData,
   PreRegistrationUsernameInputData,
   RegistrationUsernameInputData,
-} from "../TypeStructures/mnsTypeInputStructure";
+} from "../TypeInputStructures/mnsTypeInputStructure";
 
 const executePreRegistrationUsername = async (
   InputData: PreRegistrationUsernameInputData,
@@ -69,4 +70,41 @@ const executeRegistrationUsername = async (
     });
 };
 
-export { executePreRegistrationUsername, executeRegistrationUsername };
+const executeMakeOffer = async (
+  InputData: MakeOfferInputData,
+  mnsAddress: `0x${string}`
+) => {
+  if (!InputData) {
+    return Promise.reject("No data to execute payment");
+  }
+
+  writeContract(config, {
+    abi: MateNameService.abi,
+    address: mnsAddress,
+    functionName: "makeOffer",
+    args: [
+      InputData.user,
+      InputData.nonce,
+      InputData.username,
+      InputData.amount,
+      InputData.expireDate,
+      InputData.priorityFeeForFisher,
+      InputData.signature,
+      InputData.nonce_Evvm,
+      InputData.priority_Evvm,
+      InputData.signature_Evvm,
+    ],
+  })
+    .then(() => {
+      return Promise.resolve();
+    })
+    .catch((error) => {
+      return Promise.reject(error);
+    });
+};
+
+export {
+  executePreRegistrationUsername,
+  executeRegistrationUsername,
+  executeMakeOffer,
+};

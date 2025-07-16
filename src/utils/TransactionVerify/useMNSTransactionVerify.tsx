@@ -4,7 +4,7 @@ import MateNameService from "@/constants/abi/MateNameService.json";
 import {
   PreRegistrationUsernameInputData,
   RegistrationUsernameInputData,
-} from "../TypeStructures/mnsTypeInputStructure";
+} from "../TypeInputStructures/mnsTypeInputStructure";
 
 const verifyPreRegistrationUsername = async (
   InputData: PreRegistrationUsernameInputData,

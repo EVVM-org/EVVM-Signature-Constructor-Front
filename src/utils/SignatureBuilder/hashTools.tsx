@@ -1,5 +1,5 @@
 import { keccak256, encodePacked, encodeAbiParameters, sha256 } from "viem";
-import { DispersePayMetadata } from "../TypeStructures/evvmTypeInputStructure";
+import { DispersePayMetadata } from "../TypeInputStructures/evvmTypeInputStructure";
 
 
 

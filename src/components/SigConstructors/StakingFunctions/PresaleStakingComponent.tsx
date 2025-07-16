@@ -8,13 +8,15 @@ import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
-import { PresaleStakingInputData } from "@/utils/TypeStructures/sMateTypeInputStructure";
-import { PayInputData } from "@/utils/TypeStructures/evvmTypeInputStructure";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import { executePresaleStaking } from "@/utils/TransactionExecuter/useSMateTransactionExecuter";
 import { contractAddress, tokenAddress } from "@/constants/address";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
+import {
+  PayInputData,
+  PresaleStakingInputData,
+} from "@/utils/TypeInputStructures";
 
 type InputData = {
   PresaleStakingInputData: PresaleStakingInputData;

@@ -12,9 +12,11 @@ import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
 import { contractAddress, tokenAddress } from "@/constants/address";
 import { executePublicStaking } from "@/utils/TransactionExecuter/useSMateTransactionExecuter";
-import { PublicStakingInputData } from "@/utils/TypeStructures/sMateTypeInputStructure";
-import { PayInputData } from "@/utils/TypeStructures/evvmTypeInputStructure";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
+import {
+  PayInputData,
+  PublicStakingInputData,
+} from "@/utils/TypeInputStructures";
 
 type InputData = {
   PublicStakingInputData: PublicStakingInputData;
@@ -48,7 +50,8 @@ export const PublicStakingComponent = () => {
       return;
     }
 
-    const amountOfToken = BigInt(formData.amountOfSMate) *
+    const amountOfToken =
+      BigInt(formData.amountOfSMate) *
       (BigInt(5083) * BigInt(10) ** BigInt(18));
 
     // Sign message

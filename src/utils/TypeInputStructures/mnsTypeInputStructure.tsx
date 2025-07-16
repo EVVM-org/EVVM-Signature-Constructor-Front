@@ -21,4 +21,21 @@ type RegistrationUsernameInputData = {
   signature_Evvm: string;
 };
 
-export type { PreRegistrationUsernameInputData, RegistrationUsernameInputData };
+type MakeOfferInputData = {
+  user: `0x${string}`;
+  nonce: bigint;
+  username: string;
+  amount: bigint;
+  expireDate: bigint;
+  priorityFeeForFisher: bigint;
+  signature: string;
+  nonce_Evvm: bigint;
+  priority_Evvm: boolean;
+  signature_Evvm: string;
+};
+
+export type {
+  PreRegistrationUsernameInputData,
+  RegistrationUsernameInputData,
+  MakeOfferInputData,
+};

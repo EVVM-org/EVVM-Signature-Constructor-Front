@@ -10,7 +10,7 @@ import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { ExecutorSelector } from "../InputsAndModules/ExecutorSelector";
 import { AsStakerSelector } from "../InputsAndModules/AsStakerSelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
-import { PayInputData } from "@/utils/TypeStructures/evvmTypeInputStructure";
+import { PayInputData } from "@/utils/TypeInputStructures";
 import { executePay } from "@/utils/TransactionExecuter/useEVVMTransactionExecuter";
 import { contractAddress } from "@/constants/address";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
@@ -42,7 +42,6 @@ export const PaySignaturesComponent = () => {
       amount: getValue("amountTokenInput_Pay"),
       priorityFee: getValue("priorityFeeInput_Pay"),
     };
-
 
     signPay(
       formData.amount,

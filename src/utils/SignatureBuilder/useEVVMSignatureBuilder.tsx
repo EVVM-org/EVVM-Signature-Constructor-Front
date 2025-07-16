@@ -4,7 +4,7 @@ import {
   buildMessageSignedForPay,
 } from "./constructMessage";
 import { hashDispersePaymentUsersToPay } from "./hashTools";
-import { DispersePayMetadata } from "../TypeStructures/evvmTypeInputStructure";
+import { DispersePayMetadata } from "../TypeInputStructures/evvmTypeInputStructure";
 
 
 export const useSignatureBuilder = () => {

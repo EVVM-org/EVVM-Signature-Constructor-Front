@@ -11,7 +11,6 @@ import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { TextInputField } from "../InputsAndModules/TextInputField";
 import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
 
-
 type AcceptOfferData = {
   user: string;
   nonce: string;
@@ -76,7 +75,6 @@ export const AcceptOfferComponent = () => {
         link="https://www.evvm.org/docs/SignatureStructures/MNS/acceptOfferStructure"
       />
 
-      
       <br />
 
       <AddressInputField

@@ -2,7 +2,7 @@ import { writeContract } from "@wagmi/core";
 import {
   DispersePayInputData,
   PayInputData,
-} from "../TypeStructures/evvmTypeInputStructure";
+} from "../TypeInputStructures/evvmTypeInputStructure";
 import { config } from "@/config";
 import Evvm from "@/constants/abi/Evvm.json";
 

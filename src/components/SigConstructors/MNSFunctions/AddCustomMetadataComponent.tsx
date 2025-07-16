@@ -41,10 +41,12 @@ export const AddCustomMetadataComponent = () => {
     const subschema = getValue("subschemaInput_addCustomMetadata");
     const value = getValue("valueInput_addCustomMetadata");
     const priorityFeeForFisher = getValue("priorityFeeInput_addCustomMetadata");
-    const amountOfMateReward = getValue("amountOfMateRewardInput_addCustomMetadata");
+    const amountOfMateReward = getValue(
+      "amountOfMateRewardInput_addCustomMetadata"
+    );
     const nonceEVVM = getValue("nonceEVVMInput_addCustomMetadata");
     const priorityFlag = priority === "high";
-    
+
     signAddCustomMetadata(
       addressMNS,
       BigInt(nonceMNS),
@@ -71,7 +73,6 @@ export const AddCustomMetadataComponent = () => {
       },
       (error) => console.error("Error signing payment:", error)
     );
-    
   };
 
   return (

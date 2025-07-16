@@ -6,7 +6,7 @@ import {
   PresaleStakingInputData,
   PublicServiceStakingInputData,
   PublicStakingInputData,
-} from "../TypeStructures/sMateTypeInputStructure";
+} from "../TypeInputStructures/sMateTypeInputStructure";
 
 const executeGoldenStaking = async (
   InputData: GoldenStakingInputData,

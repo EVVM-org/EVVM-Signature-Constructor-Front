@@ -9,11 +9,13 @@ import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
 import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector";
-import { PayInputData } from "@/utils/TypeStructures/evvmTypeInputStructure";
-import { GoldenStakingInputData } from "@/utils/TypeStructures/sMateTypeInputStructure";
 import { contractAddress, tokenAddress } from "@/constants/address";
 import { executeGoldenStaking } from "@/utils/TransactionExecuter/useSMateTransactionExecuter";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
+import {
+  GoldenStakingInputData,
+  PayInputData,
+} from "@/utils/TypeInputStructures";
 
 type InfoData = {
   PayInputData: PayInputData;

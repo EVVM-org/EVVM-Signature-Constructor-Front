@@ -4,35 +4,35 @@ import { getAccount, writeContract } from "@wagmi/core";
 import { config } from "@/config/index";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
-import { address } from "@/constants/address";
 import Evvm from "@/constants/abi/Evvm.json";
+import { contractAddress } from "@/constants/address";
+import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 
 export const FaucetFunctionsComponent = () => {
+  const account = getAccount(config);
+
   const executeFaucet = async () => {
-    const account = getAccount(config);
-    const user = (
-      document.getElementById("addressGive_faucet") as HTMLInputElement
-    ).value;
-    const token = (
-      document.getElementById("tokenAddress_faucet") as HTMLInputElement
-    ).value;
-    const quantity = (
-      document.getElementById("amountTokenInput_faucet") as HTMLInputElement
-    ).value;
-    const chainId = account.chain?.id;
-    if (!chainId) {
-      console.error("No chain ID available");
-      return;
-    }
+    const walletData = await getAccountWithRetry(config);
+    if (!walletData) return;
+
+    const getValue = (id: string) =>
+      (document.getElementById(id) as HTMLInputElement).value;
+
+    const formData = {
+      evvmAddress: getValue("evvmAddressInput_faucet"),
+      user: getValue("addressGive_faucet"),
+      token: getValue("tokenAddress_faucet"),
+      quantity: getValue("amountTokenInput_faucet"),
+    };
+
     writeContract(config, {
       abi: Evvm.abi,
-      address: address[chainId.toString() as keyof typeof address]
-        .evvm as `0x${string}`,
+      address: formData.evvmAddress as `0x${string}`,
       functionName: "addBalance",
-      args: [user, token, quantity],
+      args: [formData.user, formData.token, formData.quantity],
     })
       .then(() => {
-        console.log("Tokens successfully sent to", user);
+        console.log("Tokens successfully sent to", formData.user);
       })
       .catch((error) => {
         console.error("Error sending tokens:", error);
@@ -43,6 +43,16 @@ export const FaucetFunctionsComponent = () => {
     <div className="flex flex-1 flex-col justify-center items-center">
       <h1>Faucet</h1>
       <br />
+
+      <AddressInputField
+        label="EVVM Address"
+        inputId="evvmAddressInput_faucet"
+        placeholder="Enter EVVM address"
+        defaultValue={
+          contractAddress[account.chain?.id as keyof typeof contractAddress]
+            ?.evvm || ""
+        }
+      />
 
       <AddressInputField
         label="Address to give tokens to"

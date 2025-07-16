@@ -9,4 +9,16 @@ type PreRegistrationUsernameInputData = {
   signature_Evvm: string;
 };
 
-export type { PreRegistrationUsernameInputData };
+type RegistrationUsernameInputData = {
+  user: `0x${string}`;
+  nonce: bigint;
+  username: string;
+  clowNumber: bigint;
+  signature: string;
+  priorityFeeForFisher: bigint;
+  nonce_Evvm: bigint;
+  priority_Evvm: boolean;
+  signature_Evvm: string;
+};
+
+export type { PreRegistrationUsernameInputData, RegistrationUsernameInputData };

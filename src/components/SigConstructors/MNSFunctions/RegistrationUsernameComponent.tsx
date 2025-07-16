@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { getAccount } from "@wagmi/core";
+import { getAccount, readContract } from "@wagmi/core";
 import { config } from "@/config/index";
 import { useMnsSignatureBuilder } from "@/utils/SignatureBuilder/useMnsSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
@@ -10,65 +10,136 @@ import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { TextInputField } from "../InputsAndModules/TextInputField";
 import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
+import { PayInputData } from "@/utils/TypeStructures/evvmTypeInputStructure";
+import { RegistrationUsernameInputData } from "@/utils/TypeStructures/mnsTypeInputStructure";
+import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
+import { contractAddress, tokenAddress } from "@/constants/address";
+import Evvm from "@/constants/abi/Evvm.json";
+import { executeRegistrationUsername } from "@/utils/TransactionExecuter/useMNSTransactionExecuter";
 
-type RegistrationData = {
-  user: `0x${string}`;
-  nonce: string;
-  username: string;
-  clowNumber: string;
-  signature: string;
-  priorityFeeForFisher: string;
-  nonce_Evvm: string;
-  priority_Evvm: string;
-  signature_Evvm: string;
+type InfoData = {
+  PayInputData: PayInputData;
+  RegistrationUsernameInputData: RegistrationUsernameInputData;
 };
 
 export const RegistrationUsernameComponent = () => {
   const { signRegistrationUsername } = useMnsSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
-  const [dataToGet, setDataToGet] = React.useState<RegistrationData | null>(
+  const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
+  const [mateRewardAmount, setMateRewardAmount] = React.useState<bigint | null>(
     null
   );
 
   const makeSig = async () => {
+    const walletData = await getAccountWithRetry(config);
+    if (!walletData) return;
+
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
-    const addressMNS = getValue("mnsAddressInput_registration");
-    const nonceMNS = getValue("nonceMNSInput_registration");
-    const username = getValue("usernameInput_registration");
-    const clowNumber = getValue("clowNumberInput_registration");
-    const mateRewardAmount = getValue("mateRewardInput_registration");
-    const priorityFeeForFisher = getValue("priorityFeeInput_registration");
-    const nonceEVVM = getValue("nonceEVVMInput_registration");
+    const formData = {
+      addressMNS: getValue("mnsAddressInput_registration"),
+      nonceMNS: getValue("nonceMNSInput_registration"),
+      username: getValue("usernameInput_registration"),
+      clowNumber: getValue("clowNumberInput_registration"),
+      priorityFeeForFisher: getValue("priorityFeeInput_registration"),
+      nonceEVVM: getValue("nonceEVVMInput_registration"),
+    };
+
+    if (!mateRewardAmount) {
+      setMateRewardAmount(BigInt(5000000000000000000)); // Default value if not set
+      return; // Exit early if mateRewardAmount is still null
+    }
+
     const priorityFlag = priority === "high";
 
     signRegistrationUsername(
-      addressMNS,
-      BigInt(nonceMNS),
-      username,
-      BigInt(clowNumber),
-      BigInt(mateRewardAmount),
-      BigInt(priorityFeeForFisher),
-      BigInt(nonceEVVM),
+      formData.addressMNS,
+      BigInt(formData.nonceMNS),
+      formData.username,
+      BigInt(formData.clowNumber),
+      mateRewardAmount,
+      BigInt(formData.priorityFeeForFisher),
+      BigInt(formData.nonceEVVM),
       priorityFlag,
       (paySignature, registrationSignature) => {
         setDataToGet({
-          user: account.address as `0x${string}`,
-          nonce: nonceMNS,
-          username,
-          clowNumber,
-          signature: registrationSignature,
-          priorityFeeForFisher,
-          nonce_Evvm: nonceEVVM,
-          priority_Evvm: priorityFlag ? "true" : "false",
-          signature_Evvm: paySignature,
+          PayInputData: {
+            from: walletData.address as `0x${string}`,
+            to_address: formData.addressMNS as `0x${string}`,
+            to_identity: "",
+            token: tokenAddress.mate as `0x${string}`,
+            amount: (mateRewardAmount as bigint) * BigInt(100),
+            priorityFee: BigInt(formData.priorityFeeForFisher),
+            nonce: BigInt(formData.nonceEVVM),
+            priority: priority === "high",
+            executor: formData.addressMNS as `0x${string}`,
+            signature: paySignature,
+          },
+          RegistrationUsernameInputData: {
+            user: walletData.address as `0x${string}`,
+            nonce: BigInt(formData.nonceMNS),
+            username: formData.username,
+            clowNumber: BigInt(formData.clowNumber),
+            signature: registrationSignature,
+            priorityFeeForFisher: BigInt(formData.priorityFeeForFisher),
+            nonce_Evvm: BigInt(formData.nonceEVVM),
+            priority_Evvm: priorityFlag,
+            signature_Evvm: paySignature,
+          },
         });
       },
       (error) => console.error("Error signing payment:", error)
     );
   };
+
+  const readMateRewardAmount = async () => {
+    let evvmAddress =
+      contractAddress[account.chain?.id as keyof typeof contractAddress]
+        ?.evvm || "";
+
+    if (!evvmAddress) {
+      setMateRewardAmount(null);
+    } else {
+      try {
+        const result = await readContract(config, {
+          abi: Evvm.abi,
+          address: evvmAddress as `0x${string}`,
+          functionName: "seeMateReward",
+          args: [],
+        });
+        console.log("Mate reward amount:", result);
+        setMateRewardAmount(result ? BigInt(result.toString()) : null);
+      } catch (error) {
+        console.error("Error reading mate reward amount:", error);
+        setMateRewardAmount(null);
+      }
+    }
+  };
+
+  const execute = async () => {
+    if (!dataToGet) {
+      console.error("No data to execute payment");
+      return;
+    }
+    const mnsAddress = dataToGet.PayInputData.to_address;
+
+    executeRegistrationUsername(
+      dataToGet.RegistrationUsernameInputData,
+      mnsAddress
+    )
+      .then(() => {
+        console.log("Registration username executed successfully");
+      })
+      .catch((error) => {
+        console.error("Error executing registration username:", error);
+      });
+  };
+
+  React.useEffect(() => {
+    readMateRewardAmount();
+  }, [account.chain?.id]);
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
@@ -83,7 +154,13 @@ export const RegistrationUsernameComponent = () => {
         label="MNS Address"
         inputId="mnsAddressInput_registration"
         placeholder="Enter MNS address"
+        defaultValue={
+          contractAddress[account.chain?.id as keyof typeof contractAddress]
+            ?.mns || ""
+        }
       />
+
+      <br />
 
       {/* Nonce section with automatic generator */}
 
@@ -103,12 +180,6 @@ export const RegistrationUsernameComponent = () => {
         label="Username"
         inputId="usernameInput_registration"
         placeholder="Enter username"
-      />
-
-      <NumberInputField
-        label="Mate reward amount"
-        inputId="mateRewardInput_registration"
-        placeholder="Enter mate reward amount"
       />
 
       <NumberInputField
@@ -140,6 +211,7 @@ export const RegistrationUsernameComponent = () => {
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
+        onExecute={execute}
       />
     </div>
   );

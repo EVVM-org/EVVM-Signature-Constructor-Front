@@ -185,7 +185,12 @@ function buildMessageSignedForPreRegistrationUsername(
   nonceMNS: bigint
 ): string {
   return (
-    "393b9c6f," + `${hashUsername.toLowerCase()},` + `${nonceMNS.toString()}`
+    "393b9c6f," +
+    `${
+      hashUsername.toLowerCase().slice(0, 2) +
+      hashUsername.toUpperCase().slice(2)
+    },` +
+    `${nonceMNS.toString()}`
   );
 }
 

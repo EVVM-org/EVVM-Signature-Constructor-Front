@@ -56,6 +56,11 @@ export const PreRegistrationUsernameComponent = () => {
       BigInt(formData.nonceEVVM),
       priorityFlag,
       (paySignature, preRegistrationSignature) => {
+        const hashUsername = hashPreRegisteredUsername(
+          formData.username,
+          BigInt(formData.clowNumber)
+        );
+        
         setDataToGet({
           PayInputData: {
             from: walletData.address as `0x${string}`,
@@ -72,10 +77,8 @@ export const PreRegistrationUsernameComponent = () => {
           PreRegistrationUsernameInputData: {
             user: walletData.address as `0x${string}`,
             nonce: BigInt(formData.nonceMNS),
-            hashUsername: hashPreRegisteredUsername(
-              formData.username,
-              BigInt(formData.clowNumber)
-            ),
+            hashUsername: hashUsername.toLowerCase().slice(0, 2) +
+              hashUsername.toUpperCase().slice(2),
             priorityFeeForFisher: BigInt(formData.priorityFeeForFisher),
             signature: preRegistrationSignature,
             nonce_Evvm: BigInt(formData.nonceEVVM),

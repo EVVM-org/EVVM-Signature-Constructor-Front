@@ -2,11 +2,16 @@ import { writeContract } from "@wagmi/core";
 import { config } from "@/config";
 import MateNameService from "@/constants/abi/MateNameService.json";
 import {
-  AcceptOfferInputData,
-  MakeOfferInputData,
   PreRegistrationUsernameInputData,
   RegistrationUsernameInputData,
+  MakeOfferInputData,
   WithdrawOfferInputData,
+  AcceptOfferInputData,
+  RenewUsernameInputData,
+  AddCustomMetadataInputData,
+  RemoveCustomMetadataInputData,
+  FlushCustomMetadataInputData,
+  FlushUsernameInputData,
 } from "../TypeInputStructures/";
 
 const executePreRegistrationUsername = async (
@@ -14,7 +19,7 @@ const executePreRegistrationUsername = async (
   mnsAddress: `0x${string}`
 ) => {
   if (!InputData) {
-    return Promise.reject("No data to execute payment");
+    return Promise.reject("No input to execute");
   }
 
   writeContract(config, {
@@ -45,7 +50,7 @@ const executeRegistrationUsername = async (
   mnsAddress: `0x${string}`
 ) => {
   if (!InputData) {
-    return Promise.reject("No data to execute payment");
+    return Promise.reject("No input to execute");
   }
 
   writeContract(config, {
@@ -77,7 +82,7 @@ const executeMakeOffer = async (
   mnsAddress: `0x${string}`
 ) => {
   if (!InputData) {
-    return Promise.reject("No data to execute payment");
+    return Promise.reject("No input to execute");
   }
 
   writeContract(config, {
@@ -110,7 +115,7 @@ const executeWithdrawOffer = async (
   mnsAddress: `0x${string}`
 ) => {
   if (!InputData) {
-    return Promise.reject("No data to execute payment");
+    return Promise.reject("No input to execute");
   }
 
   writeContract(config, {
@@ -142,7 +147,7 @@ const executeAcceptOffer = async (
   mnsAddress: `0x${string}`
 ) => {
   if (!InputData) {
-    return Promise.reject("No data to execute payment");
+    return Promise.reject("No input to execute");
   }
 
   writeContract(config, {
@@ -169,10 +174,172 @@ const executeAcceptOffer = async (
     });
 };
 
+const executeRenewUsername = async (
+  InputData: RenewUsernameInputData,
+  mnsAddress: `0x${string}`
+) => {
+  if (!InputData) {
+    return Promise.reject("No input to execute");
+  }
+
+  writeContract(config, {
+    abi: MateNameService.abi,
+    address: mnsAddress,
+    functionName: "renewUsername",
+    args: [
+      InputData.user,
+      InputData.nonce,
+      InputData.username,
+      InputData.priorityFeeForFisher,
+      InputData.signature,
+      InputData.nonce_Evvm,
+      InputData.priority_Evvm,
+      InputData.signature_Evvm,
+    ],
+  })
+    .then(() => {
+      return Promise.resolve();
+    })
+    .catch((error) => {
+      return Promise.reject(error);
+    });
+};
+
+const executeAddCustomMetadata = async (
+  InputData: AddCustomMetadataInputData,
+  mnsAddress: `0x${string}`
+) => {
+  if (!InputData) {
+    return Promise.reject("No input to execute");
+  }
+
+  writeContract(config, {
+    abi: MateNameService.abi,
+    address: mnsAddress,
+    functionName: "addCustomMetadata",
+    args: [
+      InputData.user,
+      InputData.nonce,
+      InputData.identity,
+      InputData.value,
+      InputData.priorityFeeForFisher,
+      InputData.signature,
+      InputData.nonce_Evvm_forAddCustomMetadata,
+      InputData.priority_Evvm_forAddCustomMetadata,
+      InputData.signature_Evvm_forAddCustomMetadata,
+    ],
+  })
+    .then(() => {
+      return Promise.resolve();
+    })
+    .catch((error) => {
+      return Promise.reject(error);
+    });
+};
+
+const executeRemoveCustomMetadata = async (
+  InputData: RemoveCustomMetadataInputData,
+  mnsAddress: `0x${string}`
+) => {
+  if (!InputData) {
+    return Promise.reject("No input to execute");
+  }
+
+  writeContract(config, {
+    abi: MateNameService.abi,
+    address: mnsAddress,
+    functionName: "removeCustomMetadata",
+    args: [
+      InputData.user,
+      InputData.nonce,
+      InputData.identity,
+      InputData.key,
+      InputData.priorityFeeForFisher,
+      InputData.signature,
+      InputData.nonce_Evvm,
+      InputData.priority_Evvm,
+      InputData.signature_Evvm,
+    ],
+  })
+    .then(() => {
+      return Promise.resolve();
+    })
+    .catch((error) => {
+      return Promise.reject(error);
+    });
+};
+
+const executeFlushCustomMetadata = async (
+  InputData: FlushCustomMetadataInputData,
+  mnsAddress: `0x${string}`
+) => {
+  if (!InputData) {
+    return Promise.reject("No input to execute");
+  }
+
+  writeContract(config, {
+    abi: MateNameService.abi,
+    address: mnsAddress,
+    functionName: "flushCustomMetadata",
+    args: [
+      InputData.user,
+      InputData.nonce,
+      InputData.identity,
+      InputData.priorityFeeForFisher,
+      InputData.signature,
+      InputData.nonce_Evvm,
+      InputData.priority_Evvm,
+      InputData.signature_Evvm,
+    ],
+  })
+    .then(() => {
+      return Promise.resolve();
+    })
+    .catch((error) => {
+      return Promise.reject(error);
+    });
+};
+
+const executeFlushUsername = async (
+  InputData: FlushUsernameInputData,
+  mnsAddress: `0x${string}`
+) => {
+  if (!InputData) {
+    return Promise.reject("No input to execute");
+  }
+
+  writeContract(config, {
+    abi: MateNameService.abi,
+    address: mnsAddress,
+    functionName: "flushUsername",
+    args: [
+      InputData.user,
+      InputData.identity,
+      InputData.priorityFeeForFisher,
+      InputData.nonce,
+      InputData.signature,
+      InputData.nonce_Evvm,
+      InputData.priority_Evvm,
+      InputData.signature_Evvm,
+    ],
+  })
+    .then(() => {
+      return Promise.resolve();
+    })
+    .catch((error) => {
+      return Promise.reject(error);
+    });
+};
+
 export {
   executePreRegistrationUsername,
   executeRegistrationUsername,
   executeMakeOffer,
   executeWithdrawOffer,
   executeAcceptOffer,
+  executeRenewUsername,
+  executeAddCustomMetadata,
+  executeRemoveCustomMetadata,
+  executeFlushCustomMetadata,
+  executeFlushUsername,
 };

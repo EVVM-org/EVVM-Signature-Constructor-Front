@@ -81,7 +81,6 @@ type AddCustomMetadataInputData = {
   signature_Evvm_forAddCustomMetadata: string;
 };
 
-
 type RemoveCustomMetadataInputData = {
   user: `0x${string}`;
   nonce: bigint;
@@ -104,8 +103,6 @@ type FlushCustomMetadataInputData = {
   priority_Evvm: boolean;
   signature_Evvm: string;
 };
-
-
 
 type FlushUsernameInputData = {
   user: `0x${string}`;

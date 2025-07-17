@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { getAccount } from "@wagmi/core";
+import { getAccount, readContract } from "@wagmi/core";
 import { config } from "@/config/index";
 import { useMnsSignatureBuilder } from "@/utils/SignatureBuilder/useMnsSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
@@ -10,6 +10,7 @@ import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { TextInputField } from "../InputsAndModules/TextInputField";
 import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
+import MateNameService from "@/constants/abi/MateNameService.json";
 import {
   PayInputData,
   RenewUsernameInputData,
@@ -28,13 +29,14 @@ export const RenewUsernameComponent = () => {
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
+  const [amountToRenew, setAmountToRenew] = React.useState<bigint | null>(null);
+
+  const getValue = (id: string) =>
+    (document.getElementById(id) as HTMLInputElement).value;
 
   const makeSig = async () => {
     const walletData = await getAccountWithRetry(config);
     if (!walletData) return;
-
-    const getValue = (id: string) =>
-      (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
       addressMNS: getValue("mnsAddressInput_renewUsername"),
@@ -84,6 +86,29 @@ export const RenewUsernameComponent = () => {
     );
   };
 
+  const readAmountToRenew = async () => {
+    let mnsAddress = getValue("mnsAddressInput_renewUsername");
+
+    if (!mnsAddress) {
+      setAmountToRenew(null);
+    } else {
+      const username = getValue("usernameInput_renewUsername");
+      try {
+        const result = await readContract(config, {
+          abi: MateNameService.abi,
+          address: mnsAddress as `0x${string}`,
+          functionName: "seePriceToRenew",
+          args: [username],
+        });
+        console.log("Amount to renew:", result);
+        setAmountToRenew(result ? BigInt(result.toString()) : null);
+      } catch (error) {
+        console.error("Error reading amount to renew:", error);
+        setAmountToRenew(null);
+      }
+    }
+  };
+
   const execute = async () => {
     if (!dataToGet) {
       console.error("No data to execute payment");
@@ -98,6 +123,10 @@ export const RenewUsernameComponent = () => {
       .catch((error) => {
         console.error("Error executing renew username:", error);
       });
+  };
+
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    readAmountToRenew();
   };
 
   return (
@@ -131,6 +160,7 @@ export const RenewUsernameComponent = () => {
         label="Username"
         inputId="usernameInput_renewUsername"
         placeholder="Enter username"
+        onChange={handleUsernameChange}
       />
 
       <NumberInputField
@@ -143,6 +173,7 @@ export const RenewUsernameComponent = () => {
         label="Priority fee"
         inputId="priorityFeeInput_renewUsername"
         placeholder="Enter priority fee"
+        defaultValue={amountToRenew !== null ? amountToRenew.toString() : ""}
       />
 
       <NumberInputWithGenerator

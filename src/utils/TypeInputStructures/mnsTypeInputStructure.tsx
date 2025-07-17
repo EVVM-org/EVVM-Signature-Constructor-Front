@@ -34,8 +34,21 @@ type MakeOfferInputData = {
   signature_Evvm: string;
 };
 
+type WithdrawOfferInputData = {
+  user: `0x${string}`;
+  nonce: string;
+  username: string;
+  offerID: string;
+  priorityFeeForFisher: string;
+  signature: string;
+  nonce_Evvm: string;
+  priority_Evvm: boolean;
+  signature_Evvm: string;
+};
+
 export type {
   PreRegistrationUsernameInputData,
   RegistrationUsernameInputData,
   MakeOfferInputData,
+  WithdrawOfferInputData,
 };

@@ -10,63 +10,98 @@ import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { TextInputField } from "../InputsAndModules/TextInputField";
 import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
+import {
+  PayInputData,
+  WithdrawOfferInputData,
+} from "@/utils/TypeInputStructures";
+import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
+import { contractAddress, tokenAddress } from "@/constants/address";
+import { executeWithdrawOffer } from "@/utils/TransactionExecuter";
 
-
-type WithdrawOfferData = {
-  user: string;
-  nonce: string;
-  username: string;
-  offerID: string;
-  priorityFeeForFisher: string;
-  signature: string;
-  nonce_Evvm: string;
-  priority_Evvm: string;
-  signature_Evvm: string;
+type InfoData = {
+  PayInputData: PayInputData;
+  WithdrawOfferInputData: WithdrawOfferInputData;
 };
 
 export const WithdrawOfferComponent = () => {
   const { signWithdrawOffer } = useMnsSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
-  const [dataToGet, setDataToGet] = React.useState<WithdrawOfferData | null>(
-    null
-  );
+  const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
 
   const makeSig = async () => {
+    const walletData = await getAccountWithRetry(config);
+    if (!walletData) return;
+
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
-    const addressMNS = getValue("mnsAddressInput_withdrawOffer");
-    const nonceMNS = getValue("nonceMNSInput_withdrawOffer");
-    const username = getValue("usernameInput_withdrawOffer");
-    const offerId = getValue("offerIdInput_withdrawOffer");
-    const priorityFeeForFisher = getValue("priorityFeeInput_withdrawOffer");
-    const nonceEVVM = getValue("nonceEVVMInput_withdrawOffer");
-    const priorityFlag = priority === "high";
+    const formData = {
+      addressMNS: getValue("mnsAddressInput_withdrawOffer"),
+      nonceMNS: getValue("nonceMNSInput_withdrawOffer"),
+      username: getValue("usernameInput_withdrawOffer"),
+      offerId: getValue("offerIdInput_withdrawOffer"),
+      priorityFeeForFisher: getValue("priorityFeeInput_withdrawOffer"),
+      nonceEVVM: getValue("nonceEVVMInput_withdrawOffer"),
+      priorityFlag: priority === "high",
+    };
 
     signWithdrawOffer(
-      addressMNS,
-      BigInt(nonceMNS),
-      username,
-      BigInt(offerId),
-      BigInt(priorityFeeForFisher),
-      BigInt(nonceEVVM),
-      priorityFlag,
+      formData.addressMNS,
+      BigInt(formData.nonceMNS),
+      formData.username,
+      BigInt(formData.offerId),
+      BigInt(formData.priorityFeeForFisher),
+      BigInt(formData.nonceEVVM),
+      formData.priorityFlag,
       (paySignature, withdrawOfferSignature) => {
         setDataToGet({
-          user: account.address || "",
-          nonce: nonceMNS,
-          username: username,
-          offerID: offerId,
-          priorityFeeForFisher: priorityFeeForFisher,
-          signature: withdrawOfferSignature,
-          nonce_Evvm: nonceEVVM,
-          priority_Evvm: priorityFlag ? "high" : "low",
-          signature_Evvm: paySignature,
+          PayInputData: {
+            from: walletData.address as `0x${string}`,
+            to_address: formData.addressMNS as `0x${string}`,
+            to_identity: "",
+            token: tokenAddress.mate as `0x${string}`,
+            amount: BigInt(formData.priorityFeeForFisher),
+            priorityFee: BigInt(0),
+            nonce: BigInt(formData.nonceEVVM),
+            priority: priority === "high",
+            executor: formData.addressMNS as `0x${string}`,
+            signature: paySignature,
+          },
+          WithdrawOfferInputData: {
+            user: walletData.address as `0x${string}`,
+            nonce: formData.nonceMNS,
+            username: formData.username,
+            offerID: formData.offerId,
+            priorityFeeForFisher: formData.priorityFeeForFisher,
+            signature: withdrawOfferSignature,
+            nonce_Evvm: formData.nonceEVVM,
+            priority_Evvm: formData.priorityFlag,
+            signature_Evvm: paySignature,
+          },
         });
       },
       (error) => console.error("Error signing payment:", error)
     );
+  };
+
+  const execute = async () => {
+    if (!dataToGet) {
+      console.error("No data to execute payment");
+      return;
+    }
+    const mnsAddress = dataToGet.PayInputData.to_address;
+
+    executeWithdrawOffer(
+      dataToGet.WithdrawOfferInputData,
+      mnsAddress
+    )
+      .then(() => {
+        console.log("Withdraw offer executed successfully");
+      })
+      .catch((error) => {
+        console.error("Error executing withdraw offer:", error);
+      });
   };
 
   return (
@@ -76,14 +111,19 @@ export const WithdrawOfferComponent = () => {
         link="https://www.evvm.org/docs/SignatureStructures/MNS/withdrawOfferStructure"
       />
 
-      
       <br />
 
       <AddressInputField
         label="MNS Address"
         inputId="mnsAddressInput_withdrawOffer"
         placeholder="Enter MNS address"
+        defaultValue={
+          contractAddress[account.chain?.id as keyof typeof contractAddress]
+            ?.mns || ""
+        }
       />
+
+      <br />
 
       <NumberInputWithGenerator
         label="MNS Nonce"
@@ -132,6 +172,7 @@ export const WithdrawOfferComponent = () => {
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
+        onExecute={execute}
       />
     </div>
   );

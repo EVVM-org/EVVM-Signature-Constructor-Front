@@ -5,6 +5,7 @@ import {
   MakeOfferInputData,
   PreRegistrationUsernameInputData,
   RegistrationUsernameInputData,
+  WithdrawOfferInputData,
 } from "../TypeInputStructures/mnsTypeInputStructure";
 
 const verifyPreRegistrationUsername = async (
@@ -70,7 +71,7 @@ const verifyRegistrationUsername = async (
     });
 };
 
-const simulateMakeOffer = async (
+const verifyMakeOffer = async (
   InputData: MakeOfferInputData,
   mnsAddress: `0x${string}`
 ) => {
@@ -103,8 +104,41 @@ const simulateMakeOffer = async (
     });
 };
 
+const verifyWithdrawOffer = async (
+  InputData: WithdrawOfferInputData,
+  mnsAddress: `0x${string}`
+) => {
+  if (!InputData) {
+    return Promise.reject("No data to execute payment");
+  }
+
+  simulateContract(config, {
+    abi: MateNameService.abi,
+    address: mnsAddress,
+    functionName: "withdrawOffer",
+    args: [
+      InputData.user,
+      InputData.nonce,
+      InputData.username,
+      InputData.offerID,
+      InputData.priorityFeeForFisher,
+      InputData.signature,
+      InputData.nonce_Evvm,
+      InputData.priority_Evvm,
+      InputData.signature_Evvm,
+    ],
+  })
+    .then(() => {
+      return Promise.resolve();
+    })
+    .catch((error) => {
+      return Promise.reject(error);
+    });
+};
+
 export {
   verifyPreRegistrationUsername,
   verifyRegistrationUsername,
-  simulateMakeOffer,
+  verifyMakeOffer,
+  verifyWithdrawOffer,
 };

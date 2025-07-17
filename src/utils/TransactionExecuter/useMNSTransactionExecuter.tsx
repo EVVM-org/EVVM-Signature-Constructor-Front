@@ -2,6 +2,7 @@ import { writeContract } from "@wagmi/core";
 import { config } from "@/config";
 import MateNameService from "@/constants/abi/MateNameService.json";
 import {
+  AcceptOfferInputData,
   MakeOfferInputData,
   PreRegistrationUsernameInputData,
   RegistrationUsernameInputData,
@@ -136,9 +137,42 @@ const executeWithdrawOffer = async (
     });
 };
 
+const executeAcceptOffer = async (
+  InputData: AcceptOfferInputData,
+  mnsAddress: `0x${string}`
+) => {
+  if (!InputData) {
+    return Promise.reject("No data to execute payment");
+  }
+
+  writeContract(config, {
+    abi: MateNameService.abi,
+    address: mnsAddress,
+    functionName: "acceptOffer",
+    args: [
+      InputData.user,
+      InputData.nonce,
+      InputData.username,
+      InputData.offerID,
+      InputData.priorityFeeForFisher,
+      InputData.signature,
+      InputData.nonce_Evvm,
+      InputData.priority_Evvm,
+      InputData.signature_Evvm,
+    ],
+  })
+    .then(() => {
+      return Promise.resolve();
+    })
+    .catch((error) => {
+      return Promise.reject(error);
+    });
+};
+
 export {
   executePreRegistrationUsername,
   executeRegistrationUsername,
   executeMakeOffer,
   executeWithdrawOffer,
+  executeAcceptOffer,
 };

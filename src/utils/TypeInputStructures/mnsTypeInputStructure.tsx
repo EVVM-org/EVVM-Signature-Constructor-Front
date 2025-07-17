@@ -36,12 +36,24 @@ type MakeOfferInputData = {
 
 type WithdrawOfferInputData = {
   user: `0x${string}`;
+  nonce: bigint;
+  username: string;
+  offerID: bigint;
+  priorityFeeForFisher: bigint;
+  signature: string;
+  nonce_Evvm: bigint;
+  priority_Evvm: boolean;
+  signature_Evvm: string;
+};
+
+type AcceptOfferInputData = {
+  user: `0x${string}`;
   nonce: string;
   username: string;
-  offerID: string;
-  priorityFeeForFisher: string;
+  offerID: bigint;
+  priorityFeeForFisher: bigint;
   signature: string;
-  nonce_Evvm: string;
+  nonce_Evvm: bigint;
   priority_Evvm: boolean;
   signature_Evvm: string;
 };
@@ -51,4 +63,5 @@ export type {
   RegistrationUsernameInputData,
   MakeOfferInputData,
   WithdrawOfferInputData,
+  AcceptOfferInputData,
 };

@@ -10,62 +10,95 @@ import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { TextInputField } from "../InputsAndModules/TextInputField";
 import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
+import {
+  AcceptOfferInputData,
+  PayInputData,
+} from "@/utils/TypeInputStructures";
+import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
+import { contractAddress, tokenAddress } from "@/constants/address";
+import { executeAcceptOffer } from "@/utils/TransactionExecuter";
 
-type AcceptOfferData = {
-  user: string;
-  nonce: string;
-  username: string;
-  offerID: string;
-  priorityFeeForFisher: string;
-  signature: string;
-  nonce_Evvm: string;
-  priority_Evvm: string;
-  signature_Evvm: string;
+type InfoData = {
+  PayInputData: PayInputData;
+  AcceptOfferInputData: AcceptOfferInputData;
 };
 
 export const AcceptOfferComponent = () => {
   const { signAcceptOffer } = useMnsSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
-  const [dataToGet, setDataToGet] = React.useState<AcceptOfferData | null>(
-    null
-  );
+  const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
 
   const makeSig = async () => {
+    const walletData = await getAccountWithRetry(config);
+    if (!walletData) return;
+
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
-    const addressMNS = getValue("mnsAddressInput_acceptOffer");
-    const nonceMNS = getValue("nonceMNSInput_acceptOffer");
-    const username = getValue("usernameInput_acceptOffer");
-    const offerId = getValue("offerIdInput_acceptOffer");
-    const priorityFeeForFisher = getValue("priorityFeeInput_acceptOffer");
-    const nonceEVVM = getValue("nonceEVVMInput_acceptOffer");
-    const priorityFlag = priority === "high";
+    const formData = {
+      addressMNS: getValue("mnsAddressInput_acceptOffer"),
+      nonceMNS: getValue("nonceMNSInput_acceptOffer"),
+      username: getValue("usernameInput_acceptOffer"),
+      offerId: getValue("offerIdInput_acceptOffer"),
+      priorityFeeForFisher: getValue("priorityFeeInput_acceptOffer"),
+      nonceEVVM: getValue("nonceEVVMInput_acceptOffer"),
+      priorityFlag: priority === "high",
+    };
 
     signAcceptOffer(
-      addressMNS,
-      BigInt(nonceMNS),
-      username,
-      BigInt(offerId),
-      BigInt(priorityFeeForFisher),
-      BigInt(nonceEVVM),
-      priorityFlag,
+      formData.addressMNS,
+      BigInt(formData.nonceMNS),
+      formData.username,
+      BigInt(formData.offerId),
+      BigInt(formData.priorityFeeForFisher),
+      BigInt(formData.nonceEVVM),
+      formData.priorityFlag,
       (paySignature, acceptOfferSignature) => {
         setDataToGet({
-          user: account.address || "",
-          nonce: nonceMNS,
-          username: username,
-          offerID: offerId,
-          priorityFeeForFisher: priorityFeeForFisher,
-          signature: acceptOfferSignature,
-          nonce_Evvm: nonceEVVM,
-          priority_Evvm: priorityFlag ? "high" : "low",
-          signature_Evvm: paySignature,
+          PayInputData: {
+            from: walletData.address as `0x${string}`,
+            to_address: formData.addressMNS as `0x${string}`,
+            to_identity: "",
+            token: tokenAddress.mate as `0x${string}`,
+            amount: BigInt(formData.priorityFeeForFisher),
+            priorityFee: BigInt(0),
+            nonce: BigInt(formData.nonceEVVM),
+            priority: priority === "high",
+            executor: formData.addressMNS as `0x${string}`,
+            signature: paySignature,
+          },
+          AcceptOfferInputData: {
+            user: walletData.address as `0x${string}`,
+            nonce: formData.nonceMNS,
+            username: formData.username,
+            offerID: BigInt(formData.offerId),
+            priorityFeeForFisher: BigInt(formData.priorityFeeForFisher),
+            signature: acceptOfferSignature,
+            nonce_Evvm: BigInt(formData.nonceEVVM),
+            priority_Evvm: formData.priorityFlag,
+            signature_Evvm: paySignature,
+          },
         });
       },
       (error) => console.error("Error signing payment:", error)
     );
+  };
+
+  const execute = async () => {
+    if (!dataToGet) {
+      console.error("No data to execute payment");
+      return;
+    }
+    const mnsAddress = dataToGet.PayInputData.to_address;
+
+    executeAcceptOffer(dataToGet.AcceptOfferInputData, mnsAddress)
+      .then(() => {
+        console.log("Withdraw offer executed successfully");
+      })
+      .catch((error) => {
+        console.error("Error executing withdraw offer:", error);
+      });
   };
 
   return (
@@ -81,7 +114,13 @@ export const AcceptOfferComponent = () => {
         label="MNS Address"
         inputId="mnsAddressInput_acceptOffer"
         placeholder="Enter MNS address"
+        defaultValue={
+          contractAddress[account.chain?.id as keyof typeof contractAddress]
+            ?.mns || ""
+        }
       />
+
+      <br />
 
       <NumberInputWithGenerator
         label="MNS Nonce"
@@ -130,6 +169,7 @@ export const AcceptOfferComponent = () => {
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
+        onExecute={execute}
       />
     </div>
   );

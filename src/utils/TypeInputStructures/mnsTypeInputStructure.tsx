@@ -58,10 +58,75 @@ type AcceptOfferInputData = {
   signature_Evvm: string;
 };
 
+type RenewUsernameInputData = {
+  user: `0x${string}`;
+  nonce: bigint;
+  username: string;
+  priorityFeeForFisher: bigint;
+  signature: string;
+  nonce_Evvm: bigint;
+  priority_Evvm: boolean;
+  signature_Evvm: string;
+};
+
+type AddCustomMetadataInputData = {
+  user: `0x${string}`;
+  nonce: bigint;
+  identity: string;
+  value: string;
+  priorityFeeForFisher: bigint;
+  signature: string;
+  nonce_Evvm_forAddCustomMetadata: bigint;
+  priority_Evvm_forAddCustomMetadata: boolean;
+  signature_Evvm_forAddCustomMetadata: string;
+};
+
+
+type RemoveCustomMetadataInputData = {
+  user: `0x${string}`;
+  nonce: bigint;
+  identity: string;
+  key: bigint;
+  priorityFeeForFisher: bigint;
+  signature: string;
+  nonce_Evvm: bigint;
+  priority_Evvm: boolean;
+  signature_Evvm: string;
+};
+
+type FlushCustomMetadataInputData = {
+  user: `0x${string}`;
+  nonce: bigint;
+  identity: string;
+  priorityFeeForFisher: bigint;
+  signature: string;
+  nonce_Evvm: bigint;
+  priority_Evvm: boolean;
+  signature_Evvm: string;
+};
+
+
+
+type FlushUsernameInputData = {
+  user: `0x${string}`;
+  identity: string;
+  priorityFeeForFisher: bigint;
+  nonce: bigint;
+  signature: string;
+  nonce_Evvm: bigint;
+  priority_Evvm: boolean;
+  signature_Evvm: string;
+};
+
 export type {
   PreRegistrationUsernameInputData,
   RegistrationUsernameInputData,
   MakeOfferInputData,
   WithdrawOfferInputData,
   AcceptOfferInputData,
+  RenewUsernameInputData,
+  AddCustomMetadataInputData,
+  RemoveCustomMetadataInputData,
+  FlushCustomMetadataInputData,
+  FlushUsernameInputData,
 };

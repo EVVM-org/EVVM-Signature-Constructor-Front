@@ -6,6 +6,7 @@ interface TextInputFieldProps {
   inputId: string;
   placeholder?: string;
   defaultValue?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const TextInputField: React.FC<TextInputFieldProps> = ({
@@ -13,6 +14,7 @@ export const TextInputField: React.FC<TextInputFieldProps> = ({
   inputId,
   placeholder = "Enter text",
   defaultValue,
+  onChange,
 }) => {
   return (
     <div style={{ marginBottom: "1rem" }}>
@@ -23,6 +25,7 @@ export const TextInputField: React.FC<TextInputFieldProps> = ({
         id={inputId}
         className={styles.textInput}
         defaultValue={defaultValue}
+        onChange={onChange}
       />
     </div>
   );

@@ -45,14 +45,13 @@ export const RegistrationUsernameComponent = () => {
       clowNumber: getValue("clowNumberInput_registration"),
       priorityFeeForFisher: getValue("priorityFeeInput_registration"),
       nonceEVVM: getValue("nonceEVVMInput_registration"),
+      priorityFlag: priority === "high",
     };
 
     if (!mateRewardAmount) {
       setMateRewardAmount(BigInt(5000000000000000000)); // Default value if not set
       return; // Exit early if mateRewardAmount is still null
     }
-
-    const priorityFlag = priority === "high";
 
     signRegistrationUsername(
       formData.addressMNS,
@@ -62,7 +61,7 @@ export const RegistrationUsernameComponent = () => {
       mateRewardAmount,
       BigInt(formData.priorityFeeForFisher),
       BigInt(formData.nonceEVVM),
-      priorityFlag,
+      formData.priorityFlag,
       (paySignature, registrationSignature) => {
         setDataToGet({
           PayInputData: {
@@ -85,7 +84,7 @@ export const RegistrationUsernameComponent = () => {
             signature: registrationSignature,
             priorityFeeForFisher: BigInt(formData.priorityFeeForFisher),
             nonce_Evvm: BigInt(formData.nonceEVVM),
-            priority_Evvm: priorityFlag,
+            priority_Evvm: formData.priorityFlag,
             signature_Evvm: paySignature,
           },
         });

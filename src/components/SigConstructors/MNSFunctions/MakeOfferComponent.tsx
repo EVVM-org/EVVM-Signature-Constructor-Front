@@ -43,9 +43,8 @@ export const MakeOfferComponent = () => {
       expireDate: dateToUnixTimestamp(getValue("expireDateInput_makeOffer")),
       priorityFeeForFisher: getValue("priorityFeeInput_makeOffer"),
       nonceEVVM: getValue("nonceEVVMInput_makeOffer"),
+      priorityFlag: priority === "high",
     };
-
-    const priorityFlag = priority === "high";
 
     signMakeOffer(
       formData.addressMNS,
@@ -55,7 +54,7 @@ export const MakeOfferComponent = () => {
       BigInt(formData.expireDate),
       BigInt(formData.priorityFeeForFisher),
       BigInt(formData.nonceEVVM),
-      priorityFlag,
+      formData.priorityFlag,
       (paySignature, makeOfferSignature) => {
         setDataToGet({
           PayInputData: {
@@ -79,7 +78,7 @@ export const MakeOfferComponent = () => {
             priorityFeeForFisher: BigInt(formData.priorityFeeForFisher),
             signature: makeOfferSignature,
             nonce_Evvm: BigInt(formData.nonceEVVM),
-            priority_Evvm: priorityFlag,
+            priority_Evvm: formData.priorityFlag,
             signature_Evvm: paySignature,
           },
         });

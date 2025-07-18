@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { getAccount } from "@wagmi/core";
+import { getAccount, readContract } from "@wagmi/core";
 import { config } from "@/config/index";
 import { useMnsSignatureBuilder } from "@/utils/SignatureBuilder/useMnsSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
@@ -10,69 +10,138 @@ import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { TextInputField } from "../InputsAndModules/TextInputField";
 import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
+import {
+  AddCustomMetadataInputData,
+  PayInputData,
+} from "@/utils/TypeInputStructures";
+import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
+import { contractAddress, tokenAddress } from "@/constants/address";
+import { executeAddCustomMetadata } from "@/utils/TransactionExecuter";
+import Evvm from "@/constants/abi/Evvm.json";
+import MateNameService from "@/constants/abi/MateNameService.json";
 
-type AddCustomMetadataData = {
-  user: string;
-  nonce: string;
-  identity: string;
-  value: string;
-  priorityFeeForFisher: string;
-  signature: string;
-  nonce_Evvm: string;
-  priority_Evvm: string;
-  signature_Evvm: string;
+type InfoData = {
+  PayInputData: PayInputData;
+  AddCustomMetadataInputData: AddCustomMetadataInputData;
 };
 
 export const AddCustomMetadataComponent = () => {
   const { signAddCustomMetadata } = useMnsSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
-  const [dataToGet, setDataToGet] =
-    React.useState<AddCustomMetadataData | null>(null);
+  const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
+  const [amountToAddCustomMetadata, setAmountToAddCustomMetadata] =
+    React.useState<bigint | null>(null);
+
+  const getValue = (id: string) =>
+    (document.getElementById(id) as HTMLInputElement).value;
 
   const makeSig = async () => {
-    const getValue = (id: string) =>
-      (document.getElementById(id) as HTMLInputElement).value;
+    const walletData = await getAccountWithRetry(config);
+    if (!walletData) return;
 
-    const addressMNS = getValue("mnsAddressInput_addCustomMetadata");
-    const nonceMNS = getValue("nonceMNSInput_addCustomMetadata");
-    const identity = getValue("identityInput_addCustomMetadata");
-    const schema = getValue("schemaInput_addCustomMetadata");
-    const subschema = getValue("subschemaInput_addCustomMetadata");
-    const value = getValue("valueInput_addCustomMetadata");
-    const priorityFeeForFisher = getValue("priorityFeeInput_addCustomMetadata");
-    const amountOfMateReward = getValue(
-      "amountOfMateRewardInput_addCustomMetadata"
-    );
-    const nonceEVVM = getValue("nonceEVVMInput_addCustomMetadata");
-    const priorityFlag = priority === "high";
+    const formData = {
+      addressMNS: getValue("mnsAddressInput_addCustomMetadata"),
+      nonceMNS: getValue("nonceMNSInput_addCustomMetadata"),
+      identity: getValue("identityInput_addCustomMetadata"),
+      schema: getValue("schemaInput_addCustomMetadata"),
+      subschema: getValue("subschemaInput_addCustomMetadata"),
+      value: getValue("valueInput_addCustomMetadata"),
+      priorityFeeForFisher: getValue("priorityFeeInput_addCustomMetadata"),
+      nonceEVVM: getValue("nonceEVVMInput_addCustomMetadata"),
+      priorityFlag: priority === "high",
+    };
 
-    signAddCustomMetadata(
-      addressMNS,
-      BigInt(nonceMNS),
-      identity,
-      schema,
-      subschema,
-      value,
-      BigInt(amountOfMateReward),
-      BigInt(priorityFeeForFisher),
-      BigInt(nonceEVVM),
-      priorityFlag,
-      (paySignature, addCustomMetadataSignature) => {
-        setDataToGet({
-          user: account.address || "",
-          nonce: nonceMNS,
-          identity: identity,
-          value: `${schema}:${subschema}>${value}`,
-          priorityFeeForFisher: priorityFeeForFisher,
-          signature: addCustomMetadataSignature,
-          nonce_Evvm: nonceEVVM,
-          priority_Evvm: priorityFlag ? "high" : "low",
-          signature_Evvm: paySignature,
+    let valueCustomMetadata = `${formData.schema}:${formData.subschema}>${formData.value}`;
+
+    getPriceToAddCustomMetadata()
+      .then(() => {
+        signAddCustomMetadata(
+          formData.addressMNS,
+          BigInt(formData.nonceMNS),
+          formData.identity,
+          valueCustomMetadata,
+          amountToAddCustomMetadata
+            ? BigInt(amountToAddCustomMetadata)
+            : BigInt(5000000000000000000 * 10),
+          BigInt(formData.priorityFeeForFisher),
+          BigInt(formData.nonceEVVM),
+          formData.priorityFlag,
+          (paySignature, addCustomMetadataSignature) => {
+            setDataToGet({
+              PayInputData: {
+                from: walletData.address as `0x${string}`,
+                to_address: formData.addressMNS as `0x${string}`,
+                to_identity: "",
+                token: tokenAddress.mate as `0x${string}`,
+                amount: amountToAddCustomMetadata
+                  ? BigInt(amountToAddCustomMetadata)
+                  : BigInt(5000000000000000000 * 10),
+                priorityFee: BigInt(formData.priorityFeeForFisher),
+                nonce: BigInt(formData.nonceEVVM),
+                priority: priority === "high",
+                executor: formData.addressMNS as `0x${string}`,
+                signature: paySignature,
+              },
+              AddCustomMetadataInputData: {
+                user: walletData.address as `0x${string}`,
+                nonce: BigInt(formData.nonceMNS),
+                identity: formData.identity,
+                value: valueCustomMetadata,
+                priorityFeeForFisher: BigInt(formData.priorityFeeForFisher),
+                signature: addCustomMetadataSignature,
+                nonce_Evvm: BigInt(formData.nonceEVVM),
+                priority_Evvm: formData.priorityFlag,
+                signature_Evvm: paySignature,
+              },
+            });
+          },
+          (error) => console.error("Error signing payment:", error)
+        );
+      })
+      .catch((error) => {
+        console.error("Error reading mate reward amount:", error);
+        return;
+      });
+  };
+
+  const getPriceToAddCustomMetadata = async () => {
+    let mnsAddress = getValue("mnsAddressInput_addCustomMetadata");
+
+    if (!mnsAddress) {
+      setAmountToAddCustomMetadata(null);
+    } else {
+      await readContract(config, {
+        abi: MateNameService.abi,
+        address: mnsAddress as `0x${string}`,
+        functionName: "getPriceToAddCustomMetadata",
+        args: [],
+      })
+        .then((price) => {
+          console.log("Price to add custom metadata:", price);
+          setAmountToAddCustomMetadata(price ? BigInt(price.toString()) : null);
+        })
+        .catch((error) => {
+          console.error("Error reading price to add custom metadata:", error);
+          setAmountToAddCustomMetadata(null);
         });
-      },
-      (error) => console.error("Error signing payment:", error)
-    );
+    }
+  };
+
+  const execute = async () => {
+    if (!dataToGet) {
+      console.error("No data to execute payment");
+      return;
+    }
+    const mnsAddress = dataToGet.PayInputData.to_address;
+
+    executeAddCustomMetadata(dataToGet.AddCustomMetadataInputData, mnsAddress)
+      .then(() => {
+        console.log("Registration username executed successfully");
+      })
+      .catch((error) => {
+        console.error("Error executing registration username:", error);
+      });
   };
 
   return (
@@ -88,7 +157,13 @@ export const AddCustomMetadataComponent = () => {
         label="MNS Address"
         inputId="mnsAddressInput_addCustomMetadata"
         placeholder="Enter MNS address"
+        defaultValue={
+          contractAddress[account.chain?.id as keyof typeof contractAddress]
+            ?.mns || ""
+        }
       />
+
+      <br />
 
       <NumberInputWithGenerator
         label="MNS Nonce"
@@ -126,12 +201,6 @@ export const AddCustomMetadataComponent = () => {
         placeholder="Enter priority fee"
       />
 
-      <NumberInputField
-        label="Amount of MATE reward"
-        inputId="amountOfMateRewardInput_addCustomMetadata"
-        placeholder="Enter amount of MATE reward"
-      />
-
       <NumberInputWithGenerator
         label="EVVM Nonce"
         inputId="nonceEVVMInput_addCustomMetadata"
@@ -155,6 +224,7 @@ export const AddCustomMetadataComponent = () => {
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
+        onExecute={execute}
       />
     </div>
   );

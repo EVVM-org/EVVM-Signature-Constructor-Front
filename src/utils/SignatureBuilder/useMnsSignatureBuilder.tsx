@@ -381,7 +381,7 @@ export const useMnsSignatureBuilder = () => {
     nonceMNS: bigint,
     identity: string,
     key: bigint,
-    amountOfMateReward: bigint,
+    amountToRemoveCustomMetadata: bigint,
     priorityFeeForFisher: bigint,
     nonceEVVM: bigint,
     priorityFlag: boolean,
@@ -397,7 +397,7 @@ export const useMnsSignatureBuilder = () => {
           const payMessage = buildMessageSignedForPay(
             addressMNS,
             "0x0000000000000000000000000000000000000001",
-            (BigInt(10) * amountOfMateReward).toString(),
+            (amountToRemoveCustomMetadata).toString(),
             priorityFeeForFisher.toString(),
             nonceEVVM.toString(),
             priorityFlag,

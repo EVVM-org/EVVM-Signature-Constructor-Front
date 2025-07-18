@@ -17,7 +17,6 @@ import {
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import { contractAddress, tokenAddress } from "@/constants/address";
 import { executeAddCustomMetadata } from "@/utils/TransactionExecuter";
-import Evvm from "@/constants/abi/Evvm.json";
 import MateNameService from "@/constants/abi/MateNameService.json";
 
 type InfoData = {

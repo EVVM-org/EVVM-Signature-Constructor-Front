@@ -334,11 +334,9 @@ export const useMnsSignatureBuilder = () => {
     addressMNS: string,
     nonceMNS: bigint,
     identity: string,
-    schema: string,
-    subschema: string,
     value: string,
+    amountToAddCustomMetadata: bigint,
     priorityFeeForFisher: bigint,
-    amountOfMateReward: bigint,
     nonceEVVM: bigint,
     priorityFlag: boolean,
     onSuccess?: (paySignature: string, customMetadataSignature: string) => void,
@@ -346,7 +344,7 @@ export const useMnsSignatureBuilder = () => {
   ) => {
     const customMetadataMessage = buildMessageSignedForAddCustomMetadata(
       identity,
-      `${schema}:${subschema}>${value}`,
+      value,
       nonceMNS
     );
 
@@ -357,7 +355,7 @@ export const useMnsSignatureBuilder = () => {
           const payMessage = buildMessageSignedForPay(
             addressMNS,
             "0x0000000000000000000000000000000000000001",
-            (BigInt(10) * amountOfMateReward).toString(),
+            (amountToAddCustomMetadata).toString(),
             priorityFeeForFisher.toString(),
             nonceEVVM.toString(),
             priorityFlag,

@@ -224,9 +224,9 @@ const verifyAddCustomMetadata = async (
       InputData.value,
       InputData.priorityFeeForFisher,
       InputData.signature,
-      InputData.nonce_Evvm_forAddCustomMetadata,
-      InputData.priority_Evvm_forAddCustomMetadata,
-      InputData.signature_Evvm_forAddCustomMetadata,
+      InputData.nonce_Evvm,
+      InputData.priority_Evvm,
+      InputData.signature_Evvm,
     ],
   })
     .then(() => {

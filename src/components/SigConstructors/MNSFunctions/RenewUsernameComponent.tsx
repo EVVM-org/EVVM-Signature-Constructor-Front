@@ -167,13 +167,13 @@ export const RenewUsernameComponent = () => {
         label="Amount to Renew"
         inputId="amountToRenew_renewUsername"
         placeholder="Enter amount to renew"
+        defaultValue={amountToRenew !== null ? amountToRenew.toString() : ""}
       />
 
       <NumberInputField
         label="Priority fee"
         inputId="priorityFeeInput_renewUsername"
         placeholder="Enter priority fee"
-        defaultValue={amountToRenew !== null ? amountToRenew.toString() : ""}
       />
 
       <NumberInputWithGenerator

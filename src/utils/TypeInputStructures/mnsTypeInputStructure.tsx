@@ -76,9 +76,9 @@ type AddCustomMetadataInputData = {
   value: string;
   priorityFeeForFisher: bigint;
   signature: string;
-  nonce_Evvm_forAddCustomMetadata: bigint;
-  priority_Evvm_forAddCustomMetadata: boolean;
-  signature_Evvm_forAddCustomMetadata: string;
+  nonce_Evvm: bigint;
+  priority_Evvm: boolean;
+  signature_Evvm: string;
 };
 
 type RemoveCustomMetadataInputData = {

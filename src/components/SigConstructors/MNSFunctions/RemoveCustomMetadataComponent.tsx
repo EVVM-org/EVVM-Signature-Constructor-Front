@@ -29,8 +29,6 @@ export const RemoveCustomMetadataComponent = () => {
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
-  const [amountToRemoveCustomMetadata, setAmountToRemoveCustomMetadata] =
-    React.useState<bigint | null>(null);
 
   const getValue = (id: string) =>
     (document.getElementById(id) as HTMLInputElement).value;
@@ -49,18 +47,23 @@ export const RemoveCustomMetadataComponent = () => {
       priorityFlag: priority === "high",
     };
 
-    getPriceToRemoveCustomMetadata()
-      .then(() => {
+    readContract(config, {
+      abi: MateNameService.abi,
+      address: formData.addressMNS as `0x${string}`,
+      functionName: "getPriceToRemoveCustomMetadata",
+      args: [],
+    })
+      .then((price) => {
+        if (!price) {
+          console.error("Price to remove custom metadata is not available");
+          return;
+        }
         signRemoveCustomMetadata(
           formData.addressMNS,
           BigInt(formData.nonceMNS),
           formData.identity,
           BigInt(formData.key),
-          BigInt(
-            amountToRemoveCustomMetadata
-              ? amountToRemoveCustomMetadata
-              : 5000000000000000000 * 10
-          ),
+          price as bigint,
           BigInt(formData.priorityFeeForFisher),
           BigInt(formData.nonceEVVM),
           formData.priorityFlag,
@@ -71,11 +74,7 @@ export const RemoveCustomMetadataComponent = () => {
                 to_address: formData.addressMNS as `0x${string}`,
                 to_identity: "",
                 token: tokenAddress.mate as `0x${string}`,
-                amount: BigInt(
-                  amountToRemoveCustomMetadata
-                    ? amountToRemoveCustomMetadata
-                    : 5000000000000000000 * 10
-                ),
+                amount: price as bigint,
                 priorityFee: BigInt(formData.priorityFeeForFisher),
                 nonce: BigInt(formData.nonceEVVM),
                 priority: priority === "high",
@@ -102,31 +101,6 @@ export const RemoveCustomMetadataComponent = () => {
         console.error("Error reading mate reward amount:", error);
         return;
       });
-  };
-
-  const getPriceToRemoveCustomMetadata = async () => {
-    let mnsAddress = getValue("mnsAddressInput_removeCustomMetadata");
-
-    if (!mnsAddress) {
-      setAmountToRemoveCustomMetadata(null);
-    } else {
-      await readContract(config, {
-        abi: MateNameService.abi,
-        address: mnsAddress as `0x${string}`,
-        functionName: "getPriceToRemoveCustomMetadata",
-        args: [],
-      })
-        .then((price) => {
-          console.log("Price to add custom metadata:", price);
-          setAmountToRemoveCustomMetadata(
-            price ? BigInt(price.toString()) : null
-          );
-        })
-        .catch((error) => {
-          console.error("Error reading price to add custom metadata:", error);
-          setAmountToRemoveCustomMetadata(null);
-        });
-    }
   };
 
   const execute = async () => {

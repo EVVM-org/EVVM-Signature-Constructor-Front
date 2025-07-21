@@ -50,7 +50,7 @@ export const FlushCustomMetadataComponent = () => {
       abi: MateNameService.abi,
       address: formData.addressMNS as `0x${string}`,
       functionName: "getPriceToFlushCustomMetadata",
-      args: [],
+      args: [formData.identity],
     })
       .then((price) => {
         if (!price) {
@@ -81,7 +81,7 @@ export const FlushCustomMetadataComponent = () => {
                 signature: paySignature,
               },
               FlushCustomMetadataInputData: {
-                user: formData.addressMNS as `0x${string}`,
+                user: walletData.address as `0x${string}`,
                 nonce: BigInt(formData.nonceMNS),
                 identity: formData.identity,
                 priorityFeeForFisher: BigInt(formData.priorityFeeForFisher),
@@ -101,23 +101,23 @@ export const FlushCustomMetadataComponent = () => {
   };
 
   const execute = async () => {
-      if (!dataToGet) {
-        console.error("No data to execute payment");
-        return;
-      }
-      const mnsAddress = dataToGet.PayInputData.to_address;
+    if (!dataToGet) {
+      console.error("No data to execute payment");
+      return;
+    }
+    const mnsAddress = dataToGet.PayInputData.to_address;
 
-      executeFlushCustomMetadata(
-        dataToGet.FlushCustomMetadataInputData,
-        mnsAddress
-      )
-        .then(() => {
-          console.log("Flush custom metadata executed successfully");
-        })
-        .catch((error) => {
-          console.error("Error executing flush custom metadata:", error);
-        });
-    };
+    executeFlushCustomMetadata(
+      dataToGet.FlushCustomMetadataInputData,
+      mnsAddress
+    )
+      .then(() => {
+        console.log("Flush custom metadata executed successfully");
+      })
+      .catch((error) => {
+        console.error("Error executing flush custom metadata:", error);
+      });
+  };
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
@@ -155,12 +155,6 @@ export const FlushCustomMetadataComponent = () => {
       />
 
       <NumberInputField
-        label="Price for flush"
-        inputId="priceForFlushInput_flushCustomMetadata"
-        placeholder="Enter price for flush"
-      />
-
-      <NumberInputField
         label="Priority fee"
         inputId="priorityFeeInput_flushCustomMetadata"
         placeholder="Enter priority fee"
@@ -189,7 +183,7 @@ export const FlushCustomMetadataComponent = () => {
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
-        execute={execute}
+        onExecute={execute}
       />
     </div>
   );

@@ -2,7 +2,7 @@
 import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useMnsSignatureBuilder } from "@/utils/SignatureBuilder/useMnsSignatureBuilder";
+import { useNameServiceSignatureBuilder } from "@/utils/SignatureBuilder/useNameServiceSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
@@ -11,20 +11,20 @@ import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { TextInputField } from "../InputsAndModules/TextInputField";
 import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
 import {
+  AcceptOfferInputData,
   PayInputData,
-  WithdrawOfferInputData,
 } from "@/utils/TypeInputStructures";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import { contractAddress, tokenAddress } from "@/constants/address";
-import { executeWithdrawOffer } from "@/utils/TransactionExecuter";
+import { executeAcceptOffer } from "@/utils/TransactionExecuter";
 
 type InfoData = {
   PayInputData: PayInputData;
-  WithdrawOfferInputData: WithdrawOfferInputData;
+  AcceptOfferInputData: AcceptOfferInputData;
 };
 
-export const WithdrawOfferComponent = () => {
-  const { signWithdrawOffer } = useMnsSignatureBuilder();
+export const AcceptOfferComponent = () => {
+  const { signAcceptOffer } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
@@ -37,47 +37,47 @@ export const WithdrawOfferComponent = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
-      addressMNS: getValue("mnsAddressInput_withdrawOffer"),
-      nonceMNS: getValue("nonceMNSInput_withdrawOffer"),
-      username: getValue("usernameInput_withdrawOffer"),
-      offerId: getValue("offerIdInput_withdrawOffer"),
-      priorityFeeForFisher: getValue("priorityFeeInput_withdrawOffer"),
-      nonceEVVM: getValue("nonceEVVMInput_withdrawOffer"),
-      priorityFlag: priority === "high",
+      addressNameService: getValue("nameServiceAddressInput_acceptOffer"),
+      username: getValue("usernameInput_acceptOffer"),
+      offerId: getValue("offerIdInput_acceptOffer"),
+      nonce: getValue("nonceInput_acceptOffer"),
+      priorityFee_EVVM: getValue("priorityFeeEVVMInput_acceptOffer"),
+      priorityFlag_EVVM: priority === "high",
+      nonce_EVVM: getValue("nonceEVVMInput_acceptOffer"),
     };
 
-    signWithdrawOffer(
-      formData.addressMNS,
-      BigInt(formData.nonceMNS),
+    signAcceptOffer(
+      formData.addressNameService,
       formData.username,
       BigInt(formData.offerId),
-      BigInt(formData.priorityFeeForFisher),
-      BigInt(formData.nonceEVVM),
-      formData.priorityFlag,
-      (paySignature, withdrawOfferSignature) => {
+      BigInt(formData.nonce),
+      BigInt(formData.priorityFee_EVVM),
+      BigInt(formData.nonce_EVVM),
+      formData.priorityFlag_EVVM,
+      (paySignature, acceptOfferSignature) => {
         setDataToGet({
           PayInputData: {
             from: walletData.address as `0x${string}`,
-            to_address: formData.addressMNS as `0x${string}`,
+            to_address: formData.addressNameService as `0x${string}`,
             to_identity: "",
             token: tokenAddress.mate as `0x${string}`,
-            amount: BigInt(formData.priorityFeeForFisher),
-            priorityFee: BigInt(0),
-            nonce: BigInt(formData.nonceEVVM),
+            amount: BigInt(0),
+            priorityFee: BigInt(formData.priorityFee_EVVM),
+            nonce: BigInt(formData.nonce_EVVM),
             priority: priority === "high",
-            executor: formData.addressMNS as `0x${string}`,
+            executor: formData.addressNameService as `0x${string}`,
             signature: paySignature,
           },
-          WithdrawOfferInputData: {
+          AcceptOfferInputData: {
             user: walletData.address as `0x${string}`,
-            nonce: BigInt(formData.nonceMNS),
             username: formData.username,
             offerID: BigInt(formData.offerId),
-            priorityFeeForFisher: BigInt(formData.priorityFeeForFisher),
-            signature: withdrawOfferSignature,
-            nonce_Evvm: BigInt(formData.nonceEVVM),
-            priority_Evvm: formData.priorityFlag,
-            signature_Evvm: paySignature,
+            nonce: formData.nonce,
+            signature: acceptOfferSignature,
+            priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
+            nonce_EVVM: BigInt(formData.nonce_EVVM),
+            priorityFlag_EVVM: formData.priorityFlag_EVVM,
+            signature_EVVM: paySignature,
           },
         });
       },
@@ -90,12 +90,9 @@ export const WithdrawOfferComponent = () => {
       console.error("No data to execute payment");
       return;
     }
-    const mnsAddress = dataToGet.PayInputData.to_address;
+    const nameServiceAddress = dataToGet.PayInputData.to_address;
 
-    executeWithdrawOffer(
-      dataToGet.WithdrawOfferInputData,
-      mnsAddress
-    )
+    executeAcceptOffer(dataToGet.AcceptOfferInputData, nameServiceAddress)
       .then(() => {
         console.log("Withdraw offer executed successfully");
       })
@@ -107,19 +104,19 @@ export const WithdrawOfferComponent = () => {
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
-        title="Withdraw offer of username"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/withdrawOfferStructure"
+        title="Accept offer of username"
+        link="https://www.evvm.org/docs/SignatureStructures/MNS/acceptOfferStructure"
       />
 
       <br />
 
       <AddressInputField
         label="MNS Address"
-        inputId="mnsAddressInput_withdrawOffer"
+        inputId="nameServiceAddressInput_acceptOffer"
         placeholder="Enter MNS address"
         defaultValue={
           contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.mns || ""
+            ?.nameService || ""
         }
       />
 
@@ -127,31 +124,31 @@ export const WithdrawOfferComponent = () => {
 
       <NumberInputWithGenerator
         label="MNS Nonce"
-        inputId="nonceMNSInput_withdrawOffer"
+        inputId="nonceInput_acceptOffer"
         placeholder="Enter nonce"
       />
 
       <TextInputField
         label="Username"
-        inputId="usernameInput_withdrawOffer"
+        inputId="usernameInput_acceptOffer"
         placeholder="Enter username"
       />
 
       <NumberInputField
         label="Offer ID"
-        inputId="offerIdInput_withdrawOffer"
+        inputId="offerIdInput_acceptOffer"
         placeholder="Enter offer ID"
       />
 
       <NumberInputField
         label="Priority fee"
-        inputId="priorityFeeInput_withdrawOffer"
+        inputId="priorityFeeEVVMInput_acceptOffer"
         placeholder="Enter priority fee"
       />
 
       <NumberInputWithGenerator
         label="EVVM Nonce"
-        inputId="nonceEVVMInput_withdrawOffer"
+        inputId="nonceEVVMInput_acceptOffer"
         placeholder="Enter nonce"
       />
 

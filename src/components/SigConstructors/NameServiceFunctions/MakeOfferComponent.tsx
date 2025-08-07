@@ -13,7 +13,7 @@ import { DateInputField } from "../InputsAndModules/DateInputField";
 import { dateToUnixTimestamp } from "@/utils/dateToUnixTimestamp";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import { contractAddress, tokenAddress } from "@/constants/address";
-import { useMnsSignatureBuilder } from "@/utils/SignatureBuilder/useMnsSignatureBuilder";
+import { useNameServiceSignatureBuilder } from "@/utils/SignatureBuilder/useNameServiceSignatureBuilder";
 import { MakeOfferInputData, PayInputData } from "@/utils/TypeInputStructures";
 import { executeMakeOffer } from "@/utils/TransactionExecuter";
 
@@ -23,7 +23,7 @@ type InfoData = {
 };
 
 export const MakeOfferComponent = () => {
-  const { signMakeOffer } = useMnsSignatureBuilder();
+  const { signMakeOffer } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
@@ -36,50 +36,51 @@ export const MakeOfferComponent = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
-      addressMNS: getValue("mnsAddressInput_makeOffer"),
-      nonceMNS: getValue("nonceMNSInput_makeOffer"),
+      addressNameService: getValue("nameServiceAddressInput_makeOffer"),
+      nonceNameService: getValue("nonceNameServiceInput_makeOffer"),
       username: getValue("usernameInput_makeOffer"),
       amount: getValue("amountInput_makeOffer"),
       expireDate: dateToUnixTimestamp(getValue("expireDateInput_makeOffer")),
-      priorityFeeForFisher: getValue("priorityFeeInput_makeOffer"),
+      priorityFee_EVVM: getValue("priorityFeeInput_makeOffer"),
       nonceEVVM: getValue("nonceEVVMInput_makeOffer"),
       priorityFlag: priority === "high",
     };
 
     signMakeOffer(
-      formData.addressMNS,
-      BigInt(formData.nonceMNS),
+      formData.addressNameService,
       formData.username,
-      BigInt(formData.amount),
       BigInt(formData.expireDate),
-      BigInt(formData.priorityFeeForFisher),
+      BigInt(formData.amount),
+      BigInt(formData.nonceNameService),
+      BigInt(formData.priorityFee_EVVM),
       BigInt(formData.nonceEVVM),
       formData.priorityFlag,
       (paySignature, makeOfferSignature) => {
         setDataToGet({
           PayInputData: {
             from: walletData.address as `0x${string}`,
-            to_address: formData.addressMNS as `0x${string}`,
+            to_address: formData.addressNameService as `0x${string}`,
             to_identity: "",
             token: tokenAddress.mate as `0x${string}`,
             amount: BigInt(formData.amount),
-            priorityFee: BigInt(formData.priorityFeeForFisher),
+            priorityFee: BigInt(formData.priorityFee_EVVM),
             nonce: BigInt(formData.nonceEVVM),
             priority: priority === "high",
-            executor: formData.addressMNS as `0x${string}`,
+            executor: formData.addressNameService as `0x${string}`,
             signature: paySignature,
           },
           MakeOfferInputData: {
             user: walletData.address as `0x${string}`,
-            nonce: BigInt(formData.nonceMNS),
+
             username: formData.username,
-            amount: BigInt(formData.amount),
             expireDate: BigInt(formData.expireDate),
-            priorityFeeForFisher: BigInt(formData.priorityFeeForFisher),
+            amount: BigInt(formData.amount),
+            nonce: BigInt(formData.nonceNameService),
             signature: makeOfferSignature,
-            nonce_Evvm: BigInt(formData.nonceEVVM),
-            priority_Evvm: formData.priorityFlag,
-            signature_Evvm: paySignature,
+            priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
+            nonce_EVVM: BigInt(formData.nonceEVVM),
+            priorityFlag_EVVM: formData.priorityFlag,
+            signature_EVVM: paySignature,
           },
         });
       },
@@ -92,9 +93,9 @@ export const MakeOfferComponent = () => {
       console.error("No data to execute payment");
       return;
     }
-    const mnsAddress = dataToGet.PayInputData.to_address;
+    const nameServiceAddress = dataToGet.PayInputData.to_address;
 
-    executeMakeOffer(dataToGet.MakeOfferInputData, mnsAddress)
+    executeMakeOffer(dataToGet.MakeOfferInputData, nameServiceAddress)
       .then(() => {
         console.log("Make offer executed successfully");
       })
@@ -113,20 +114,20 @@ export const MakeOfferComponent = () => {
       <br />
 
       <AddressInputField
-        label="MNS Address"
-        inputId="mnsAddressInput_makeOffer"
-        placeholder="Enter MNS address"
+        label="NameService Address"
+        inputId="nameServiceAddressInput_makeOffer"
+        placeholder="Enter NameService address"
         defaultValue={
           contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.mns || ""
+            ?.nameService || ""
         }
       />
 
       <br />
 
       <NumberInputWithGenerator
-        label="MNS Nonce"
-        inputId="nonceMNSInput_makeOffer"
+        label="NameService Nonce"
+        inputId="nonceNameServiceInput_makeOffer"
         placeholder="Enter nonce"
       />
 

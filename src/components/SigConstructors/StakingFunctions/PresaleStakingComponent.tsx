@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useSMateSignatureBuilder } from "@/utils/SignatureBuilder/useSMateSignatureBuilder";
+import { useStakingSignatureBuilder } from "@/utils/SignatureBuilder/useStakingSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
@@ -10,7 +10,7 @@ import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
-import { executePresaleStaking } from "@/utils/TransactionExecuter/useSMateTransactionExecuter";
+import { executePresaleStaking } from "@/utils/TransactionExecuter/useStakingTransactionExecuter";
 import { contractAddress, tokenAddress } from "@/constants/address";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import {
@@ -24,7 +24,7 @@ type InputData = {
 };
 
 export const PresaleStakingComponent = () => {
-  const { signPresaleStaking } = useSMateSignatureBuilder();
+  const { signPresaleStaking } = useStakingSignatureBuilder();
 
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
@@ -41,14 +41,14 @@ export const PresaleStakingComponent = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
-      sMateAddress: getValue("sMateAddressInput_presaleStaking"),
-      amountOfSMate: Number(getValue("amountOfSMateInput_presaleStaking")),
-      priorityFee: getValue("priorityFeeInput_presaleStaking"),
-      nonceEVVM: getValue("nonceEVVMInput_presaleStaking"),
-      nonceSMATE: getValue("nonceSMATEInput_presaleStaking"),
+      stakingAddress: getValue("stakingAddressInput_presaleStaking"),
+      priorityFee_EVVM: getValue("priorityFeeInput_presaleStaking"),
+      nonce_EVVM: getValue("nonceEVVMInput_presaleStaking"),
+      nonce: getValue("nonceSMATEInput_presaleStaking"),
+      priorityFlag_EVVM: priority === "high",
     };
 
-    const amountOfToken = (formData.amountOfSMate * 10 ** 18).toLocaleString(
+    const amountOfToken = (1 * 10 ** 18).toLocaleString(
       "fullwide",
       {
         useGrouping: false,
@@ -56,35 +56,34 @@ export const PresaleStakingComponent = () => {
     );
 
     signPresaleStaking(
-      formData.sMateAddress,
-      formData.amountOfSMate,
-      formData.priorityFee,
-      formData.nonceEVVM,
-      priority === "high",
+      formData.stakingAddress,
       isStaking,
-      formData.nonceSMATE,
+      formData.nonce,
+      formData.priorityFee_EVVM,
+      formData.nonce_EVVM,
+      formData.priorityFlag_EVVM,
       (paySignature, stakingSignature) => {
         setDataToGet({
           PresaleStakingInputData: {
             isStaking: isStaking,
             user: walletData.address as `0x${string}`,
-            nonce: BigInt(formData.nonceSMATE),
+            nonce: BigInt(formData.nonce),
             signature: stakingSignature,
-            priorityFee_Evvm: BigInt(formData.priorityFee),
-            priority_Evvm: priority === "high",
-            nonce_Evvm: BigInt(formData.nonceEVVM),
-            signature_Evvm: paySignature,
+            priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
+            priorityFlag_EVVM: priority === "high",
+            nonce_EVVM: BigInt(formData.nonce_EVVM),
+            signature_EVVM: paySignature,
           },
           PayInputData: {
             from: walletData.address as `0x${string}`,
-            to_address: formData.sMateAddress as `0x${string}`,
+            to_address: formData.stakingAddress as `0x${string}`,
             to_identity: "",
             token: tokenAddress.mate as `0x${string}`,
             amount: BigInt(amountOfToken),
-            priorityFee: BigInt(formData.priorityFee),
-            nonce: BigInt(formData.nonceEVVM),
+            priorityFee: BigInt(formData.priorityFee_EVVM),
+            nonce: BigInt(formData.nonce_EVVM),
             priority: priority === "high",
-            executor: formData.sMateAddress as `0x${string}`,
+            executor: formData.stakingAddress as `0x${string}`,
             signature: paySignature,
           },
         });
@@ -99,9 +98,9 @@ export const PresaleStakingComponent = () => {
       return;
     }
 
-    const sMateAddress = dataToGet.PayInputData.to_address;
+    const stakingAddress = dataToGet.PayInputData.to_address;
 
-    executePresaleStaking(dataToGet.PresaleStakingInputData, sMateAddress)
+    executePresaleStaking(dataToGet.PresaleStakingInputData, stakingAddress)
       .then(() => {
         console.log("Presale staking executed successfully");
       })
@@ -120,12 +119,12 @@ export const PresaleStakingComponent = () => {
 
       {/* Address Input */}
       <AddressInputField
-        label="sMate Address"
-        inputId="sMateAddressInput_presaleStaking"
-        placeholder="Enter sMate address"
+        label="staking Address"
+        inputId="stakingAddressInput_presaleStaking"
+        placeholder="Enter staking address"
         defaultValue={
           contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.sMate || ""
+            ?.staking || ""
         }
       />
       <br />
@@ -142,16 +141,9 @@ export const PresaleStakingComponent = () => {
       />
 
       <NumberInputWithGenerator
-        label="sMate Nonce"
+        label="staking Nonce"
         inputId="nonceSMATEInput_presaleStaking"
         placeholder="Enter nonce"
-      />
-
-      {/* Amount Inputs */}
-      <NumberInputField
-        label="Amount of sMate"
-        inputId="amountOfSMateInput_presaleStaking"
-        placeholder="Enter amount of sMate"
       />
 
       <NumberInputField

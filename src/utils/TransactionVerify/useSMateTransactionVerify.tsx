@@ -6,7 +6,7 @@ import {
   PresaleStakingInputData,
   PublicServiceStakingInputData,
   PublicStakingInputData,
-} from "../TypeInputStructures/sMateTypeInputStructure";
+} from "../TypeInputStructures/stakingTypeInputStructure";
 
 const verifyGoldenStaking = async (
   InputData: GoldenStakingInputData,
@@ -48,9 +48,9 @@ const verifyPresaleStaking = async (
       InputData.nonce,
       InputData.signature,
       InputData.priorityFee_Evvm,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -80,9 +80,9 @@ const verifyPublicStaking = async (
       InputData.amountOfSMate,
       InputData.signature,
       InputData.priorityFee_Evvm,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -113,9 +113,9 @@ const verifyPublicServiceStaking = async (
       InputData.amountOfSMate,
       InputData.signature,
       InputData.priorityFee_Evvm,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {

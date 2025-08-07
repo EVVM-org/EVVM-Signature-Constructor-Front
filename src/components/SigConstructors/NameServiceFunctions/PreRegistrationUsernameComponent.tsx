@@ -2,7 +2,7 @@
 import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useMnsSignatureBuilder } from "@/utils/SignatureBuilder/useMnsSignatureBuilder";
+import { useNameServiceSignatureBuilder } from "@/utils/SignatureBuilder/useNameServiceSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { hashPreRegisteredUsername } from "@/utils/SignatureBuilder/hashTools";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
@@ -12,10 +12,10 @@ import { TextInputField } from "../InputsAndModules/TextInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { PayInputData } from "@/utils/TypeInputStructures/evvmTypeInputStructure";
-import { PreRegistrationUsernameInputData } from "@/utils/TypeInputStructures/mnsTypeInputStructure";
+import { PreRegistrationUsernameInputData } from "@/utils/TypeInputStructures/nameServiceTypeInputStructure";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import { contractAddress, tokenAddress } from "@/constants/address";
-import { executePreRegistrationUsername } from "@/utils/TransactionExecuter/useMNSTransactionExecuter";
+import { executePreRegistrationUsername } from "@/utils/TransactionExecuter/useNameServiceTransactionExecuter";
 
 type InfoData = {
   PayInputData: PayInputData;
@@ -23,7 +23,7 @@ type InfoData = {
 };
 
 export const PreRegistrationUsernameComponent = () => {
-  const { signPreRegistrationUsername } = useMnsSignatureBuilder();
+  const { signPreRegistrationUsername } = useNameServiceSignatureBuilder();
   let account = getAccount(config);
 
   const [priority, setPriority] = React.useState("low");
@@ -37,23 +37,23 @@ export const PreRegistrationUsernameComponent = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
-      addressMNS: getValue("mnsAddressInput_preRegistration"),
-      nonceMNS: getValue("nonceMNSInput_preRegistration"),
+      addressNameService: getValue("nameServiceAddressInput_preRegistration"),
       username: getValue("usernameInput_preRegistration"),
+      nonce: getValue("nonceNameServiceInput_preRegistration"),
       clowNumber: getValue("clowNumberInput_preRegistration"),
-      priorityFeeForFisher: getValue("priorityFeeInput_preRegistration"),
-      nonceEVVM: getValue("nonceEVVMInput_preRegistration"),
-      priorityFlag: priority === "high",
+      nonce_EVVM: getValue("nonceEVVMInput_preRegistration"),
+      priorityFee_EVVM: getValue("priorityFeeInput_preRegistration"),
+      priorityFlag_EVVM: priority === "high",
     };
 
     signPreRegistrationUsername(
-      formData.addressMNS,
-      BigInt(formData.nonceMNS),
+      formData.addressNameService,
       formData.username,
       BigInt(formData.clowNumber),
-      BigInt(formData.priorityFeeForFisher),
-      BigInt(formData.nonceEVVM),
-      formData.priorityFlag,
+      BigInt(formData.nonce),
+      BigInt(formData.priorityFee_EVVM),
+      BigInt(formData.nonce_EVVM),
+      formData.priorityFlag_EVVM,
       (paySignature, preRegistrationSignature) => {
         const hashUsername = hashPreRegisteredUsername(
           formData.username,
@@ -63,27 +63,27 @@ export const PreRegistrationUsernameComponent = () => {
         setDataToGet({
           PayInputData: {
             from: walletData.address as `0x${string}`,
-            to_address: formData.addressMNS as `0x${string}`,
+            to_address: formData.addressNameService as `0x${string}`,
             to_identity: "",
             token: tokenAddress.mate as `0x${string}`,
-            amount: BigInt(formData.priorityFeeForFisher),
-            priorityFee: BigInt(0),
-            nonce: BigInt(formData.nonceEVVM),
+            amount: BigInt(0),
+            priorityFee: BigInt(formData.priorityFee_EVVM),
+            nonce: BigInt(formData.nonce_EVVM),
             priority: priority === "high",
-            executor: formData.addressMNS as `0x${string}`,
+            executor: formData.addressNameService as `0x${string}`,
             signature: paySignature,
           },
           PreRegistrationUsernameInputData: {
             user: walletData.address as `0x${string}`,
-            nonce: BigInt(formData.nonceMNS),
-            hashUsername:
+            hashPreRegisteredUsername:
               hashUsername.toLowerCase().slice(0, 2) +
               hashUsername.toUpperCase().slice(2),
-            priorityFeeForFisher: BigInt(formData.priorityFeeForFisher),
+            nonce: BigInt(formData.nonce),
             signature: preRegistrationSignature,
-            nonce_Evvm: BigInt(formData.nonceEVVM),
-            priority_Evvm: formData.priorityFlag,
-            signature_Evvm: paySignature,
+            priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
+            nonce_EVVM: BigInt(formData.nonce_EVVM),
+            priorityFlag_EVVM: formData.priorityFlag_EVVM,
+            signature_EVVM: paySignature,
           },
         });
       },
@@ -96,11 +96,11 @@ export const PreRegistrationUsernameComponent = () => {
       console.error("No data to execute payment");
       return;
     }
-    const mnsAddress = dataToGet.PayInputData.to_address;
+    const nameServiceAddress = dataToGet.PayInputData.to_address;
 
     executePreRegistrationUsername(
       dataToGet.PreRegistrationUsernameInputData,
-      mnsAddress
+      nameServiceAddress
     )
       .then(() => {
         console.log("Pre-registration username executed successfully");
@@ -121,12 +121,12 @@ export const PreRegistrationUsernameComponent = () => {
 
       {/* Address Input */}
       <AddressInputField
-        label="MNS Address"
-        inputId="mnsAddressInput_preRegistration"
-        placeholder="Enter MNS address"
+        label="NameService Address"
+        inputId="nameServiceAddressInput_preRegistration"
+        placeholder="Enter NameService address"
         defaultValue={
           contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.mns || ""
+            ?.nameService || ""
         }
       />
 
@@ -135,8 +135,8 @@ export const PreRegistrationUsernameComponent = () => {
       {/* Nonce section with automatic generator */}
 
       <NumberInputWithGenerator
-        label="MNS Nonce"
-        inputId="nonceMNSInput_preRegistration"
+        label="NameService Nonce"
+        inputId="nonceNameServiceInput_preRegistration"
         placeholder="Enter nonce"
       />
 

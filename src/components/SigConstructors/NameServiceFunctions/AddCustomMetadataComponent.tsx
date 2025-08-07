@@ -2,7 +2,7 @@
 import React from "react";
 import { getAccount, readContract } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useMnsSignatureBuilder } from "@/utils/SignatureBuilder/useMnsSignatureBuilder";
+import { useNameServiceSignatureBuilder } from "@/utils/SignatureBuilder/useNameServiceSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
@@ -17,7 +17,7 @@ import {
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import { contractAddress, tokenAddress } from "@/constants/address";
 import { executeAddCustomMetadata } from "@/utils/TransactionExecuter";
-import MateNameService from "@/constants/abi/MateNameService.json";
+import NameService from "@/constants/abi/NameService.json";
 
 type InfoData = {
   PayInputData: PayInputData;
@@ -25,7 +25,7 @@ type InfoData = {
 };
 
 export const AddCustomMetadataComponent = () => {
-  const { signAddCustomMetadata } = useMnsSignatureBuilder();
+  const { signAddCustomMetadata } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
@@ -40,13 +40,13 @@ export const AddCustomMetadataComponent = () => {
     if (!walletData) return;
 
     const formData = {
-      addressMNS: getValue("mnsAddressInput_addCustomMetadata"),
-      nonceMNS: getValue("nonceMNSInput_addCustomMetadata"),
+      addressNameService: getValue("nameServiceAddressInput_addCustomMetadata"),
+      nonceNameService: getValue("nonceNameServiceInput_addCustomMetadata"),
       identity: getValue("identityInput_addCustomMetadata"),
       schema: getValue("schemaInput_addCustomMetadata"),
       subschema: getValue("subschemaInput_addCustomMetadata"),
       value: getValue("valueInput_addCustomMetadata"),
-      priorityFeeForFisher: getValue("priorityFeeInput_addCustomMetadata"),
+      priorityFee_EVVM: getValue("priorityFeeInput_addCustomMetadata"),
       nonceEVVM: getValue("nonceEVVMInput_addCustomMetadata"),
       priorityFlag: priority === "high",
     };
@@ -56,8 +56,8 @@ export const AddCustomMetadataComponent = () => {
     getPriceToAddCustomMetadata()
       .then(() => {
         signAddCustomMetadata(
-          formData.addressMNS,
-          BigInt(formData.nonceMNS),
+          formData.addressNameService,
+          BigInt(formData.nonceNameService),
           formData.identity,
           valueCustomMetadata,
           amountToAddCustomMetadata
@@ -70,7 +70,7 @@ export const AddCustomMetadataComponent = () => {
             setDataToGet({
               PayInputData: {
                 from: walletData.address as `0x${string}`,
-                to_address: formData.addressMNS as `0x${string}`,
+                to_address: formData.addressNameService as `0x${string}`,
                 to_identity: "",
                 token: tokenAddress.mate as `0x${string}`,
                 amount: amountToAddCustomMetadata
@@ -79,19 +79,19 @@ export const AddCustomMetadataComponent = () => {
                 priorityFee: BigInt(formData.priorityFeeForFisher),
                 nonce: BigInt(formData.nonceEVVM),
                 priority: priority === "high",
-                executor: formData.addressMNS as `0x${string}`,
+                executor: formData.addressNameService as `0x${string}`,
                 signature: paySignature,
               },
               AddCustomMetadataInputData: {
                 user: walletData.address as `0x${string}`,
-                nonce: BigInt(formData.nonceMNS),
                 identity: formData.identity,
                 value: valueCustomMetadata,
-                priorityFeeForFisher: BigInt(formData.priorityFeeForFisher),
+                nonce: BigInt(formData.nonceNameService),
                 signature: addCustomMetadataSignature,
-                nonce_Evvm: BigInt(formData.nonceEVVM),
-                priority_Evvm: formData.priorityFlag,
-                signature_Evvm: paySignature,
+                priorityFee_EVVM: BigInt(formData.priorityFeeForFisher),
+                nonce_EVVM: BigInt(formData.nonceEVVM),
+                priorityFlag_EVVM: formData.priorityFlag,
+                signature_EVVM: paySignature,
               },
             });
           },
@@ -105,14 +105,14 @@ export const AddCustomMetadataComponent = () => {
   };
 
   const getPriceToAddCustomMetadata = async () => {
-    let mnsAddress = getValue("mnsAddressInput_addCustomMetadata");
+    let nameServiceAddress = getValue("nameServiceAddressInput_addCustomMetadata");
 
-    if (!mnsAddress) {
+    if (!nameServiceAddress) {
       setAmountToAddCustomMetadata(null);
     } else {
       await readContract(config, {
-        abi: MateNameService.abi,
-        address: mnsAddress as `0x${string}`,
+        abi: NameService.abi,
+        address: nameServiceAddress as `0x${string}`,
         functionName: "getPriceToAddCustomMetadata",
         args: [],
       })
@@ -132,9 +132,9 @@ export const AddCustomMetadataComponent = () => {
       console.error("No data to execute payment");
       return;
     }
-    const mnsAddress = dataToGet.PayInputData.to_address;
+    const nameServiceAddress = dataToGet.PayInputData.to_address;
 
-    executeAddCustomMetadata(dataToGet.AddCustomMetadataInputData, mnsAddress)
+    executeAddCustomMetadata(dataToGet.AddCustomMetadataInputData, nameServiceAddress)
       .then(() => {
         console.log("Registration username executed successfully");
       })
@@ -153,20 +153,20 @@ export const AddCustomMetadataComponent = () => {
       <br />
 
       <AddressInputField
-        label="MNS Address"
-        inputId="mnsAddressInput_addCustomMetadata"
-        placeholder="Enter MNS address"
+        label="Name Service Address"
+        inputId="nameServiceAddressInput_addCustomMetadata"
+        placeholder="Enter NameService address"
         defaultValue={
           contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.mns || ""
+            ?.nameService || ""
         }
       />
 
       <br />
 
       <NumberInputWithGenerator
-        label="MNS Nonce"
-        inputId="nonceMNSInput_addCustomMetadata"
+        label="NameService Nonce"
+        inputId="nonceNameServiceInput_addCustomMetadata"
         placeholder="Enter nonce"
       />
 

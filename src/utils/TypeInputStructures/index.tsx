@@ -1,3 +1,3 @@
 export * from "./evvmTypeInputStructure";
-export * from "./mnsTypeInputStructure";
-export * from "./sMateTypeInputStructure";
+export * from "./nameServiceTypeInputStructure";
+export * from "./stakingTypeInputStructure";

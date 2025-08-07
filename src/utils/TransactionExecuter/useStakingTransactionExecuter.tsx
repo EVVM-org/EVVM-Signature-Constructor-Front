@@ -1,12 +1,12 @@
 import { writeContract } from "@wagmi/core";
 import { config } from "@/config";
-import SMate from "@/constants/abi/SMate.json";
+import Staking from "@/constants/abi/Staking.json";
 import {
   GoldenStakingInputData,
   PresaleStakingInputData,
   PublicServiceStakingInputData,
   PublicStakingInputData,
-} from "../TypeInputStructures/sMateTypeInputStructure";
+} from "../TypeInputStructures/stakingTypeInputStructure";
 
 const executeGoldenStaking = async (
   InputData: GoldenStakingInputData,
@@ -17,10 +17,14 @@ const executeGoldenStaking = async (
   }
 
   writeContract(config, {
-    abi: SMate.abi,
+    abi: Staking.abi,
     address: sMateAddress,
     functionName: "goldenStaking",
-    args: [InputData.isStaking, InputData.amountOfSMate, InputData.signature],
+    args: [
+      InputData.isStaking,
+      InputData.amountOfStaking,
+      InputData.signature_EVVM,
+    ],
   })
     .then(() => {
       return Promise.resolve();
@@ -39,18 +43,18 @@ const executePresaleStaking = async (
   }
 
   writeContract(config, {
-    abi: SMate.abi,
+    abi: Staking.abi,
     address: sMateAddress,
     functionName: "goldenStaking",
     args: [
-      InputData.isStaking,
       InputData.user,
+      InputData.isStaking,
       InputData.nonce,
       InputData.signature,
-      InputData.priorityFee_Evvm,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -70,19 +74,19 @@ const executePublicStaking = async (
   }
 
   writeContract(config, {
-    abi: SMate.abi,
+    abi: Staking.abi,
     address: sMateAddress,
     functionName: "publicStaking",
     args: [
-      InputData.isStaking,
       InputData.user,
+      InputData.isStaking,
+      InputData.amountOfStaking,
       InputData.nonce,
-      InputData.amountOfSMate,
       InputData.signature,
-      InputData.priorityFee_Evvm,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -102,20 +106,20 @@ const executePublicServiceStaking = async (
   }
 
   writeContract(config, {
-    abi: SMate.abi,
+    abi: Staking.abi,
     address: sMateAddress,
     functionName: "publicStaking",
     args: [
-      InputData.isStaking,
       InputData.user,
       InputData.service,
+      InputData.isStaking,
+      InputData.amountOfStaking,
       InputData.nonce,
-      InputData.amountOfSMate,
       InputData.signature,
-      InputData.priorityFee_Evvm,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM
     ],
   })
     .then(() => {

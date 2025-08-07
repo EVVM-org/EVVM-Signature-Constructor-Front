@@ -2,7 +2,7 @@
 import React from "react";
 import { getAccount, readContract } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useMnsSignatureBuilder } from "@/utils/SignatureBuilder/useMnsSignatureBuilder";
+import { useNameServiceSignatureBuilder } from "@/utils/SignatureBuilder/useNameServiceSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
@@ -15,7 +15,7 @@ import {
   PayInputData,
 } from "@/utils/TypeInputStructures";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import MateNameService from "@/constants/abi/MateNameService.json";
+import NameService from "@/constants/abi/NameService.json";
 import { contractAddress, tokenAddress } from "@/constants/address";
 import { executeFlushUsername } from "@/utils/TransactionExecuter";
 
@@ -25,7 +25,7 @@ type InfoData = {
 };
 
 export const FlushUsernameComponent = () => {
-  const { signFlushUsername } = useMnsSignatureBuilder();
+  const { signFlushUsername } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
@@ -38,17 +38,17 @@ export const FlushUsernameComponent = () => {
     if (!walletData) return;
 
     const formData = {
-      addressMNS: getValue("mnsAddressInput_flushUsername"),
-      nonceMNS: getValue("nonceMNSInput_flushUsername"),
+      addressNameService: getValue("nameServiceAddressInput_flushUsername"),
+      nonceNameService: getValue("nonceNameServiceInput_flushUsername"),
       username: getValue("usernameInput_flushUsername"),
-      priorityFeeForFisher: getValue("priorityFeeInput_flushUsername"),
-      nonceEVVM: getValue("nonceEVVMInput_flushUsername"),
-      priorityFlag: priority === "high",
+      priorityFee_EVVM: getValue("priorityFeeInput_flushUsername"),
+      nonce_EVVM: getValue("nonceEVVMInput_flushUsername"),
+      priorityFlag_EVVM: priority === "high",
     };
 
     readContract(config, {
-      abi: MateNameService.abi,
-      address: formData.addressMNS as `0x${string}`,
+      abi: NameService.abi,
+      address: formData.addressNameService as `0x${string}`,
       functionName: "getPriceToFlushUsername",
       args: [formData.username],
     })
@@ -59,36 +59,36 @@ export const FlushUsernameComponent = () => {
           return;
         }
         signFlushUsername(
-          formData.addressMNS,
-          BigInt(formData.nonceMNS),
+          formData.addressNameService,
           formData.username,
+          BigInt(formData.nonceNameService),
           priceToFlushUsername as bigint,
-          BigInt(formData.priorityFeeForFisher),
-          BigInt(formData.nonceEVVM),
-          formData.priorityFlag,
+          BigInt(formData.priorityFee_EVVM),
+          BigInt(formData.nonce_EVVM),
+          formData.priorityFlag_EVVM,
           (paySignature, flushUsernameSignature) => {
             setDataToGet({
               PayInputData: {
                 from: walletData.address as `0x${string}`,
-                to_address: formData.addressMNS as `0x${string}`,
+                to_address: formData.addressNameService as `0x${string}`,
                 to_identity: "",
                 token: tokenAddress.mate as `0x${string}`,
                 amount: priceToFlushUsername as bigint,
-                priorityFee: BigInt(formData.priorityFeeForFisher),
-                nonce: BigInt(formData.nonceEVVM),
-                priority: formData.priorityFlag,
-                executor: formData.addressMNS as `0x${string}`,
+                priorityFee: BigInt(formData.priorityFee_EVVM),
+                nonce: BigInt(formData.nonce_EVVM),
+                priority: formData.priorityFlag_EVVM,
+                executor: formData.addressNameService as `0x${string}`,
                 signature: paySignature,
               },
               FlushUsernameInputData: {
                 user: walletData.address as `0x${string}`,
-                identity: formData.username,
-                priorityFeeForFisher: BigInt(formData.priorityFeeForFisher),
-                nonce: BigInt(formData.nonceMNS),
+                username: formData.username,
+                nonce: BigInt(formData.nonceNameService),
                 signature: flushUsernameSignature,
-                nonce_Evvm: BigInt(formData.nonceEVVM),
-                priority_Evvm: formData.priorityFlag,
-                signature_Evvm: paySignature,
+                priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
+                nonce_EVVM: BigInt(formData.nonce_EVVM),
+                priorityFlag_EVVM: formData.priorityFlag_EVVM,
+                signature_EVVM: paySignature,
               },
             });
           },
@@ -102,23 +102,20 @@ export const FlushUsernameComponent = () => {
   };
 
   const execute = async () => {
-      if (!dataToGet) {
-        console.error("No data to execute payment");
-        return;
-      }
-      const mnsAddress = dataToGet.PayInputData.to_address;
-  
-      executeFlushUsername(
-        dataToGet.FlushUsernameInputData,
-        mnsAddress
-      )
-        .then(() => {
-          console.log("Registration username executed successfully");
-        })
-        .catch((error) => {
-          console.error("Error executing registration username:", error);
-        });
-    };
+    if (!dataToGet) {
+      console.error("No data to execute payment");
+      return;
+    }
+    const nameServiceAddress = dataToGet.PayInputData.to_address;
+
+    executeFlushUsername(dataToGet.FlushUsernameInputData, nameServiceAddress)
+      .then(() => {
+        console.log("Registration username executed successfully");
+      })
+      .catch((error) => {
+        console.error("Error executing registration username:", error);
+      });
+  };
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
@@ -130,20 +127,20 @@ export const FlushUsernameComponent = () => {
       <br />
 
       <AddressInputField
-        label="MNS Address"
-        inputId="mnsAddressInput_flushUsername"
-        placeholder="Enter MNS address"
+        label="NameService Address"
+        inputId="nameServiceAddressInput_flushUsername"
+        placeholder="Enter NameService address"
         defaultValue={
           contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.mns || ""
+            ?.nameService || ""
         }
       />
 
       {/* Nonce section with automatic generator */}
 
       <NumberInputWithGenerator
-        label="MNS Nonce"
-        inputId="nonceMNSInput_flushUsername"
+        label="NameService Nonce"
+        inputId="nonceNameServiceInput_flushUsername"
         placeholder="Enter nonce"
       />
 

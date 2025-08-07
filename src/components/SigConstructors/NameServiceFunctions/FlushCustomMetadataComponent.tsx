@@ -2,7 +2,7 @@
 import React from "react";
 import { getAccount, readContract } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useMnsSignatureBuilder } from "@/utils/SignatureBuilder/useMnsSignatureBuilder";
+import { useNameServiceSignatureBuilder } from "@/utils/SignatureBuilder/useNameServiceSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
@@ -11,21 +11,21 @@ import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { TextInputField } from "../InputsAndModules/TextInputField";
 import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
 import {
-  RemoveCustomMetadataInputData,
+  FlushCustomMetadataInputData,
   PayInputData,
 } from "@/utils/TypeInputStructures";
-import MateNameService from "@/constants/abi/MateNameService.json";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import { executeRemoveCustomMetadata } from "@/utils/TransactionExecuter";
+import NameService from "@/constants/abi/NameService.json";
 import { contractAddress, tokenAddress } from "@/constants/address";
+import { executeFlushCustomMetadata } from "@/utils/TransactionExecuter";
 
 type InfoData = {
   PayInputData: PayInputData;
-  RemoveCustomMetadataInputData: RemoveCustomMetadataInputData;
+  FlushCustomMetadataInputData: FlushCustomMetadataInputData;
 };
 
-export const RemoveCustomMetadataComponent = () => {
-  const { signRemoveCustomMetadata } = useMnsSignatureBuilder();
+export const FlushCustomMetadataComponent = () => {
+  const { signFlushCustomMetadata } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
@@ -38,59 +38,59 @@ export const RemoveCustomMetadataComponent = () => {
     if (!walletData) return;
 
     const formData = {
-      addressMNS: getValue("mnsAddressInput_removeCustomMetadata"),
-      nonceMNS: getValue("nonceMNSInput_removeCustomMetadata"),
-      identity: getValue("identityInput_removeCustomMetadata"),
-      key: getValue("keyInput_removeCustomMetadata"),
-      priorityFeeForFisher: getValue("priorityFeeInput_removeCustomMetadata"),
-      nonceEVVM: getValue("nonceEVVMInput_removeCustomMetadata"),
-      priorityFlag: priority === "high",
+      addressNameService: getValue(
+        "nameServiceAddressInput_flushCustomMetadata"
+      ),
+      nonceNameService: getValue("nonceNameServiceInput_flushCustomMetadata"),
+      identity: getValue("identityInput_flushCustomMetadata"),
+      priorityFee_EVVM: getValue("priorityFeeInput_flushCustomMetadata"),
+      nonce_EVVM: getValue("nonceEVVMInput_flushCustomMetadata"),
+      priorityFlag_EVVM: priority === "high",
     };
 
     readContract(config, {
-      abi: MateNameService.abi,
-      address: formData.addressMNS as `0x${string}`,
-      functionName: "getPriceToRemoveCustomMetadata",
-      args: [],
+      abi: NameService.abi,
+      address: formData.addressNameService as `0x${string}`,
+      functionName: "getPriceToFlushCustomMetadata",
+      args: [formData.identity],
     })
       .then((price) => {
         if (!price) {
-          console.error("Price to remove custom metadata is not available");
+          console.error("Price to flush custom metadata is not available");
           return;
         }
-        signRemoveCustomMetadata(
-          formData.addressMNS,
-          BigInt(formData.nonceMNS),
+
+        signFlushCustomMetadata(
+          formData.addressNameService,
           formData.identity,
-          BigInt(formData.key),
+          BigInt(formData.nonceNameService),
           price as bigint,
-          BigInt(formData.priorityFeeForFisher),
-          BigInt(formData.nonceEVVM),
-          formData.priorityFlag,
-          (paySignature, removeCustomMetadataSignature) => {
+          BigInt(formData.priorityFee_EVVM),
+          BigInt(formData.nonce_EVVM),
+          formData.priorityFlag_EVVM,
+          (paySignature, flushCustomMetadataSignature) => {
             setDataToGet({
               PayInputData: {
                 from: walletData.address as `0x${string}`,
-                to_address: formData.addressMNS as `0x${string}`,
+                to_address: formData.addressNameService as `0x${string}`,
                 to_identity: "",
                 token: tokenAddress.mate as `0x${string}`,
                 amount: price as bigint,
-                priorityFee: BigInt(formData.priorityFeeForFisher),
-                nonce: BigInt(formData.nonceEVVM),
+                priorityFee: BigInt(formData.priorityFee_EVVM),
+                nonce: BigInt(formData.nonce_EVVM),
                 priority: priority === "high",
-                executor: formData.addressMNS as `0x${string}`,
+                executor: formData.addressNameService as `0x${string}`,
                 signature: paySignature,
               },
-              RemoveCustomMetadataInputData: {
+              FlushCustomMetadataInputData: {
                 user: walletData.address as `0x${string}`,
-                nonce: BigInt(formData.nonceMNS),
                 identity: formData.identity,
-                key: BigInt(formData.key),
-                priorityFeeForFisher: BigInt(formData.priorityFeeForFisher),
-                signature: removeCustomMetadataSignature,
-                nonce_Evvm: BigInt(formData.nonceEVVM),
-                priority_Evvm: formData.priorityFlag,
-                signature_Evvm: paySignature,
+                nonce: BigInt(formData.nonceNameService),
+                signature: flushCustomMetadataSignature,
+                priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
+                nonce_EVVM: BigInt(formData.nonce_EVVM),
+                priorityFlag_EVVM: formData.priorityFlag_EVVM,
+                signature_EVVM: paySignature,
               },
             });
           },
@@ -98,8 +98,7 @@ export const RemoveCustomMetadataComponent = () => {
         );
       })
       .catch((error) => {
-        console.error("Error reading mate reward amount:", error);
-        return;
+        console.error("Error fetching price:", error);
       });
   };
 
@@ -108,68 +107,64 @@ export const RemoveCustomMetadataComponent = () => {
       console.error("No data to execute payment");
       return;
     }
-    const mnsAddress = dataToGet.PayInputData.to_address;
+    const nameServiceAddress = dataToGet.PayInputData.to_address;
 
-    executeRemoveCustomMetadata(
-      dataToGet.RemoveCustomMetadataInputData,
-      mnsAddress
+    executeFlushCustomMetadata(
+      dataToGet.FlushCustomMetadataInputData,
+      nameServiceAddress
     )
       .then(() => {
-        console.log("Registration username executed successfully");
+        console.log("Flush custom metadata executed successfully");
       })
       .catch((error) => {
-        console.error("Error executing registration username:", error);
+        console.error("Error executing flush custom metadata:", error);
       });
   };
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
-        title="Remove custom metadata of identity"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/removeCustomMetadataStructure"
+        title="Flush Custom Metadata of Identity"
+        link="https://www.evvm.org/docs/SignatureStructures/MNS/flushCustomMetadataStructure"
       />
 
       <br />
 
       <AddressInputField
-        label="MNS Address"
-        inputId="mnsAddressInput_removeCustomMetadata"
-        placeholder="Enter MNS address"
+        label="NameService Address"
+        inputId="nameServiceAddressInput_flushCustomMetadata"
+        placeholder="Enter NameService address"
         defaultValue={
           contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.mns || ""
+            ?.nameService || ""
         }
       />
 
       <br />
 
+      {/* Nonce section with automatic generator */}
+
       <NumberInputWithGenerator
-        label="MNS Nonce"
-        inputId="nonceMNSInput_removeCustomMetadata"
+        label="NameService Nonce"
+        inputId="nonceNameServiceInput_flushCustomMetadata"
         placeholder="Enter nonce"
       />
 
       <TextInputField
         label="Identity"
-        inputId="identityInput_removeCustomMetadata"
+        inputId="identityInput_flushCustomMetadata"
         placeholder="Enter identity"
-      />
-
-      <TextInputField
-        label="Key"
-        inputId="keyInput_removeCustomMetadata"
-        placeholder="Enter key"
       />
 
       <NumberInputField
         label="Priority fee"
-        inputId="priorityFeeInput_removeCustomMetadata"
+        inputId="priorityFeeInput_flushCustomMetadata"
         placeholder="Enter priority fee"
       />
 
       <NumberInputWithGenerator
         label="EVVM Nonce"
-        inputId="nonceEVVMInput_removeCustomMetadata"
+        inputId="nonceEVVMInput_flushCustomMetadata"
         placeholder="Enter nonce"
       />
 

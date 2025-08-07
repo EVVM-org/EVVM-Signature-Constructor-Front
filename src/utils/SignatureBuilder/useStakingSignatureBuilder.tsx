@@ -7,7 +7,7 @@ import {
 } from "./constructMessage";
 import { keccak256, encodePacked, encodeAbiParameters, sha256 } from "viem";
 
-export const useSMateSignatureBuilder = () => {
+export const useStakingSignatureBuilder = () => {
   const { signMessage, ...rest } = useSignMessage();
 
   // Generic ERC191 message signing
@@ -25,9 +25,9 @@ export const useSMateSignatureBuilder = () => {
     );
   };
 
-  // sMate golden staking signature (5083 EVVM per stake)
+  // staking golden staking signature (5083 EVVM per stake)
   const signGoldenStaking = (
-    sMateAddress: string,
+    stakingAddress: string,
     stakingAmount: number,
     nonceEVVM: string,
     priorityFlag: boolean,
@@ -35,7 +35,7 @@ export const useSMateSignatureBuilder = () => {
     onError?: (error: Error) => void
   ) => {
     const message = buildMessageSignedForPay(
-      sMateAddress,
+      stakingAddress,
       "0x0000000000000000000000000000000000000001", // Native token address
       (stakingAmount * (5083 * 10 ** 18)).toLocaleString("fullwide", {
         useGrouping: false,
@@ -43,7 +43,7 @@ export const useSMateSignatureBuilder = () => {
       "0",
       nonceEVVM,
       priorityFlag,
-      sMateAddress
+      stakingAddress
     );
 
     signMessage(
@@ -55,31 +55,34 @@ export const useSMateSignatureBuilder = () => {
     );
   };
 
-  // sMate presale staking signature (dual signature: payment + staking)
+  // staking presale staking signature (dual signature: payment + staking)
   const signPresaleStaking = (
-    sMateAddress: string,
-    stakingAmount: number,
-    priorityFee: string,
-    nonceEVVM: string,
-    priorityFlag: boolean,
+    stakingAddress: string,
+
     isStaking: boolean,
-    nonceSMATE: string,
+    nonce: string,
+    
+    priorityFee_EVVM: string,
+    nonce_EVVM: string,
+    priorityFlag_EVVM: boolean,
+    
+    
     onSuccess?: (paySignature: string, stakingSignature: string) => void,
     onError?: (error: Error) => void
   ) => {
     // First signature: payment
     const payMessage = buildMessageSignedForPay(
-      sMateAddress,
+      stakingAddress,
       "0x0000000000000000000000000000000000000001",
       isStaking
-        ? (stakingAmount * (5083 * 10 ** 18)).toLocaleString("fullwide", {
+        ? (1 * (5083 * 10 ** 18)).toLocaleString("fullwide", {
             useGrouping: false,
           })
         : "0",
-      priorityFee,
-      nonceEVVM,
-      priorityFlag,
-      sMateAddress
+      priorityFee_EVVM,
+      nonce_EVVM,
+      priorityFlag_EVVM,
+      stakingAddress
     );
 
     signMessage(
@@ -89,8 +92,8 @@ export const useSMateSignatureBuilder = () => {
           // Second signature: staking
           const stakingMessage = buildMessageSignedForPresaleStaking(
             isStaking,
-            stakingAmount.toString(),
-            nonceSMATE
+            "1",
+            nonce
           );
 
           signMessage(
@@ -107,21 +110,21 @@ export const useSMateSignatureBuilder = () => {
     );
   };
 
-  // sMate public staking signature (dual signature: payment + staking)
+  // staking public staking signature (dual signature: payment + staking)
   const signPublicStaking = (
-    sMateAddress: string,
+    stakingAddress: string,
+    isStaking: boolean,
     stakingAmount: number,
+    nonceSMATE: string,
     priorityFee: string,
     nonceEVVM: string,
     priorityFlag: boolean,
-    isStaking: boolean,
-    nonceSMATE: string,
     onSuccess?: (paySignature: string, stakingSignature: string) => void,
     onError?: (error: Error) => void
   ) => {
     // First signature: payment
     const payMessage = buildMessageSignedForPay(
-      sMateAddress,
+      stakingAddress,
       "0x0000000000000000000000000000000000000001",
       isStaking
         ? (stakingAmount * (5083 * 10 ** 18)).toLocaleString("fullwide", {
@@ -131,7 +134,7 @@ export const useSMateSignatureBuilder = () => {
       priorityFee,
       nonceEVVM,
       priorityFlag,
-      sMateAddress
+      stakingAddress
     );
 
     signMessage(
@@ -159,32 +162,32 @@ export const useSMateSignatureBuilder = () => {
     );
   };
 
-  // sMate public service staking signature (dual signature: payment + staking for specific service)
+  // staking public service staking signature (dual signature: payment + staking for specific service)
   const signPublicServiceStaking = (
-    sMateAddress: string,
+    stakingAddress: string,
     serviceAddress: string,
-    stakingAmount: number,
-    priorityFee: string,
-    nonceEVVM: string,
-    priorityFlag: boolean,
     isStaking: boolean,
-    nonceSMATE: string,
+    stakingAmount: number,
+    nonce: string,
+    priorityFee_EVVM: string,
+    nonce_EVVM: string,
+    priorityFlag_EVVM: boolean,
     onSuccess?: (paySignature: string, stakingSignature: string) => void,
     onError?: (error: Error) => void
   ) => {
     // First signature: payment
     const payMessage = buildMessageSignedForPay(
-      sMateAddress,
+      stakingAddress,
       "0x0000000000000000000000000000000000000001",
       isStaking
         ? (stakingAmount * (5083 * 10 ** 18)).toLocaleString("fullwide", {
             useGrouping: false,
           })
         : "0",
-      priorityFee,
-      nonceEVVM,
-      priorityFlag,
-      sMateAddress
+      priorityFee_EVVM,
+      nonce_EVVM,
+      priorityFlag_EVVM,
+      stakingAddress
     );
 
     signMessage(
@@ -196,7 +199,7 @@ export const useSMateSignatureBuilder = () => {
             serviceAddress,
             isStaking,
             stakingAmount.toString(),
-            nonceSMATE
+            nonce
           );
 
           signMessage(

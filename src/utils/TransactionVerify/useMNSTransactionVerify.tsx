@@ -1,6 +1,6 @@
 import { simulateContract } from "@wagmi/core";
 import { config } from "@/config";
-import MateNameService from "@/constants/abi/MateNameService.json";
+import NameService from "@/constants/abi/NameService.json";
 import {
   PreRegistrationUsernameInputData,
   RegistrationUsernameInputData,
@@ -12,7 +12,7 @@ import {
   RemoveCustomMetadataInputData,
   FlushCustomMetadataInputData,
   FlushUsernameInputData,
-} from "../TypeInputStructures/mnsTypeInputStructure";
+} from "../TypeInputStructures/nameServiceTypeInputStructure";
 
 const verifyPreRegistrationUsername = async (
   InputData: PreRegistrationUsernameInputData,
@@ -23,7 +23,7 @@ const verifyPreRegistrationUsername = async (
   }
 
   simulateContract(config, {
-    abi: MateNameService.abi,
+    abi: NameService.abi,
     address: mnsAddress,
     functionName: "preRegistrationUsername",
     args: [
@@ -32,9 +32,9 @@ const verifyPreRegistrationUsername = async (
       InputData.hashUsername,
       InputData.priorityFeeForFisher,
       InputData.signature,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -54,7 +54,7 @@ const verifyRegistrationUsername = async (
   }
 
   simulateContract(config, {
-    abi: MateNameService.abi,
+    abi: NameService.abi,
     address: mnsAddress,
     functionName: "registrationUsername",
     args: [
@@ -64,9 +64,9 @@ const verifyRegistrationUsername = async (
       InputData.clowNumber,
       InputData.signature,
       InputData.priorityFeeForFisher,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -86,7 +86,7 @@ const verifyMakeOffer = async (
   }
 
   simulateContract(config, {
-    abi: MateNameService.abi,
+    abi: NameService.abi,
     address: mnsAddress,
     functionName: "makeOffer",
     args: [
@@ -97,9 +97,9 @@ const verifyMakeOffer = async (
       InputData.expireDate,
       InputData.priorityFeeForFisher,
       InputData.signature,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -119,7 +119,7 @@ const verifyWithdrawOffer = async (
   }
 
   simulateContract(config, {
-    abi: MateNameService.abi,
+    abi: NameService.abi,
     address: mnsAddress,
     functionName: "withdrawOffer",
     args: [
@@ -129,9 +129,9 @@ const verifyWithdrawOffer = async (
       InputData.offerID,
       InputData.priorityFeeForFisher,
       InputData.signature,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -151,7 +151,7 @@ const verifyAcceptOffer = async (
   }
 
   simulateContract(config, {
-    abi: MateNameService.abi,
+    abi: NameService.abi,
     address: mnsAddress,
     functionName: "acceptOffer",
     args: [
@@ -161,9 +161,9 @@ const verifyAcceptOffer = async (
       InputData.offerID,
       InputData.priorityFeeForFisher,
       InputData.signature,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -183,7 +183,7 @@ const verifyRenewUsername = async (
   }
 
   simulateContract(config, {
-    abi: MateNameService.abi,
+    abi: NameService.abi,
     address: mnsAddress,
     functionName: "renewUsername",
     args: [
@@ -192,9 +192,9 @@ const verifyRenewUsername = async (
       InputData.username,
       InputData.priorityFeeForFisher,
       InputData.signature,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -214,7 +214,7 @@ const verifyAddCustomMetadata = async (
   }
 
   simulateContract(config, {
-    abi: MateNameService.abi,
+    abi: NameService.abi,
     address: mnsAddress,
     functionName: "addCustomMetadata",
     args: [
@@ -224,9 +224,9 @@ const verifyAddCustomMetadata = async (
       InputData.value,
       InputData.priorityFeeForFisher,
       InputData.signature,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -246,7 +246,7 @@ const verifyRemoveCustomMetadata = async (
   }
 
   simulateContract(config, {
-    abi: MateNameService.abi,
+    abi: NameService.abi,
     address: mnsAddress,
     functionName: "removeCustomMetadata",
     args: [
@@ -256,9 +256,9 @@ const verifyRemoveCustomMetadata = async (
       InputData.key,
       InputData.priorityFeeForFisher,
       InputData.signature,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -278,7 +278,7 @@ const verifyFlushCustomMetadata = async (
   }
 
   simulateContract(config, {
-    abi: MateNameService.abi,
+    abi: NameService.abi,
     address: mnsAddress,
     functionName: "flushCustomMetadata",
     args: [
@@ -287,9 +287,9 @@ const verifyFlushCustomMetadata = async (
       InputData.identity,
       InputData.priorityFeeForFisher,
       InputData.signature,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -309,7 +309,7 @@ const verifyFlushUsername = async (
   }
 
   simulateContract(config, {
-    abi: MateNameService.abi,
+    abi: NameService.abi,
     address: mnsAddress,
     functionName: "flushUsername",
     args: [
@@ -318,9 +318,9 @@ const verifyFlushUsername = async (
       InputData.priorityFeeForFisher,
       InputData.nonce,
       InputData.signature,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {

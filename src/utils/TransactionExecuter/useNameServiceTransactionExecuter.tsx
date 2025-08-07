@@ -1,6 +1,6 @@
 import { writeContract } from "@wagmi/core";
 import { config } from "@/config";
-import MateNameService from "@/constants/abi/MateNameService.json";
+import NameService from "@/constants/abi/NameService.json";
 import {
   PreRegistrationUsernameInputData,
   RegistrationUsernameInputData,
@@ -16,25 +16,25 @@ import {
 
 const executePreRegistrationUsername = async (
   InputData: PreRegistrationUsernameInputData,
-  mnsAddress: `0x${string}`
+  nameServiceAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No input to execute");
   }
 
   writeContract(config, {
-    abi: MateNameService.abi,
-    address: mnsAddress,
+    abi: NameService.abi,
+    address: nameServiceAddress,
     functionName: "preRegistrationUsername",
     args: [
       InputData.user,
+      InputData.hashPreRegisteredUsername,
       InputData.nonce,
-      InputData.hashUsername,
-      InputData.priorityFeeForFisher,
       InputData.signature,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -47,26 +47,26 @@ const executePreRegistrationUsername = async (
 
 const executeRegistrationUsername = async (
   InputData: RegistrationUsernameInputData,
-  mnsAddress: `0x${string}`
+  nameServiceAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No input to execute");
   }
 
   writeContract(config, {
-    abi: MateNameService.abi,
-    address: mnsAddress,
+    abi: NameService.abi,
+    address: nameServiceAddress,
     functionName: "registrationUsername",
     args: [
       InputData.user,
-      InputData.nonce,
       InputData.username,
       InputData.clowNumber,
+      InputData.nonce,
       InputData.signature,
-      InputData.priorityFeeForFisher,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -79,27 +79,27 @@ const executeRegistrationUsername = async (
 
 const executeMakeOffer = async (
   InputData: MakeOfferInputData,
-  mnsAddress: `0x${string}`
+  nameServiceAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No input to execute");
   }
 
   writeContract(config, {
-    abi: MateNameService.abi,
-    address: mnsAddress,
+    abi: NameService.abi,
+    address: nameServiceAddress,
     functionName: "makeOffer",
     args: [
       InputData.user,
-      InputData.nonce,
       InputData.username,
-      InputData.amount,
       InputData.expireDate,
-      InputData.priorityFeeForFisher,
+      InputData.amount,
+      InputData.nonce,
       InputData.signature,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -112,26 +112,26 @@ const executeMakeOffer = async (
 
 const executeWithdrawOffer = async (
   InputData: WithdrawOfferInputData,
-  mnsAddress: `0x${string}`
+  nameServiceAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No input to execute");
   }
 
   writeContract(config, {
-    abi: MateNameService.abi,
-    address: mnsAddress,
+    abi: NameService.abi,
+    address: nameServiceAddress,
     functionName: "withdrawOffer",
     args: [
       InputData.user,
-      InputData.nonce,
       InputData.username,
       InputData.offerID,
-      InputData.priorityFeeForFisher,
+      InputData.nonce,
       InputData.signature,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -144,26 +144,26 @@ const executeWithdrawOffer = async (
 
 const executeAcceptOffer = async (
   InputData: AcceptOfferInputData,
-  mnsAddress: `0x${string}`
+  nameServiceAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No input to execute");
   }
 
   writeContract(config, {
-    abi: MateNameService.abi,
-    address: mnsAddress,
+    abi: NameService.abi,
+    address: nameServiceAddress,
     functionName: "acceptOffer",
     args: [
       InputData.user,
-      InputData.nonce,
       InputData.username,
       InputData.offerID,
-      InputData.priorityFeeForFisher,
+      InputData.nonce,
       InputData.signature,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -176,25 +176,25 @@ const executeAcceptOffer = async (
 
 const executeRenewUsername = async (
   InputData: RenewUsernameInputData,
-  mnsAddress: `0x${string}`
+  nameServiceAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No input to execute");
   }
 
   writeContract(config, {
-    abi: MateNameService.abi,
-    address: mnsAddress,
+    abi: NameService.abi,
+    address: nameServiceAddress,
     functionName: "renewUsername",
     args: [
       InputData.user,
-      InputData.nonce,
       InputData.username,
-      InputData.priorityFeeForFisher,
+      InputData.nonce,
       InputData.signature,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -207,26 +207,26 @@ const executeRenewUsername = async (
 
 const executeAddCustomMetadata = async (
   InputData: AddCustomMetadataInputData,
-  mnsAddress: `0x${string}`
+  nameServiceAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No input to execute");
   }
 
   writeContract(config, {
-    abi: MateNameService.abi,
-    address: mnsAddress,
+    abi: NameService.abi,
+    address: nameServiceAddress,
     functionName: "addCustomMetadata",
     args: [
       InputData.user,
-      InputData.nonce,
       InputData.identity,
       InputData.value,
-      InputData.priorityFeeForFisher,
+      InputData.nonce,
       InputData.signature,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -239,26 +239,26 @@ const executeAddCustomMetadata = async (
 
 const executeRemoveCustomMetadata = async (
   InputData: RemoveCustomMetadataInputData,
-  mnsAddress: `0x${string}`
+  nameServiceAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No input to execute");
   }
 
   writeContract(config, {
-    abi: MateNameService.abi,
-    address: mnsAddress,
+    abi: NameService.abi,
+    address: nameServiceAddress,
     functionName: "removeCustomMetadata",
     args: [
       InputData.user,
-      InputData.nonce,
       InputData.identity,
       InputData.key,
-      InputData.priorityFeeForFisher,
+      InputData.nonce,
       InputData.signature,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -271,25 +271,25 @@ const executeRemoveCustomMetadata = async (
 
 const executeFlushCustomMetadata = async (
   InputData: FlushCustomMetadataInputData,
-  mnsAddress: `0x${string}`
+  nameServiceAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No input to execute");
   }
 
   writeContract(config, {
-    abi: MateNameService.abi,
-    address: mnsAddress,
+    abi: NameService.abi,
+    address: nameServiceAddress,
     functionName: "flushCustomMetadata",
     args: [
       InputData.user,
-      InputData.nonce,
       InputData.identity,
-      InputData.priorityFeeForFisher,
+      InputData.nonce,
       InputData.signature,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -302,25 +302,25 @@ const executeFlushCustomMetadata = async (
 
 const executeFlushUsername = async (
   InputData: FlushUsernameInputData,
-  mnsAddress: `0x${string}`
+  nameServiceAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No input to execute");
   }
 
   writeContract(config, {
-    abi: MateNameService.abi,
-    address: mnsAddress,
+    abi: NameService.abi,
+    address: nameServiceAddress,
     functionName: "flushUsername",
     args: [
       InputData.user,
-      InputData.identity,
-      InputData.priorityFeeForFisher,
+      InputData.username,
       InputData.nonce,
       InputData.signature,
-      InputData.nonce_Evvm,
-      InputData.priority_Evvm,
-      InputData.signature_Evvm,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {

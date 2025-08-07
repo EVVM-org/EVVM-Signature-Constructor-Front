@@ -14,7 +14,7 @@ import {
 } from "./constructMessage";
 import { hashPreRegisteredUsername } from "./hashTools";
 
-export const useMnsSignatureBuilder = () => {
+export const useNameServiceSignatureBuilder = () => {
   const { signMessage, ...rest } = useSignMessage();
 
   // Generic ERC191 message signing
@@ -32,15 +32,18 @@ export const useMnsSignatureBuilder = () => {
     );
   };
 
-  // MNS username pre-registration signature (dual signature if priority fee > 0)
+  // NameService username pre-registration signature (dual signature if priority fee > 0)
   const signPreRegistrationUsername = (
-    addressMNS: string,
-    nonceMNS: bigint,
+    addressNameService: string,
+
     username: string,
     clowNumber: bigint,
-    priorityFeeForFisher: bigint,
-    nonceEVVM: bigint,
-    priorityFlag: boolean,
+
+    nonce: bigint,
+
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
+    priorityFlag_EVVM_EVVM: boolean,
     onSuccess?: (
       paySignature: string,
       preRegistrationSignature: string
@@ -51,7 +54,7 @@ export const useMnsSignatureBuilder = () => {
     const hashUsername = hashPreRegisteredUsername(username, clowNumber);
     const preRegistrationMessage = buildMessageSignedForPreRegistrationUsername(
       hashUsername,
-      nonceMNS
+      nonce
     );
 
     signMessage(
@@ -59,20 +62,20 @@ export const useMnsSignatureBuilder = () => {
       {
         onSuccess: (preRegistrationSignature) => {
           // If no priority fee, skip payment signature
-          if (priorityFeeForFisher === BigInt(0)) {
+          if (priorityFee_EVVM === BigInt(0)) {
             onSuccess?.("", preRegistrationSignature);
             return;
           }
 
           // Payment signature for priority fee
           const payMessage = buildMessageSignedForPay(
-            addressMNS,
+            addressNameService,
             "0x0000000000000000000000000000000000000001",
-            priorityFeeForFisher.toString(),
             "0",
-            nonceEVVM.toString(),
-            priorityFlag,
-            addressMNS
+            priorityFee_EVVM.toString(),
+            nonce_EVVM.toString(),
+            priorityFlag_EVVM_EVVM,
+            addressNameService
           );
 
           signMessage(
@@ -90,21 +93,23 @@ export const useMnsSignatureBuilder = () => {
   };
 
   const signRegistrationUsername = (
-    addressMNS: string,
-    nonceMNS: bigint,
+    addressNameService: string,
     username: string,
     clowNumber: bigint,
+    nonce: bigint,
+
     mateReward: bigint,
-    priorityFeeForFisher: bigint,
-    nonceEVVM: bigint,
-    priorityFlag: boolean,
+
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
+    priorityFlag_EVVM: boolean,
     onSuccess?: (paySignature: string, registrationSignature: string) => void,
     onError?: (error: Error) => void
   ) => {
     const registrationMessage = buildMessageSignedForRegistrationUsername(
       username,
       clowNumber,
-      nonceMNS
+      nonce
     );
 
     signMessage(
@@ -113,13 +118,13 @@ export const useMnsSignatureBuilder = () => {
         onSuccess: (registrationSignature) => {
           // Payment signature for priority fee
           const payMessage = buildMessageSignedForPay(
-            addressMNS,
+            addressNameService,
             "0x0000000000000000000000000000000000000001",
             (mateReward * BigInt(100)).toString(),
-            priorityFeeForFisher.toString(),
-            nonceEVVM.toString(),
-            priorityFlag,
-            addressMNS
+            priorityFee_EVVM.toString(),
+            nonce_EVVM.toString(),
+            priorityFlag_EVVM,
+            addressNameService
           );
 
           signMessage(
@@ -137,14 +142,16 @@ export const useMnsSignatureBuilder = () => {
   };
 
   const signMakeOffer = (
-    addressMNS: string,
-    nonceMNS: bigint,
+    addressNameService: string,
+
     username: string,
-    amount: bigint,
     expirationDate: bigint,
-    priorityFeeForFisher: bigint,
-    nonceEVVM: bigint,
-    priorityFlag: boolean,
+    amount: bigint,
+    nonce: bigint,
+
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
+    priorityFlag_EVVM: boolean,
     onSuccess?: (paySignature: string, makeOfferSignature: string) => void,
     onError?: (error: Error) => void
   ) => {
@@ -152,7 +159,7 @@ export const useMnsSignatureBuilder = () => {
       username,
       expirationDate,
       amount,
-      nonceMNS
+      nonce
     );
 
     signMessage(
@@ -161,13 +168,13 @@ export const useMnsSignatureBuilder = () => {
         onSuccess: (makeOfferSignature) => {
           // Payment signature for priority fee
           const payMessage = buildMessageSignedForPay(
-            addressMNS,
+            addressNameService,
             "0x0000000000000000000000000000000000000001",
             amount.toString(),
-            priorityFeeForFisher.toString(),
-            nonceEVVM.toString(),
-            priorityFlag,
-            addressMNS
+            priorityFee_EVVM.toString(),
+            nonce_EVVM.toString(),
+            priorityFlag_EVVM,
+            addressNameService
           );
 
           signMessage(
@@ -185,20 +192,22 @@ export const useMnsSignatureBuilder = () => {
   };
 
   const signWithdrawOffer = (
-    addressMNS: string,
-    nonceMNS: bigint,
+    addressNameService: string,
+
     username: string,
     offerId: bigint,
-    priorityFeeForFisher: bigint,
-    nonceEVVM: bigint,
-    priorityFlag: boolean,
+    nonce: bigint,
+
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
+    priorityFlag_EVVM: boolean,
     onSuccess?: (paySignature: string, makeOfferSignature: string) => void,
     onError?: (error: Error) => void
   ) => {
     const withdrawOfferMessage = buildMessageSignedForWithdrawOffer(
       username,
       offerId,
-      nonceMNS
+      nonce
     );
 
     signMessage(
@@ -206,19 +215,19 @@ export const useMnsSignatureBuilder = () => {
       {
         onSuccess: (makeOfferSignature) => {
           // Payment signature for priority fee
-          if (priorityFeeForFisher === BigInt(0)) {
+          if (priorityFee_EVVM === BigInt(0)) {
             onSuccess?.("", makeOfferSignature);
             return;
           }
 
           const payMessage = buildMessageSignedForPay(
-            addressMNS,
+            addressNameService,
             "0x0000000000000000000000000000000000000001",
-            priorityFeeForFisher.toString(),
             "0",
-            nonceEVVM.toString(),
-            priorityFlag,
-            addressMNS
+            priorityFee_EVVM.toString(),
+            nonce_EVVM.toString(),
+            priorityFlag_EVVM,
+            addressNameService
           );
 
           signMessage(
@@ -236,20 +245,22 @@ export const useMnsSignatureBuilder = () => {
   };
 
   const signAcceptOffer = (
-    addressMNS: string,
-    nonceMNS: bigint,
+    addressNameService: string,
+
     username: string,
     offerId: bigint,
-    priorityFeeForFisher: bigint,
-    nonceEVVM: bigint,
-    priorityFlag: boolean,
+    nonce: bigint,
+
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
+    priorityFlag_EVVM: boolean,
     onSuccess?: (paySignature: string, makeOfferSignature: string) => void,
     onError?: (error: Error) => void
   ) => {
     const acceptOfferMessage = buildMessageSignedForAcceptOffer(
       username,
       offerId,
-      nonceMNS
+      nonce
     );
 
     signMessage(
@@ -257,19 +268,19 @@ export const useMnsSignatureBuilder = () => {
       {
         onSuccess: (makeOfferSignature) => {
           // Payment signature for priority fee
-          if (priorityFeeForFisher === BigInt(0)) {
+          if (priorityFee_EVVM === BigInt(0)) {
             onSuccess?.("", makeOfferSignature);
             return;
           }
 
           const payMessage = buildMessageSignedForPay(
-            addressMNS,
+            addressNameService,
             "0x0000000000000000000000000000000000000001",
-            priorityFeeForFisher.toString(),
             "0",
-            nonceEVVM.toString(),
-            priorityFlag,
-            addressMNS
+            priorityFee_EVVM.toString(),
+            nonce_EVVM.toString(),
+            priorityFlag_EVVM,
+            addressNameService
           );
 
           signMessage(
@@ -287,19 +298,21 @@ export const useMnsSignatureBuilder = () => {
   };
 
   const signRenewUsername = (
-    addressMNS: string,
-    nonceMNS: bigint,
+    addressNameService: string,
     username: string,
+    nonce: bigint,
+
     amountToRenew: bigint,
-    priorityFeeForFisher: bigint,
-    nonceEVVM: bigint,
-    priorityFlag: boolean,
+
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
+    priorityFlag_EVVM: boolean,
     onSuccess?: (paySignature: string, makeOfferSignature: string) => void,
     onError?: (error: Error) => void
   ) => {
     const renewUsernameMessage = buildMessageSignedForRenewUsername(
       username,
-      nonceMNS
+      nonce
     );
 
     signMessage(
@@ -307,13 +320,13 @@ export const useMnsSignatureBuilder = () => {
       {
         onSuccess: (makeOfferSignature) => {
           const payMessage = buildMessageSignedForPay(
-            addressMNS,
+            addressNameService,
             "0x0000000000000000000000000000000000000001",
             amountToRenew.toString(),
-            priorityFeeForFisher.toString(),
-            nonceEVVM.toString(),
-            priorityFlag,
-            addressMNS
+            priorityFee_EVVM.toString(),
+            nonce_EVVM.toString(),
+            priorityFlag_EVVM,
+            addressNameService
           );
 
           signMessage(
@@ -331,21 +344,21 @@ export const useMnsSignatureBuilder = () => {
   };
 
   const signAddCustomMetadata = (
-    addressMNS: string,
-    nonceMNS: bigint,
+    addressNameService: string,
+    nonce: bigint,
     identity: string,
     value: string,
     amountToAddCustomMetadata: bigint,
-    priorityFeeForFisher: bigint,
-    nonceEVVM: bigint,
-    priorityFlag: boolean,
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
+    priorityFlag_EVVM: boolean,
     onSuccess?: (paySignature: string, customMetadataSignature: string) => void,
     onError?: (error: Error) => void
   ) => {
     const customMetadataMessage = buildMessageSignedForAddCustomMetadata(
       identity,
       value,
-      nonceMNS
+      nonce
     );
 
     signMessage(
@@ -353,13 +366,13 @@ export const useMnsSignatureBuilder = () => {
       {
         onSuccess: (makeOfferSignature) => {
           const payMessage = buildMessageSignedForPay(
-            addressMNS,
+            addressNameService,
             "0x0000000000000000000000000000000000000001",
-            (amountToAddCustomMetadata).toString(),
-            priorityFeeForFisher.toString(),
-            nonceEVVM.toString(),
-            priorityFlag,
-            addressMNS
+            amountToAddCustomMetadata.toString(),
+            priorityFee_EVVM.toString(),
+            nonce_EVVM.toString(),
+            priorityFlag_EVVM,
+            addressNameService
           );
 
           signMessage(
@@ -377,31 +390,34 @@ export const useMnsSignatureBuilder = () => {
   };
 
   const signRemoveCustomMetadata = (
-    addressMNS: string,
-    nonceMNS: bigint,
+    addressNameService: string,
+
     identity: string,
     key: bigint,
+    nonce: bigint,
+
     amountToRemoveCustomMetadata: bigint,
-    priorityFeeForFisher: bigint,
-    nonceEVVM: bigint,
-    priorityFlag: boolean,
+
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
+    priorityFlag_EVVM: boolean,
     onSuccess?: (paySignature: string, removeMetadataSignature: string) => void,
     onError?: (error: Error) => void
   ) => {
     const removeCustomMetadataMessage =
-      buildMessageSignedForRemoveCustomMetadata(identity, key, nonceMNS);
+      buildMessageSignedForRemoveCustomMetadata(identity, key, nonce);
     signMessage(
       { message: removeCustomMetadataMessage },
       {
         onSuccess: (makeOfferSignature) => {
           const payMessage = buildMessageSignedForPay(
-            addressMNS,
+            addressNameService,
             "0x0000000000000000000000000000000000000001",
-            (amountToRemoveCustomMetadata).toString(),
-            priorityFeeForFisher.toString(),
-            nonceEVVM.toString(),
-            priorityFlag,
-            addressMNS
+            amountToRemoveCustomMetadata.toString(),
+            priorityFee_EVVM.toString(),
+            nonce_EVVM.toString(),
+            priorityFlag_EVVM,
+            addressNameService
           );
 
           signMessage(
@@ -419,32 +435,36 @@ export const useMnsSignatureBuilder = () => {
   };
 
   const signFlushCustomMetadata = (
-    addressMNS: string,
-    nonceMNS: bigint,
+    addressNameService: string,
+
     identity: string,
+
+    nonce: bigint,
+
     priceToFlushCustomMetadata: bigint,
-    priorityFeeForFisher: bigint,
-    nonceEVVM: bigint,
-    priorityFlag: boolean,
+
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
+    priorityFlag_EVVM: boolean,
     onSuccess?: (paySignature: string, flushSignature: string) => void,
     onError?: (error: Error) => void
   ) => {
     const flushCustomMetadataMessage = buildMessageSignedForFlushCustomMetadata(
       identity,
-      nonceMNS
+      nonce
     );
     signMessage(
       { message: flushCustomMetadataMessage },
       {
         onSuccess: (flushSignature) => {
           const payMessage = buildMessageSignedForPay(
-            addressMNS,
+            addressNameService,
             "0x0000000000000000000000000000000000000001",
             priceToFlushCustomMetadata.toString(),
-            priorityFeeForFisher.toString(),
-            nonceEVVM.toString(),
-            priorityFlag,
-            addressMNS
+            priorityFee_EVVM.toString(),
+            nonce_EVVM.toString(),
+            priorityFlag_EVVM,
+            addressNameService
           );
 
           signMessage(
@@ -462,32 +482,35 @@ export const useMnsSignatureBuilder = () => {
   };
 
   const signFlushUsername = (
-    addressMNS: string,
-    nonceMNS: bigint,
+    addressNameService: string,
+
     username: string,
+    nonce: bigint,
+
     priceToFlushUsername: bigint,
-    priorityFeeForFisher: bigint,
-    nonceEVVM: bigint,
-    priorityFlag: boolean,
+
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
+    priorityFlag_EVVM: boolean,
     onSuccess?: (paySignature: string, flushSignature: string) => void,
     onError?: (error: Error) => void
   ) => {
     const flushCustomMetadataMessage = buildMessageSignedForFlushUsername(
       username,
-      nonceMNS
+      nonce
     );
     signMessage(
       { message: flushCustomMetadataMessage },
       {
         onSuccess: (flushSignature) => {
           const payMessage = buildMessageSignedForPay(
-            addressMNS,
+            addressNameService,
             "0x0000000000000000000000000000000000000001",
             priceToFlushUsername.toString(),
-            priorityFeeForFisher.toString(),
-            nonceEVVM.toString(),
-            priorityFlag,
-            addressMNS
+            priorityFee_EVVM.toString(),
+            nonce_EVVM.toString(),
+            priorityFlag_EVVM,
+            addressNameService
           );
 
           signMessage(

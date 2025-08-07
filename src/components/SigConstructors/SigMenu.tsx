@@ -7,16 +7,16 @@ import { GoldenStakingComponent } from "./StakingFunctions/GoldenStakingComponen
 import { PresaleStakingComponent } from "./StakingFunctions/PresaleStakingComponent";
 import { PublicStakingComponent } from "./StakingFunctions/PublicStakingComponent";
 import { PublicServiceStakingComponent } from "./StakingFunctions/PublicServiceStakingComponent";
-import { PreRegistrationUsernameComponent } from "./MNSFunctions/PreRegistrationUsernameComponent";
-import { RegistrationUsernameComponent } from "./MNSFunctions/RegistrationUsernameComponent";
-import { MakeOfferComponent } from "./MNSFunctions/MakeOfferComponent";
-import { WithdrawOfferComponent } from "./MNSFunctions/WithdrawOfferComponent";
-import { AcceptOfferComponent } from "./MNSFunctions/AcceptOfferComponent";
-import { RenewUsernameComponent } from "./MNSFunctions/RenewUsernameComponent";
-import { AddCustomMetadataComponent } from "./MNSFunctions/AddCustomMetadataComponent";
-import { RemoveCustomMetadataComponent } from "./MNSFunctions/RemoveCustomMetadataComponent";
-import { FlushCustomMetadataComponent } from "./MNSFunctions/FlushCustomMetadataComponent";
-import { FlushUsernameComponent } from "./MNSFunctions/FlushUsernameComponent";
+import { PreRegistrationUsernameComponent } from "./NameServiceFunctions/PreRegistrationUsernameComponent";
+import { RegistrationUsernameComponent } from "./NameServiceFunctions/RegistrationUsernameComponent";
+import { MakeOfferComponent } from "./NameServiceFunctions/MakeOfferComponent";
+import { WithdrawOfferComponent } from "./NameServiceFunctions/WithdrawOfferComponent";
+import { AcceptOfferComponent } from "./NameServiceFunctions/AcceptOfferComponent";
+import { RenewUsernameComponent } from "./NameServiceFunctions/RenewUsernameComponent";
+import { AddCustomMetadataComponent } from "./NameServiceFunctions/AddCustomMetadataComponent";
+import { RemoveCustomMetadataComponent } from "./NameServiceFunctions/RemoveCustomMetadataComponent";
+import { FlushCustomMetadataComponent } from "./NameServiceFunctions/FlushCustomMetadataComponent";
+import { FlushUsernameComponent } from "./NameServiceFunctions/FlushUsernameComponent";
 
 const boxStyle = {
   display: "flex",

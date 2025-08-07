@@ -2,7 +2,7 @@
 import React from "react";
 import { getAccount, readContract } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useMnsSignatureBuilder } from "@/utils/SignatureBuilder/useMnsSignatureBuilder";
+import { useNameServiceSignatureBuilder } from "@/utils/SignatureBuilder/useNameServiceSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
@@ -11,12 +11,12 @@ import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { TextInputField } from "../InputsAndModules/TextInputField";
 import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
 import { PayInputData } from "@/utils/TypeInputStructures/evvmTypeInputStructure";
-import { RegistrationUsernameInputData } from "@/utils/TypeInputStructures/mnsTypeInputStructure";
+import { RegistrationUsernameInputData } from "@/utils/TypeInputStructures/nameServiceTypeInputStructure";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import { contractAddress, tokenAddress } from "@/constants/address";
-import MateNameService from "@/constants/abi/MateNameService.json";
+import NameService from "@/constants/abi/NameService.json";
 import Evvm from "@/constants/abi/Evvm.json";
-import { executeRegistrationUsername } from "@/utils/TransactionExecuter/useMNSTransactionExecuter";
+import { executeRegistrationUsername } from "@/utils/TransactionExecuter/useNameServiceTransactionExecuter";
 
 type InfoData = {
   PayInputData: PayInputData;
@@ -24,11 +24,11 @@ type InfoData = {
 };
 
 export const RegistrationUsernameComponent = () => {
-  const { signRegistrationUsername } = useMnsSignatureBuilder();
+  const { signRegistrationUsername } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
-  const [mateRewardAmount, setMateRewardAmount] = React.useState<bigint | null>(
+  const [rewardAmount, setRewardAmount] = React.useState<bigint | null>(
     null
   );
 
@@ -40,52 +40,52 @@ export const RegistrationUsernameComponent = () => {
     if (!walletData) return;
 
     const formData = {
-      addressMNS: getValue("mnsAddressInput_registration"),
-      nonceMNS: getValue("nonceMNSInput_registration"),
+      addressNameService: getValue("nameServiceAddressInput_registration"),
+      nonceNameService: getValue("nonceNameServiceInput_registration"),
       username: getValue("usernameInput_registration"),
       clowNumber: getValue("clowNumberInput_registration"),
-      priorityFeeForFisher: getValue("priorityFeeInput_registration"),
+      priorityFee_EVVM: getValue("priorityFeeInput_registration"),
       nonceEVVM: getValue("nonceEVVMInput_registration"),
       priorityFlag: priority === "high",
     };
 
-    readMateRewardAmount()
+    readRewardAmount()
       .then(() => {
         signRegistrationUsername(
-          formData.addressMNS,
-          BigInt(formData.nonceMNS),
+          formData.addressNameService,
           formData.username,
           BigInt(formData.clowNumber),
-          mateRewardAmount
-            ? BigInt(mateRewardAmount)
+          BigInt(formData.nonceNameService),
+          rewardAmount
+            ? BigInt(rewardAmount)
             : BigInt(5000000000000000000),
-          BigInt(formData.priorityFeeForFisher),
+          BigInt(formData.priorityFee_EVVM),
           BigInt(formData.nonceEVVM),
           formData.priorityFlag,
           (paySignature, registrationSignature) => {
             setDataToGet({
               PayInputData: {
                 from: walletData.address as `0x${string}`,
-                to_address: formData.addressMNS as `0x${string}`,
+                to_address: formData.addressNameService as `0x${string}`,
                 to_identity: "",
                 token: tokenAddress.mate as `0x${string}`,
-                amount: (mateRewardAmount as bigint) * BigInt(100),
-                priorityFee: BigInt(formData.priorityFeeForFisher),
+                amount: BigInt(rewardAmount as bigint) * BigInt(100),
+                priorityFee: BigInt(formData.priorityFee_EVVM),
                 nonce: BigInt(formData.nonceEVVM),
                 priority: priority === "high",
-                executor: formData.addressMNS as `0x${string}`,
+                executor: formData.addressNameService as `0x${string}`,
                 signature: paySignature,
               },
               RegistrationUsernameInputData: {
                 user: walletData.address as `0x${string}`,
-                nonce: BigInt(formData.nonceMNS),
+                nonce: BigInt(formData.nonceNameService),
                 username: formData.username,
                 clowNumber: BigInt(formData.clowNumber),
                 signature: registrationSignature,
-                priorityFeeForFisher: BigInt(formData.priorityFeeForFisher),
-                nonce_Evvm: BigInt(formData.nonceEVVM),
-                priority_Evvm: formData.priorityFlag,
-                signature_Evvm: paySignature,
+                priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
+                nonce_EVVM: BigInt(formData.nonceEVVM),
+                priorityFlag_EVVM: formData.priorityFlag,
+                signature_EVVM: paySignature,
               },
             });
           },
@@ -98,43 +98,43 @@ export const RegistrationUsernameComponent = () => {
       });
   };
 
-  const readMateRewardAmount = async () => {
-    let mnsAddress = getValue("mnsAddressInput_registration");
+  const readRewardAmount = async () => {
+    let nameServiceAddress = getValue("nameServiceAddressInput_registration");
 
-    if (!mnsAddress) {
-      setMateRewardAmount(null);
+    if (!nameServiceAddress) {
+      setRewardAmount(null);
     } else {
       await readContract(config, {
-        abi: MateNameService.abi,
-        address: mnsAddress as `0x${string}`,
+        abi: NameService.abi,
+        address: nameServiceAddress as `0x${string}`,
         functionName: "getEvvmAddress",
         args: [],
       })
         .then((evvmAddress) => {
           if (!evvmAddress) {
-            setMateRewardAmount(null);
+            setRewardAmount(null);
           }
 
           readContract(config, {
             abi: Evvm.abi,
             address: evvmAddress as `0x${string}`,
-            functionName: "seeMateReward",
+            functionName: "getRewardAmount",
             args: [],
           })
-            .then((mateReward) => {
-              console.log("Mate reward amount:", mateReward);
-              setMateRewardAmount(
-                mateReward ? BigInt(mateReward.toString()) : null
+            .then((reward) => {
+              console.log("Mate reward amount:", reward);
+              setRewardAmount(
+                reward ? BigInt(reward.toString()) : null
               );
             })
             .catch((error) => {
               console.error("Error reading mate reward amount:", error);
-              setMateRewardAmount(null);
+              setRewardAmount(null);
             });
         })
         .catch((error) => {
-          console.error("Error reading MNS address:", error);
-          setMateRewardAmount(null);
+          console.error("Error reading NameService address:", error);
+          setRewardAmount(null);
         });
     }
   };
@@ -144,11 +144,11 @@ export const RegistrationUsernameComponent = () => {
       console.error("No data to execute payment");
       return;
     }
-    const mnsAddress = dataToGet.PayInputData.to_address;
+    const nameServiceAddress = dataToGet.PayInputData.to_address;
 
     executeRegistrationUsername(
       dataToGet.RegistrationUsernameInputData,
-      mnsAddress
+      nameServiceAddress
     )
       .then(() => {
         console.log("Registration username executed successfully");
@@ -168,12 +168,12 @@ export const RegistrationUsernameComponent = () => {
       <br />
 
       <AddressInputField
-        label="MNS Address"
-        inputId="mnsAddressInput_registration"
-        placeholder="Enter MNS address"
+        label="NameService Address"
+        inputId="nameServiceAddressInput_registration"
+        placeholder="Enter NameService address"
         defaultValue={
           contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.mns || ""
+            ?.nameService || ""
         }
       />
 
@@ -182,8 +182,8 @@ export const RegistrationUsernameComponent = () => {
       {/* Nonce section with automatic generator */}
 
       <NumberInputWithGenerator
-        label="MNS Nonce"
-        inputId="nonceMNSInput_registration"
+        label="NameService Nonce"
+        inputId="nonceNameServiceInput_registration"
         placeholder="Enter nonce"
       />
 

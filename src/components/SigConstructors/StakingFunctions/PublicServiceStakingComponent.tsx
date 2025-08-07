@@ -2,7 +2,7 @@
 import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useSMateSignatureBuilder } from "@/utils/SignatureBuilder/useSMateSignatureBuilder";
+import { useStakingSignatureBuilder } from "@/utils/SignatureBuilder/useStakingSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
 import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector";
@@ -11,7 +11,7 @@ import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
 import { contractAddress, tokenAddress } from "@/constants/address";
-import { executePublicServiceStaking } from "@/utils/TransactionExecuter/useSMateTransactionExecuter";
+import { executePublicServiceStaking } from "@/utils/TransactionExecuter/useStakingTransactionExecuter";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import {
   PayInputData,
@@ -25,7 +25,7 @@ type InputData = {
 
 export const PublicServiceStakingComponent = () => {
   let account = getAccount(config);
-  const { signPublicServiceStaking } = useSMateSignatureBuilder();
+  const { signPublicServiceStaking } = useStakingSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null);
@@ -38,17 +38,17 @@ export const PublicServiceStakingComponent = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
-      sMateAddress: getValue("sMateAddressInput_PublicServiceStaking"),
+      stakingAddress: getValue("stakingAddressInput_PublicServiceStaking"),
       serviceAddress: getValue("serviceAddressInput_PublicServiceStaking"),
-      amountOfSMate: Number(
-        getValue("amountOfSMateInput_PublicServiceStaking")
+      amountOfStaking: Number(
+        getValue("amountOfStakingInput_PublicServiceStaking")
       ),
       priorityFee: getValue("priorityFeeInput_PublicServiceStaking"),
       nonceEVVM: getValue("nonceEVVMInput_PublicServiceStaking"),
       nonceSMATE: getValue("nonceSMATEInput_PublicServiceStaking"),
     };
 
-    const amountOfToken = (formData.amountOfSMate * 10 ** 18).toLocaleString(
+    const amountOfToken = (formData.amountOfStaking * 10 ** 18).toLocaleString(
       "fullwide",
       {
         useGrouping: false,
@@ -56,14 +56,14 @@ export const PublicServiceStakingComponent = () => {
     );
 
     signPublicServiceStaking(
-      formData.sMateAddress,
+      formData.stakingAddress,
       formData.serviceAddress,
-      formData.amountOfSMate,
+      isStaking,
+      formData.amountOfStaking,
+      formData.nonceSMATE,
       formData.priorityFee,
       formData.nonceEVVM,
       priority === "high",
-      isStaking,
-      formData.nonceSMATE,
       (paySignature, stakingSignature) => {
         setDataToGet({
           PublicServiceStakingInputData: {
@@ -71,23 +71,23 @@ export const PublicServiceStakingComponent = () => {
             user: walletData.address as `0x${string}`,
             service: formData.serviceAddress as `0x${string}`,
             nonce: BigInt(formData.nonceSMATE),
-            amountOfSMate: BigInt(formData.amountOfSMate),
+            amountOfStaking: BigInt(formData.amountOfStaking),
             signature: stakingSignature,
-            priorityFee_Evvm: BigInt(formData.priorityFee),
-            priority_Evvm: priority === "high",
-            nonce_Evvm: BigInt(formData.nonceEVVM),
-            signature_Evvm: paySignature,
+            priorityFee_EVVM: BigInt(formData.priorityFee),
+            priorityFlag_EVVM: priority === "high",
+            nonce_EVVM: BigInt(formData.nonceEVVM),
+            signature_EVVM: paySignature,
           },
           PayInputData: {
             from: walletData.address as `0x${string}`,
-            to_address: formData.sMateAddress as `0x${string}`,
+            to_address: formData.stakingAddress as `0x${string}`,
             to_identity: "",
             token: tokenAddress.mate as `0x${string}`,
             amount: BigInt(amountOfToken),
             priorityFee: BigInt(formData.priorityFee),
             nonce: BigInt(formData.nonceEVVM),
             priority: priority === "high",
-            executor: formData.sMateAddress as `0x${string}`,
+            executor: formData.stakingAddress as `0x${string}`,
             signature: paySignature,
           },
         });
@@ -102,11 +102,11 @@ export const PublicServiceStakingComponent = () => {
       return;
     }
 
-    const sMateAddress = dataToGet.PayInputData.to_address;
+    const stakingAddress = dataToGet.PayInputData.to_address;
 
     executePublicServiceStaking(
       dataToGet.PublicServiceStakingInputData,
-      sMateAddress
+      stakingAddress
     )
       .then(() => {
         console.log("Public staking executed successfully");
@@ -126,12 +126,12 @@ export const PublicServiceStakingComponent = () => {
 
       {/* Address Input */}
       <AddressInputField
-        label="sMate Address"
-        inputId="sMateAddressInput_PublicServiceStaking"
-        placeholder="Enter sMate address"
+        label="staking Address"
+        inputId="stakingAddressInput_PublicServiceStaking"
+        placeholder="Enter staking address"
         defaultValue={
           contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.sMate || ""
+            ?.staking || ""
         }
       />
       <br />
@@ -154,16 +154,16 @@ export const PublicServiceStakingComponent = () => {
       />
 
       <NumberInputWithGenerator
-        label="sMate Nonce"
+        label="staking Nonce"
         inputId="nonceSMATEInput_PublicServiceStaking"
         placeholder="Enter nonce"
       />
 
       {/* Amount Inputs */}
       <NumberInputField
-        label="Amount of sMate"
-        inputId="amountOfSMateInput_PublicServiceStaking"
-        placeholder="Enter amount of sMate"
+        label="Amount of staking"
+        inputId="amountOfStakingInput_PublicServiceStaking"
+        placeholder="Enter amount of staking"
       />
 
       <NumberInputField

@@ -2,7 +2,7 @@
 import React from "react";
 import { getAccount, readContract } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useMnsSignatureBuilder } from "@/utils/SignatureBuilder/useMnsSignatureBuilder";
+import { useNameServiceSignatureBuilder } from "@/utils/SignatureBuilder/useNameServiceSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
@@ -10,7 +10,7 @@ import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { TextInputField } from "../InputsAndModules/TextInputField";
 import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
-import MateNameService from "@/constants/abi/MateNameService.json";
+import NameService from "@/constants/abi/NameService.json";
 import {
   PayInputData,
   RenewUsernameInputData,
@@ -25,7 +25,7 @@ type InfoData = {
 };
 
 export const RenewUsernameComponent = () => {
-  const { signRenewUsername } = useMnsSignatureBuilder();
+  const { signRenewUsername } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
@@ -39,46 +39,46 @@ export const RenewUsernameComponent = () => {
     if (!walletData) return;
 
     const formData = {
-      addressMNS: getValue("mnsAddressInput_renewUsername"),
-      nonceMNS: getValue("nonceMNSInput_renewUsername"),
+      addressNameService: getValue("nameServiceAddressInput_renewUsername"),
+      nonceNameService: getValue("nonceNameServiceInput_renewUsername"),
       username: getValue("usernameInput_renewUsername"),
       amountToRenew: getValue("amountToRenew_renewUsername"),
-      priorityFeeForFisher: getValue("priorityFeeInput_renewUsername"),
+      priorityFee_EVVM: getValue("priorityFeeInput_renewUsername"),
       nonceEVVM: getValue("nonceEVVMInput_renewUsername"),
       priorityFlag: priority === "high",
     };
 
     signRenewUsername(
-      formData.addressMNS,
-      BigInt(formData.nonceMNS),
+      formData.addressNameService,
       formData.username,
+      BigInt(formData.nonceNameService),
       BigInt(formData.amountToRenew),
-      BigInt(formData.priorityFeeForFisher),
+      BigInt(formData.priorityFee_EVVM),
       BigInt(formData.nonceEVVM),
       formData.priorityFlag,
       (paySignature, renewUsernameSignature) => {
         setDataToGet({
           PayInputData: {
             from: walletData.address as `0x${string}`,
-            to_address: formData.addressMNS as `0x${string}`,
+            to_address: formData.addressNameService as `0x${string}`,
             to_identity: "",
             token: tokenAddress.mate as `0x${string}`,
-            amount: BigInt(formData.priorityFeeForFisher),
+            amount: BigInt(formData.priorityFee_EVVM),
             priorityFee: BigInt(0),
             nonce: BigInt(formData.nonceEVVM),
             priority: priority === "high",
-            executor: formData.addressMNS as `0x${string}`,
+            executor: formData.addressNameService as `0x${string}`,
             signature: paySignature,
           },
           RenewUsernameInputData: {
             user: walletData.address as `0x${string}`,
-            nonce: BigInt(formData.nonceMNS),
+            nonce: BigInt(formData.nonceNameService),
             username: formData.username,
-            priorityFeeForFisher: BigInt(formData.priorityFeeForFisher),
+            priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
             signature: renewUsernameSignature,
-            nonce_Evvm: BigInt(formData.nonceEVVM),
-            priority_Evvm: formData.priorityFlag,
-            signature_Evvm: paySignature,
+            nonce_EVVM: BigInt(formData.nonceEVVM),
+            priorityFlag_EVVM: formData.priorityFlag,
+            signature_EVVM: paySignature,
           },
         });
       },
@@ -87,16 +87,16 @@ export const RenewUsernameComponent = () => {
   };
 
   const readAmountToRenew = async () => {
-    let mnsAddress = getValue("mnsAddressInput_renewUsername");
+    let nameServiceAddress = getValue("nameServiceAddressInput_renewUsername");
 
-    if (!mnsAddress) {
+    if (!nameServiceAddress) {
       setAmountToRenew(null);
     } else {
       const username = getValue("usernameInput_renewUsername");
       try {
         const result = await readContract(config, {
-          abi: MateNameService.abi,
-          address: mnsAddress as `0x${string}`,
+          abi: NameService.abi,
+          address: nameServiceAddress as `0x${string}`,
           functionName: "seePriceToRenew",
           args: [username],
         });
@@ -114,9 +114,9 @@ export const RenewUsernameComponent = () => {
       console.error("No data to execute payment");
       return;
     }
-    const mnsAddress = dataToGet.PayInputData.to_address;
+    const nameServiceAddress = dataToGet.PayInputData.to_address;
 
-    executeRenewUsername(dataToGet.RenewUsernameInputData, mnsAddress)
+    executeRenewUsername(dataToGet.RenewUsernameInputData, nameServiceAddress)
       .then(() => {
         console.log("Renew username executed successfully");
       })
@@ -139,20 +139,20 @@ export const RenewUsernameComponent = () => {
       <br />
 
       <AddressInputField
-        label="MNS Address"
-        inputId="mnsAddressInput_renewUsername"
-        placeholder="Enter MNS address"
+        label="NameService Address"
+        inputId="nameServiceAddressInput_renewUsername"
+        placeholder="Enter NameService address"
         defaultValue={
           contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.mns || ""
+            ?.nameService || ""
         }
       />
 
       <br />
 
       <NumberInputWithGenerator
-        label="MNS Nonce"
-        inputId="nonceMNSInput_renewUsername"
+        label="NameService Nonce"
+        inputId="nonceNameServiceInput_renewUsername"
         placeholder="Enter nonce"
       />
 

@@ -1,3 +1,3 @@
 export * from "./useEVVMTransactionExecuter";
-export * from "./useMNSTransactionExecuter";
-export * from "./useSMateTransactionExecuter";
+export * from "./useNameServiceTransactionExecuter";
+export * from "./useStakingTransactionExecuter";

@@ -1,118 +1,119 @@
 type PreRegistrationUsernameInputData = {
   user: `0x${string}`;
+  hashPreRegisteredUsername: string;
   nonce: bigint;
-  hashUsername: string;
-  priorityFeeForFisher: bigint;
   signature: string;
-  nonce_Evvm: bigint;
-  priority_Evvm: boolean;
-  signature_Evvm: string;
+  priorityFee_EVVM: bigint;
+  nonce_EVVM: bigint;
+  priorityFlag_EVVM: boolean;
+  signature_EVVM: string;
 };
 
 type RegistrationUsernameInputData = {
   user: `0x${string}`;
-  nonce: bigint;
   username: string;
   clowNumber: bigint;
+  nonce: bigint;
   signature: string;
-  priorityFeeForFisher: bigint;
-  nonce_Evvm: bigint;
-  priority_Evvm: boolean;
-  signature_Evvm: string;
+  priorityFee_EVVM: bigint;
+  nonce_EVVM: bigint;
+  priorityFlag_EVVM: boolean;
+  signature_EVVM: string;
 };
 
 type MakeOfferInputData = {
   user: `0x${string}`;
-  nonce: bigint;
   username: string;
-  amount: bigint;
   expireDate: bigint;
-  priorityFeeForFisher: bigint;
+  amount: bigint;
+  nonce: bigint;
   signature: string;
-  nonce_Evvm: bigint;
-  priority_Evvm: boolean;
-  signature_Evvm: string;
+  priorityFee_EVVM: bigint;
+  nonce_EVVM: bigint;
+  priorityFlag_EVVM: boolean;
+  signature_EVVM: string;
 };
 
 type WithdrawOfferInputData = {
   user: `0x${string}`;
-  nonce: bigint;
   username: string;
   offerID: bigint;
-  priorityFeeForFisher: bigint;
+  nonce: bigint;
   signature: string;
-  nonce_Evvm: bigint;
-  priority_Evvm: boolean;
-  signature_Evvm: string;
+  priorityFee_EVVM: bigint;
+  nonce_EVVM: bigint;
+  priorityFlag_EVVM: boolean;
+  signature_EVVM: string;
 };
 
 type AcceptOfferInputData = {
   user: `0x${string}`;
-  nonce: string;
   username: string;
   offerID: bigint;
-  priorityFeeForFisher: bigint;
+  nonce: string;
   signature: string;
-  nonce_Evvm: bigint;
-  priority_Evvm: boolean;
-  signature_Evvm: string;
+  priorityFee_EVVM: bigint;
+  nonce_EVVM: bigint;
+  priorityFlag_EVVM: boolean;
+  signature_EVVM: string;
 };
 
 type RenewUsernameInputData = {
   user: `0x${string}`;
-  nonce: bigint;
   username: string;
-  priorityFeeForFisher: bigint;
+  nonce: bigint;
   signature: string;
-  nonce_Evvm: bigint;
-  priority_Evvm: boolean;
-  signature_Evvm: string;
+  priorityFee_EVVM: bigint;
+  nonce_EVVM: bigint;
+  priorityFlag_EVVM: boolean;
+  signature_EVVM: string;
 };
 
 type AddCustomMetadataInputData = {
   user: `0x${string}`;
-  nonce: bigint;
   identity: string;
   value: string;
-  priorityFeeForFisher: bigint;
+  nonce: bigint;
   signature: string;
-  nonce_Evvm: bigint;
-  priority_Evvm: boolean;
-  signature_Evvm: string;
+  priorityFee_EVVM: bigint;
+  nonce_EVVM: bigint;
+  priorityFlag_EVVM: boolean;
+  signature_EVVM: string;
 };
 
 type RemoveCustomMetadataInputData = {
   user: `0x${string}`;
-  nonce: bigint;
   identity: string;
   key: bigint;
-  priorityFeeForFisher: bigint;
+  nonce: bigint;
   signature: string;
-  nonce_Evvm: bigint;
-  priority_Evvm: boolean;
-  signature_Evvm: string;
+  priorityFee_EVVM: bigint;
+  nonce_EVVM: bigint;
+  priorityFlag_EVVM: boolean;
+  signature_EVVM: string;
 };
 
 type FlushCustomMetadataInputData = {
   user: `0x${string}`;
-  nonce: bigint;
   identity: string;
-  priorityFeeForFisher: bigint;
+  nonce: bigint;
   signature: string;
-  nonce_Evvm: bigint;
-  priority_Evvm: boolean;
-  signature_Evvm: string;
+  priorityFee_EVVM: bigint;
+  nonce_EVVM: bigint;
+  priorityFlag_EVVM: boolean;
+  signature_EVVM: string;
 };
+
 
 type FlushUsernameInputData = {
   user: `0x${string}`;
-  identity: string;
-  priorityFeeForFisher: bigint;
+  username: string;
   nonce: bigint;
   signature: string;
-  nonce_Evvm: bigint;
-  priority_Evvm: boolean;
-  signature_Evvm: string;
+  priorityFee_EVVM: bigint;
+  nonce_EVVM: bigint;
+  priorityFlag_EVVM: boolean;
+  signature_EVVM: string;
 };
 
 export type {

@@ -1,43 +1,43 @@
 type GoldenStakingInputData = {
   isStaking: boolean;
-  amountOfSMate: bigint;
-  signature: string;
+  amountOfStaking: bigint;
+  signature_EVVM: string;
 };
 
 type PresaleStakingInputData = {
-  isStaking: boolean;
   user: `0x${string}`;
+  isStaking: boolean;
   nonce: bigint;
   signature: string;
-  priorityFee_Evvm: bigint;
-  priority_Evvm: boolean;
-  nonce_Evvm: bigint;
-  signature_Evvm: string;
+  priorityFee_EVVM: bigint;
+  nonce_EVVM: bigint;
+  priorityFlag_EVVM: boolean;
+  signature_EVVM: string;
 };
 
 type PublicStakingInputData = {
-  isStaking: boolean;
   user: `0x${string}`;
+  isStaking: boolean;
+  amountOfStaking: bigint;
   nonce: bigint;
-  amountOfSMate: bigint;
   signature: string;
-  priorityFee_Evvm: bigint;
-  priority_Evvm: boolean;
-  nonce_Evvm: bigint;
-  signature_Evvm: string;
+  priorityFee_EVVM: bigint;
+  nonce_EVVM: bigint;
+  priorityFlag_EVVM: boolean;
+  signature_EVVM: string;
 };
 
 type PublicServiceStakingInputData = {
-  isStaking: boolean;
   user: `0x${string}`;
   service: `0x${string}`;
+  isStaking: boolean;
+  amountOfStaking: bigint;
   nonce: bigint;
-  amountOfSMate: bigint;
   signature: string;
-  priorityFee_Evvm: bigint;
-  priority_Evvm: boolean;
-  nonce_Evvm: bigint;
-  signature_Evvm: string;
+  priorityFee_EVVM: bigint;
+  nonce_EVVM: bigint;
+  priorityFlag_EVVM: boolean;
+  signature_EVVM: string;
 };
 
 export type {

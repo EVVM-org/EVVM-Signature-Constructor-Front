@@ -125,9 +125,9 @@ function buildMessageSignedForDispersePay(
 
 //・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈
 /*
-┏━━━━━━━━━━━━━━━━━┓
- sMate Signatures  
-┗━━━━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━┓
+ staking Signatures   
+┗━━━━━━━━━━━━━━━━━━━┛
 */
 //・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈
 
@@ -150,7 +150,7 @@ function buildMessageSignedForPresaleStaking(
   nonce: string
 ): string {
   return (
-    "6257deec," +
+    "c0f6e7d1," +
     `${isStaking ? "true" : "false"},` +
     `${amountOfSMate},` +
     `${nonce}`
@@ -164,7 +164,7 @@ function buildMessageSignedForPublicServiceStaking(
   nonce: string
 ): string {
   return (
-    "21cc1749," +
+    "e2ccd470," +
     `${serviceAddress.toLowerCase()},` +
     `${isStaking ? "true" : "false"},` +
     `${amountOfSMate},` +
@@ -174,9 +174,9 @@ function buildMessageSignedForPublicServiceStaking(
 
 //・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈
 /*
-┏━━━━━━━━━━━━━━━┓
- MNS Signatures  
-┗━━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━┓
+ Name service Signatures  
+┗━━━━━━━━━━━━━━━━━━━━━━━━┛
 */
 //・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈
 
@@ -185,7 +185,7 @@ function buildMessageSignedForPreRegistrationUsername(
   nonceMNS: bigint
 ): string {
   return (
-    "393b9c6f," +
+    "5d232a55," +
     `${
       hashUsername.toLowerCase().slice(0, 2) +
       hashUsername.toUpperCase().slice(2)
@@ -200,7 +200,7 @@ function buildMessageSignedForRegistrationUsername(
   nonceMNS: bigint
 ): string {
   return (
-    "d134f8b4," +
+    "afabc8db," +
     `${username},` +
     `${clowNumber.toString()},` +
     `${nonceMNS.toString()}`
@@ -214,7 +214,7 @@ function buildMessageSignedForMakeOffer(
   nonceMNS: bigint
 ): string {
   return (
-    "52649c2e," +
+    "d82e5d8b," +
     `${username},` +
     `${dateExpire.toString()},` +
     `${amount.toString()},` +
@@ -228,7 +228,7 @@ function buildMessageSignedForWithdrawOffer(
   mateNameServiceNonce: bigint
 ): string {
   return (
-    "21811609," +
+    "5761d8ed," +
     `${username},` +
     `${offerId.toString()},` +
     `${mateNameServiceNonce.toString()}`
@@ -241,7 +241,7 @@ function buildMessageSignedForAcceptOffer(
   mateNameServiceNonce: bigint
 ): string {
   return (
-    "ae36fe72," +
+    "8e3bde43," +
     `${username},` +
     `${offerId.toString()},` +
     `${mateNameServiceNonce.toString()}`
@@ -252,7 +252,7 @@ function buildMessageSignedForRenewUsername(
   username: string,
   mateNameServiceNonce: bigint
 ): string {
-  return "f1747483," + `${username},` + `${mateNameServiceNonce.toString()}`;
+  return "35723e23," + `${username},` + `${mateNameServiceNonce.toString()}`;
 }
 
 function buildMessageSignedForAddCustomMetadata(
@@ -261,7 +261,7 @@ function buildMessageSignedForAddCustomMetadata(
   mateNameServiceNonce: bigint
 ): string {
   return (
-    "e6efeffa," +
+    "4cfe021f," +
     `${identity},` +
     `${value},` +
     `${mateNameServiceNonce.toString()}`
@@ -274,7 +274,7 @@ function buildMessageSignedForRemoveCustomMetadata(
   nonceMNS: bigint
 ): string {
   return (
-    "8001a999," +
+    "8adf3927," +
     `${identity},` +
     `${key.toString()},` +
     `${nonceMNS.toString()}`
@@ -285,14 +285,14 @@ function buildMessageSignedForFlushCustomMetadata(
   identity: string,
   nonceMNS: bigint
 ): string {
-  return "3e7899a1," + `${identity},` + `${nonceMNS.toString()}`;
+  return "3ca44e54," + `${identity},` + `${nonceMNS.toString()}`;
 }
 
 function buildMessageSignedForFlushUsername(
   username: string,
   nonceMNS: bigint
 ): string {
-  return "d22c816c," + `${username},` + `${nonceMNS.toString()}`;
+  return "044695cb," + `${username},` + `${nonceMNS.toString()}`;
 }
 
 export {

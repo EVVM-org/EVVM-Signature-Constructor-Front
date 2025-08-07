@@ -2,7 +2,7 @@
 import React from "react";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useSMateSignatureBuilder } from "@/utils/SignatureBuilder/useSMateSignatureBuilder";
+import { useStakingSignatureBuilder } from "@/utils/SignatureBuilder/useStakingSignatureBuilder";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
@@ -10,7 +10,7 @@ import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
 import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector";
 import { contractAddress, tokenAddress } from "@/constants/address";
-import { executeGoldenStaking } from "@/utils/TransactionExecuter/useSMateTransactionExecuter";
+import { executeGoldenStaking } from "@/utils/TransactionExecuter/useStakingTransactionExecuter";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import {
   GoldenStakingInputData,
@@ -24,7 +24,7 @@ type InfoData = {
 
 export const GoldenStakingComponent = () => {
   let account = getAccount(config);
-  const { signGoldenStaking } = useSMateSignatureBuilder();
+  const { signGoldenStaking } = useStakingSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
@@ -38,38 +38,38 @@ export const GoldenStakingComponent = () => {
 
     const formData = {
       nonce: getValue("nonceInput_GoldenStaking"),
-      sMateAddress: getValue("sMateAddressInput_GoldenStaking"),
-      amountOfSMate: Number(getValue("amountOfSMateInput_GoldenStaking")),
+      stakingAddress: getValue("stakingAddressInput_GoldenStaking"),
+      amountOfStaking: Number(getValue("amountOfStakingInput_GoldenStaking")),
     };
 
     const amountOfToken =
-      BigInt(formData.amountOfSMate) *
+      BigInt(formData.amountOfStaking) *
       (BigInt(5083) * BigInt(10) ** BigInt(18));
 
     // Sign and set data
     signGoldenStaking(
-      formData.sMateAddress,
-      formData.amountOfSMate,
+      formData.stakingAddress,
+      formData.amountOfStaking,
       formData.nonce,
       priority === "high",
-      (signature) => {
+      (signaturePay) => {
         setDataToGet({
           PayInputData: {
             from: walletData.address as `0x${string}`,
-            to_address: formData.sMateAddress as `0x${string}`,
+            to_address: formData.stakingAddress as `0x${string}`,
             to_identity: "",
             token: tokenAddress.mate as `0x${string}`,
             amount: amountOfToken,
             priorityFee: BigInt(0),
             nonce: BigInt(formData.nonce),
             priority: priority === "high",
-            executor: formData.sMateAddress as `0x${string}`,
-            signature,
+            executor: formData.stakingAddress as `0x${string}`,
+            signature: signaturePay,
           },
           GoldenStakingInputData: {
             isStaking: isStaking,
-            amountOfSMate: BigInt(formData.amountOfSMate),
-            signature,
+            amountOfStaking: BigInt(formData.amountOfStaking),
+            signature_EVVM: signaturePay,
           },
         } as InfoData);
       }
@@ -81,9 +81,9 @@ export const GoldenStakingComponent = () => {
       console.error("No data to execute payment");
       return;
     }
-    const sMateAddress = dataToGet.PayInputData.to_address;
+    const stakingAddress = dataToGet.PayInputData.to_address;
 
-    executeGoldenStaking(dataToGet.GoldenStakingInputData, sMateAddress)
+    executeGoldenStaking(dataToGet.GoldenStakingInputData, stakingAddress)
       .then(() => {
         console.log("Golden staking executed successfully");
       })
@@ -99,13 +99,13 @@ export const GoldenStakingComponent = () => {
 
       {/* Recipient configuration section */}
       <AddressInputField
-        label="sMate Address"
-        inputId="sMateAddressInput_GoldenStaking"
-        placeholder="Enter sMate address"
+        label="staking Address"
+        inputId="stakingAddressInput_GoldenStaking"
+        placeholder="Enter staking address"
         defaultValue={
           (account.chain?.id &&
             contractAddress[account.chain.id as keyof typeof contractAddress]
-              ?.sMate) ||
+              ?.staking) ||
           ""
         }
       />
@@ -125,7 +125,7 @@ export const GoldenStakingComponent = () => {
       {/* Basic input fields */}
       <NumberInputField
         label="Amount of sMATE"
-        inputId="amountOfSMateInput_GoldenStaking"
+        inputId="amountOfStakingInput_GoldenStaking"
         placeholder="Enter amount of sMATE"
       />
 

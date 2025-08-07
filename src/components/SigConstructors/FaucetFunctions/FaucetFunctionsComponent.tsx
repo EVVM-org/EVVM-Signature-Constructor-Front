@@ -28,7 +28,7 @@ export const FaucetFunctionsComponent = () => {
     writeContract(config, {
       abi: Evvm.abi,
       address: formData.evvmAddress as `0x${string}`,
-      functionName: "addBalance",
+      functionName: "_addBalance",
       args: [formData.user, formData.token, formData.quantity],
     })
       .then(() => {

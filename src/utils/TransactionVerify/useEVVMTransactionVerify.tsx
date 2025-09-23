@@ -1,3 +1,4 @@
+// Functions to simulate/verify EVVM payment and disperse payment transactions.
 import { simulateContract } from "@wagmi/core";
 import {
   DispersePayInputData,

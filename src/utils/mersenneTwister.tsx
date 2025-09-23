@@ -1,3 +1,4 @@
+// Mersenne Twister random number generator implementation.
 function mersenneTwister(seed: number) {
   const N = 624;
   const M = 397;

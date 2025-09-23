@@ -1,4 +1,32 @@
 /**
+ * constructMessage
+ *
+ * Utility functions to construct message strings for EVVM, NameService, and Staking signatures.
+ * Each function builds a formatted message for a specific contract action, encoding all required parameters.
+ * Used for signing and verifying transactions.
+ */
+/**
+ * Constructs a message for depositing funds in EVVM Fisher.
+ * @param isERC20 Whether the token is an ERC20 token or native currency
+ * @param receiverAddress Address that will receive the deposit
+ * @param nonce Unique number to prevent replay attacks
+ * @param tokenAddress Address of the token contract (only for ERC20)
+ * @param priorityFee Fee amount for transaction priority
+ * @param ammount Amount of tokens/currency to deposit
+ * @returns Formatted message string for Fisher deposit
+ */
+/**
+ * Construct a message for payMateStaking_async/sync or payNoMateStaking_async/sync in EVVM.
+ * @param to Address of the receiver
+ * @param tokenAddress Address of the token
+ * @param amount Amount of the token
+ * @param priorityFee Priority fee of the transaction
+ * @param nonce Nonce of the transaction
+ * @param priorityFlag Priority of the transaction
+ * @param executor Executor of the transaction
+ * @returns Message for payMateStaking_async/sync or payNoMateStaking_async/sync
+ */
+/**
  * Constructs a message for depositing funds in EVVM Fisher
  * @param isERC20 - Whether the token is an ERC20 token or native currency
  * @param receiverAddress - Address that will receive the deposit

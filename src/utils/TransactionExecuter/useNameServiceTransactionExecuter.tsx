@@ -1,3 +1,72 @@
+/**
+ * NameService Transaction Executor
+ * 
+ * This module provides functions to execute NameService smart contract transactions using wagmi's writeContract.
+ * Each function corresponds to a specific NameService action (registration, offer, metadata, etc).
+ * All functions return a Promise that resolves on success or rejects on error.
+ * 
+ * Input types are imported from TypeInputStructures and match the contract ABI.
+ */
+/**
+ * Executes pre-registration of a username in NameService contract.
+ * @param InputData PreRegistrationUsernameInputData
+ * @param nameServiceAddress Contract address
+ * @returns Promise<void>
+ */
+/**
+ * Executes registration of a username in NameService contract.
+ * @param InputData RegistrationUsernameInputData
+ * @param nameServiceAddress Contract address
+ * @returns Promise<void>
+ */
+/**
+ * Executes making an offer for a username in NameService contract.
+ * @param InputData MakeOfferInputData
+ * @param nameServiceAddress Contract address
+ * @returns Promise<void>
+ */
+/**
+ * Executes withdrawal of an offer for a username in NameService contract.
+ * @param InputData WithdrawOfferInputData
+ * @param nameServiceAddress Contract address
+ * @returns Promise<void>
+ */
+/**
+ * Executes acceptance of an offer for a username in NameService contract.
+ * @param InputData AcceptOfferInputData
+ * @param nameServiceAddress Contract address
+ * @returns Promise<void>
+ */
+/**
+ * Executes renewal of a username in NameService contract.
+ * @param InputData RenewUsernameInputData
+ * @param nameServiceAddress Contract address
+ * @returns Promise<void>
+ */
+/**
+ * Executes addition of custom metadata for a username in NameService contract.
+ * @param InputData AddCustomMetadataInputData
+ * @param nameServiceAddress Contract address
+ * @returns Promise<void>
+ */
+/**
+ * Executes removal of custom metadata for a username in NameService contract.
+ * @param InputData RemoveCustomMetadataInputData
+ * @param nameServiceAddress Contract address
+ * @returns Promise<void>
+ */
+/**
+ * Executes flush of all custom metadata for a username in NameService contract.
+ * @param InputData FlushCustomMetadataInputData
+ * @param nameServiceAddress Contract address
+ * @returns Promise<void>
+ */
+/**
+ * Executes flush of a username in NameService contract.
+ * @param InputData FlushUsernameInputData
+ * @param nameServiceAddress Contract address
+ * @returns Promise<void>
+ */
 import { writeContract } from "@wagmi/core";
 import { config } from "@/config";
 import NameService from "@/constants/abi/NameService.json";
@@ -331,15 +400,18 @@ const executeFlushUsername = async (
     });
 };
 
+/**
+ * Exports all NameService transaction executor functions.
+ */
 export {
-  executePreRegistrationUsername,
-  executeRegistrationUsername,
-  executeMakeOffer,
-  executeWithdrawOffer,
-  executeAcceptOffer,
-  executeRenewUsername,
-  executeAddCustomMetadata,
-  executeRemoveCustomMetadata,
-  executeFlushCustomMetadata,
-  executeFlushUsername,
+  executePreRegistrationUsername, // Pre-register username
+  executeRegistrationUsername,    // Register username
+  executeMakeOffer,               // Make offer for username
+  executeWithdrawOffer,           // Withdraw offer for username
+  executeAcceptOffer,             // Accept offer for username
+  executeRenewUsername,           // Renew username
+  executeAddCustomMetadata,       // Add custom metadata
+  executeRemoveCustomMetadata,    // Remove custom metadata
+  executeFlushCustomMetadata,     // Flush all custom metadata
+  executeFlushUsername,           // Flush username
 };

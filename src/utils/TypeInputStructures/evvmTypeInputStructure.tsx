@@ -1,3 +1,9 @@
+/**
+ * EVVM Type Input Structures
+ *
+ * Type definitions for EVVM payment and disperse payment input data.
+ * Used for type safety and contract interaction.
+ */
 type PayInputData = {
   from: `0x${string}`;
   to_address: `0x${string}`;

@@ -1,3 +1,11 @@
+/**
+ * useMNSTransactionVerify
+ *
+ * Functions to simulate/verify NameService transactions (registration, offers, metadata, etc).
+ * Each function simulates a contract call for a specific NameService action using wagmi's simulateContract.
+ * Returns a Promise that resolves on success or rejects on error.
+ * Input types match the contract ABI.
+ */
 import { simulateContract } from "@wagmi/core";
 import { config } from "@/config";
 import NameService from "@/constants/abi/NameService.json";
@@ -27,14 +35,14 @@ const verifyPreRegistrationUsername = async (
     address: mnsAddress,
     functionName: "preRegistrationUsername",
     args: [
-      InputData.user,
-      InputData.nonce,
-      InputData.hashUsername,
-      InputData.priorityFeeForFisher,
-      InputData.signature,
-      InputData.nonce_EVVM,
-      InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM,
+  InputData.user,
+  InputData.nonce,
+  InputData.hashPreRegisteredUsername,
+  InputData.priorityFee_EVVM,
+  InputData.signature,
+  InputData.nonce_EVVM,
+  InputData.priorityFlag_EVVM,
+  InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -58,15 +66,15 @@ const verifyRegistrationUsername = async (
     address: mnsAddress,
     functionName: "registrationUsername",
     args: [
-      InputData.user,
-      InputData.nonce,
-      InputData.username,
-      InputData.clowNumber,
-      InputData.signature,
-      InputData.priorityFeeForFisher,
-      InputData.nonce_EVVM,
-      InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM,
+  InputData.user,
+  InputData.nonce,
+  InputData.username,
+  InputData.clowNumber,
+  InputData.signature,
+  InputData.priorityFee_EVVM,
+  InputData.nonce_EVVM,
+  InputData.priorityFlag_EVVM,
+  InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -90,16 +98,16 @@ const verifyMakeOffer = async (
     address: mnsAddress,
     functionName: "makeOffer",
     args: [
-      InputData.user,
-      InputData.nonce,
-      InputData.username,
-      InputData.amount,
-      InputData.expireDate,
-      InputData.priorityFeeForFisher,
-      InputData.signature,
-      InputData.nonce_EVVM,
-      InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM,
+  InputData.user,
+  InputData.nonce,
+  InputData.username,
+  InputData.amount,
+  InputData.expireDate,
+  InputData.priorityFee_EVVM,
+  InputData.signature,
+  InputData.nonce_EVVM,
+  InputData.priorityFlag_EVVM,
+  InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -123,15 +131,15 @@ const verifyWithdrawOffer = async (
     address: mnsAddress,
     functionName: "withdrawOffer",
     args: [
-      InputData.user,
-      InputData.nonce,
-      InputData.username,
-      InputData.offerID,
-      InputData.priorityFeeForFisher,
-      InputData.signature,
-      InputData.nonce_EVVM,
-      InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM,
+  InputData.user,
+  InputData.nonce,
+  InputData.username,
+  InputData.offerID,
+  InputData.priorityFee_EVVM,
+  InputData.signature,
+  InputData.nonce_EVVM,
+  InputData.priorityFlag_EVVM,
+  InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -155,15 +163,15 @@ const verifyAcceptOffer = async (
     address: mnsAddress,
     functionName: "acceptOffer",
     args: [
-      InputData.user,
-      InputData.nonce,
-      InputData.username,
-      InputData.offerID,
-      InputData.priorityFeeForFisher,
-      InputData.signature,
-      InputData.nonce_EVVM,
-      InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM,
+  InputData.user,
+  InputData.nonce,
+  InputData.username,
+  InputData.offerID,
+  InputData.priorityFee_EVVM,
+  InputData.signature,
+  InputData.nonce_EVVM,
+  InputData.priorityFlag_EVVM,
+  InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -187,14 +195,14 @@ const verifyRenewUsername = async (
     address: mnsAddress,
     functionName: "renewUsername",
     args: [
-      InputData.user,
-      InputData.nonce,
-      InputData.username,
-      InputData.priorityFeeForFisher,
-      InputData.signature,
-      InputData.nonce_EVVM,
-      InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM,
+  InputData.user,
+  InputData.nonce,
+  InputData.username,
+  InputData.priorityFee_EVVM,
+  InputData.signature,
+  InputData.nonce_EVVM,
+  InputData.priorityFlag_EVVM,
+  InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -218,15 +226,15 @@ const verifyAddCustomMetadata = async (
     address: mnsAddress,
     functionName: "addCustomMetadata",
     args: [
-      InputData.user,
-      InputData.nonce,
-      InputData.identity,
-      InputData.value,
-      InputData.priorityFeeForFisher,
-      InputData.signature,
-      InputData.nonce_EVVM,
-      InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM,
+  InputData.user,
+  InputData.nonce,
+  InputData.identity,
+  InputData.value,
+  InputData.priorityFee_EVVM,
+  InputData.signature,
+  InputData.nonce_EVVM,
+  InputData.priorityFlag_EVVM,
+  InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -250,15 +258,15 @@ const verifyRemoveCustomMetadata = async (
     address: mnsAddress,
     functionName: "removeCustomMetadata",
     args: [
-      InputData.user,
-      InputData.nonce,
-      InputData.identity,
-      InputData.key,
-      InputData.priorityFeeForFisher,
-      InputData.signature,
-      InputData.nonce_EVVM,
-      InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM,
+  InputData.user,
+  InputData.nonce,
+  InputData.identity,
+  InputData.key,
+  InputData.priorityFee_EVVM,
+  InputData.signature,
+  InputData.nonce_EVVM,
+  InputData.priorityFlag_EVVM,
+  InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -282,14 +290,14 @@ const verifyFlushCustomMetadata = async (
     address: mnsAddress,
     functionName: "flushCustomMetadata",
     args: [
-      InputData.user,
-      InputData.nonce,
-      InputData.identity,
-      InputData.priorityFeeForFisher,
-      InputData.signature,
-      InputData.nonce_EVVM,
-      InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM,
+  InputData.user,
+  InputData.nonce,
+  InputData.identity,
+  InputData.priorityFee_EVVM,
+  InputData.signature,
+  InputData.nonce_EVVM,
+  InputData.priorityFlag_EVVM,
+  InputData.signature_EVVM,
     ],
   })
     .then(() => {
@@ -313,14 +321,14 @@ const verifyFlushUsername = async (
     address: mnsAddress,
     functionName: "flushUsername",
     args: [
-      InputData.user,
-      InputData.identity,
-      InputData.priorityFeeForFisher,
-      InputData.nonce,
-      InputData.signature,
-      InputData.nonce_EVVM,
-      InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM,
+  InputData.user,
+  InputData.username,
+  InputData.priorityFee_EVVM,
+  InputData.nonce,
+  InputData.signature,
+  InputData.nonce_EVVM,
+  InputData.priorityFlag_EVVM,
+  InputData.signature_EVVM,
     ],
   })
     .then(() => {

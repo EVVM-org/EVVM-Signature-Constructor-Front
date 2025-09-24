@@ -63,7 +63,7 @@ export const AddCustomMetadataComponent = () => {
           amountToAddCustomMetadata
             ? BigInt(amountToAddCustomMetadata)
             : BigInt(5000000000000000000 * 10),
-          BigInt(formData.priorityFeeForFisher),
+          BigInt(formData.priorityFee_EVVM),
           BigInt(formData.nonceEVVM),
           formData.priorityFlag,
           (paySignature, addCustomMetadataSignature) => {
@@ -76,7 +76,7 @@ export const AddCustomMetadataComponent = () => {
                 amount: amountToAddCustomMetadata
                   ? BigInt(amountToAddCustomMetadata)
                   : BigInt(5000000000000000000 * 10),
-                priorityFee: BigInt(formData.priorityFeeForFisher),
+                priorityFee: BigInt(formData.priorityFee_EVVM),
                 nonce: BigInt(formData.nonceEVVM),
                 priority: priority === "high",
                 executor: formData.addressNameService as `0x${string}`,
@@ -88,7 +88,7 @@ export const AddCustomMetadataComponent = () => {
                 value: valueCustomMetadata,
                 nonce: BigInt(formData.nonceNameService),
                 signature: addCustomMetadataSignature,
-                priorityFee_EVVM: BigInt(formData.priorityFeeForFisher),
+                priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
                 nonce_EVVM: BigInt(formData.nonceEVVM),
                 priorityFlag_EVVM: formData.priorityFlag,
                 signature_EVVM: paySignature,
@@ -221,7 +221,7 @@ export const AddCustomMetadataComponent = () => {
       </button>
 
       <DataDisplayWithClear
-        dataToGet={dataToGet}
+        dataToGet={dataToGet ?? {}}
         onClear={() => setDataToGet(null)}
         onExecute={execute}
       />

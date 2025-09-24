@@ -24,7 +24,7 @@ type InputData = {
 };
 
 export const PublicServiceStakingComponent = () => {
-  let account = getAccount(config);
+  const account = getAccount(config);
   const { signPublicServiceStaking } = useStakingSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");

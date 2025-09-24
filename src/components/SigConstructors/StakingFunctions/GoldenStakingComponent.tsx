@@ -23,7 +23,7 @@ type InfoData = {
 };
 
 export const GoldenStakingComponent = () => {
-  let account = getAccount(config);
+  const account = getAccount(config);
   const { signGoldenStaking } = useStakingSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");

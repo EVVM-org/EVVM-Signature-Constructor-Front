@@ -87,7 +87,7 @@ export const RenewUsernameComponent = () => {
   };
 
   const readAmountToRenew = async () => {
-    let nameServiceAddress = getValue("nameServiceAddressInput_renewUsername");
+    const nameServiceAddress = getValue("nameServiceAddressInput_renewUsername");
 
     if (!nameServiceAddress) {
       setAmountToRenew(null);

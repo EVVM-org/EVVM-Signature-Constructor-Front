@@ -99,7 +99,7 @@ export const RegistrationUsernameComponent = () => {
   };
 
   const readRewardAmount = async () => {
-    let nameServiceAddress = getValue("nameServiceAddressInput_registration");
+    const nameServiceAddress = getValue("nameServiceAddressInput_registration");
 
     if (!nameServiceAddress) {
       setRewardAmount(null);

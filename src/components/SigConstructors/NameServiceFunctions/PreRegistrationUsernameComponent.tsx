@@ -24,7 +24,7 @@ type InfoData = {
 
 export const PreRegistrationUsernameComponent = () => {
   const { signPreRegistrationUsername } = useNameServiceSignatureBuilder();
-  let account = getAccount(config);
+  const account = getAccount(config);
 
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);

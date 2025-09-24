@@ -17,7 +17,7 @@ import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 
 export const PaySignaturesComponent = () => {
   const { signPay } = useSignatureBuilder();
-  let account = getAccount(config);
+  const account = getAccount(config);
 
   const [isUsingUsernames, setIsUsingUsernames] = React.useState(true);
   const [isUsingExecutor, setIsUsingExecutor] = React.useState(false);

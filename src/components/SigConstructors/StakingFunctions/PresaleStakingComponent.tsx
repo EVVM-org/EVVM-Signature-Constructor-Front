@@ -31,7 +31,7 @@ export const PresaleStakingComponent = () => {
 
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null);
 
-  let account = getAccount(config);
+  const account = getAccount(config);
 
   const makeSig = async () => {
     const walletData = await getAccountWithRetry(config);

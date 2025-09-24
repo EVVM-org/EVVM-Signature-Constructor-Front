@@ -19,7 +19,7 @@ import { contractAddress } from "@/constants/address";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 
 export const DispersePayComponent = () => {
-  let account = getAccount(config);
+  const account = getAccount(config);
   const [isUsingExecutorDisperse, setIsUsingExecutorDisperse] =
     React.useState(false);
   const [priorityDisperse, setPriorityDisperse] = React.useState("low");

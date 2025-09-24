@@ -51,7 +51,7 @@ export const AddCustomMetadataComponent = () => {
       priorityFlag: priority === "high",
     };
 
-    let valueCustomMetadata = `${formData.schema}:${formData.subschema}>${formData.value}`;
+    const valueCustomMetadata = `${formData.schema}:${formData.subschema}>${formData.value}`;
 
     getPriceToAddCustomMetadata()
       .then(() => {
@@ -105,7 +105,7 @@ export const AddCustomMetadataComponent = () => {
   };
 
   const getPriceToAddCustomMetadata = async () => {
-    let nameServiceAddress = getValue("nameServiceAddressInput_addCustomMetadata");
+    const nameServiceAddress = getValue("nameServiceAddressInput_addCustomMetadata");
 
     if (!nameServiceAddress) {
       setAmountToAddCustomMetadata(null);

@@ -3,7 +3,7 @@ import { useState } from "react";
 export const DetailedData = ({
   dataToGet,
 }: {
-  dataToGet: Record<string, any>;
+  dataToGet: Record<string, unknown>;
 }) => {
   const [showData, setShowData] = useState(false);
   return (

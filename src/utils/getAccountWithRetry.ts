@@ -1,5 +1,4 @@
-// Gets wallet account with retries if address is undefined.
-import { getAccount } from "@wagmi/core";
+import { getAccount, Config } from "@wagmi/core";
 
 /**
  * Obtiene la cuenta con reintentos si la address está indefinida.
@@ -8,7 +7,11 @@ import { getAccount } from "@wagmi/core";
  * @param intervalMs intervalo entre intentos en ms (default: 200)
  * @returns Promise con el objeto de cuenta o null si falla
  */
-export async function getAccountWithRetry(config: any, maxAttempts = 10, intervalMs = 200): Promise<ReturnType<typeof getAccount> | null> {
+export async function getAccountWithRetry(
+  config: Config,
+  maxAttempts = 10,
+  intervalMs = 200
+): Promise<ReturnType<typeof getAccount> | null> {
   let attempts = 0;
   let walletData = getAccount(config);
 

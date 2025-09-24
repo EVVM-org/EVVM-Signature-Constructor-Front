@@ -124,8 +124,13 @@ export const RenewUsernameComponent = () => {
         console.error("Error executing renew username:", error);
       });
   };
-
+  
+  /*
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    readAmountToRenew();
+  };*/
+
+  const handleUsernameChange = () => {
     readAmountToRenew();
   };
 

@@ -3,7 +3,7 @@ import { DetailedData } from "@/components/SigConstructors/InputsAndModules/Deta
 import styles from "@/components/SigConstructors/SignatureConstructor.module.css";
 
 interface DataDisplayWithClearProps {
-  dataToGet: any;
+  dataToGet: Record<string, unknown>;
   onClear: () => void;
   marginTop?: string;
   onExecute?: () => void;

@@ -274,7 +274,7 @@ export const DispersePayComponent = () => {
 
       {/* Display results */}
       <DataDisplayWithClear
-        dataToGet={dataToGet}
+        dataToGet={dataToGet ?? {}}
         onClear={() => setDataToGet(null)}
         onExecute={executeDispersePayment}
       />

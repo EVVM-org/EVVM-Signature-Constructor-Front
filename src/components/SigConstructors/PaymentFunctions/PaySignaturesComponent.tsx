@@ -211,7 +211,7 @@ export const PaySignaturesComponent = () => {
 
       {/* Results section */}
       <DataDisplayWithClear
-        dataToGet={dataToGet}
+        dataToGet={dataToGet ?? {}}
         onClear={() => setDataToGet(null)}
         onExecute={executePayment}
       />

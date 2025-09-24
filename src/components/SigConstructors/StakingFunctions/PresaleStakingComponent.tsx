@@ -171,7 +171,7 @@ export const PresaleStakingComponent = () => {
 
       {/* Results Section */}
       <DataDisplayWithClear
-        dataToGet={dataToGet}
+        dataToGet={dataToGet ?? {}}
         onClear={() => setDataToGet(null)}
         onExecute={execute}
       />

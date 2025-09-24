@@ -177,7 +177,7 @@ export const FlushUsernameComponent = () => {
       </button>
 
       <DataDisplayWithClear
-        dataToGet={dataToGet}
+        dataToGet={dataToGet ?? {}}
         onClear={() => setDataToGet(null)}
         onExecute={execute}
       />

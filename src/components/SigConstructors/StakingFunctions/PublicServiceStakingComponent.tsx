@@ -191,7 +191,7 @@ export const PublicServiceStakingComponent = () => {
 
       {/* Results Section */}
       <DataDisplayWithClear
-        dataToGet={dataToGet}
+        dataToGet={dataToGet ?? {}}
         onClear={() => setDataToGet(null)}
         onExecute={execute}
       />

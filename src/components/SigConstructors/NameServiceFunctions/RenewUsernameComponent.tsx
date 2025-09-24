@@ -202,7 +202,7 @@ export const RenewUsernameComponent = () => {
       </button>
 
       <DataDisplayWithClear
-        dataToGet={dataToGet}
+        dataToGet={dataToGet ?? {}}
         onClear={() => setDataToGet(null)}
         onExecute={execute}
       />

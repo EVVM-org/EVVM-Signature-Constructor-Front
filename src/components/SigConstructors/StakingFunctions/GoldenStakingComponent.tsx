@@ -145,7 +145,7 @@ export const GoldenStakingComponent = () => {
 
       {/* Results section */}
       <DataDisplayWithClear
-        dataToGet={dataToGet}
+        dataToGet={dataToGet ?? {}}
         onClear={() => setDataToGet(null)}
         onExecute={execute}
       />

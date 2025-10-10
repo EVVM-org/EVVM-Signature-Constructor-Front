@@ -17,60 +17,35 @@ import Evvm from "@/constants/abi/Evvm.json";
 const executePay = async (
   InputData: PayInputData,
   evvmAddress: `0x${string}`,
-  asStaker: boolean
+  _asStaker: boolean // no longer used, kept for compatibility
 ) => {
   if (!InputData) {
     return Promise.reject("No data to execute payment");
   }
 
-  if (InputData.priority) {
-    writeContract(config, {
-      abi: Evvm.abi,
-      address: evvmAddress,
-      functionName: asStaker
-        ? "payMateStaking_async"
-        : "payNoMateStaking_async",
-      args: [
-        InputData.from,
-        InputData.to_address,
-        InputData.to_identity,
-        InputData.token,
-        InputData.amount,
-        InputData.priorityFee,
-        InputData.nonce,
-        InputData.executor,
-        InputData.signature,
-      ],
+  return writeContract(config, {
+    abi: Evvm.abi,
+    address: evvmAddress,
+    functionName: "pay",
+    args: [
+      InputData.from,
+      InputData.to_address,
+      InputData.to_identity,
+      InputData.token,
+      InputData.amount,
+      InputData.priorityFee,
+      InputData.nonce,
+      InputData.priority,
+      InputData.executor,
+      InputData.signature,
+    ],
+  })
+    .then(() => {
+      return Promise.resolve();
     })
-      .then(() => {
-        return Promise.resolve();
-      })
-      .catch((error) => {
-        return Promise.reject(error);
-      });
-  } else {
-    writeContract(config, {
-      abi: Evvm.abi,
-      address: evvmAddress,
-      functionName: asStaker ? "payMateStaking_sync" : "payNoMateStaking_sync",
-      args: [
-        InputData.from,
-        InputData.to_address,
-        InputData.to_identity,
-        InputData.token,
-        InputData.amount,
-        InputData.priorityFee,
-        InputData.executor,
-        InputData.signature,
-      ],
-    })
-      .then(() => {
-        return Promise.resolve();
-      })
-      .catch((error) => {
-        return Promise.reject(error);
-      });
-  }
+    .catch((error) => {
+      return Promise.reject(error);
+    });
 };
 
 const executeDispersePay = async (

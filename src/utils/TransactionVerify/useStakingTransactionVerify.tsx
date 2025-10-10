@@ -46,27 +46,23 @@ const verifyPresaleStaking = async (
     return Promise.reject("No data to execute payment");
   }
 
-  simulateContract(config, {
+  return simulateContract(config, {
     abi: SMate.abi,
     address: stakingAddress,
-    functionName: "goldenStaking",
+    functionName: "presaleStaking",
     args: [
-  InputData.isStaking,
-  InputData.user,
-  InputData.nonce,
-  InputData.signature,
-  InputData.priorityFee_EVVM,
-  InputData.nonce_EVVM,
-  InputData.priorityFlag_EVVM,
-  InputData.signature_EVVM,
+      InputData.user,
+      InputData.isStaking,
+      InputData.nonce,
+      InputData.signature,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
-    .then(() => {
-      return Promise.resolve();
-    })
-    .catch((error) => {
-      return Promise.reject(error);
-    });
+    .then(() => Promise.resolve())
+    .catch((error) => Promise.reject(error));
 };
 
 const verifyPublicStaking = async (
@@ -77,28 +73,24 @@ const verifyPublicStaking = async (
     return Promise.reject("No data to execute payment");
   }
 
-  simulateContract(config, {
+  return simulateContract(config, {
     abi: SMate.abi,
     address: stakingAddress,
     functionName: "publicStaking",
     args: [
-  InputData.isStaking,
-  InputData.user,
-  InputData.nonce,
-  InputData.amountOfStaking,
-  InputData.signature,
-  InputData.priorityFee_EVVM,
-  InputData.nonce_EVVM,
-  InputData.priorityFlag_EVVM,
-  InputData.signature_EVVM,
+      InputData.user,
+      InputData.isStaking,
+      InputData.amountOfStaking,
+      InputData.nonce,
+      InputData.signature,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
-    .then(() => {
-      return Promise.resolve();
-    })
-    .catch((error) => {
-      return Promise.reject(error);
-    });
+    .then(() => Promise.resolve())
+    .catch((error) => Promise.reject(error));
 };
 
 const verifyPublicServiceStaking = async (
@@ -109,29 +101,25 @@ const verifyPublicServiceStaking = async (
     return Promise.reject("No data to execute payment");
   }
 
-  simulateContract(config, {
+  return simulateContract(config, {
     abi: SMate.abi,
     address: stakingAddress,
-    functionName: "publicStaking",
+    functionName: "publicServiceStaking",
     args: [
-  InputData.isStaking,
-  InputData.user,
-  InputData.service,
-  InputData.nonce,
-  InputData.amountOfStaking,
-  InputData.signature,
-  InputData.priorityFee_EVVM,
-  InputData.nonce_EVVM,
-  InputData.priorityFlag_EVVM,
-  InputData.signature_EVVM,
+      InputData.user,
+      InputData.service,
+      InputData.isStaking,
+      InputData.amountOfStaking,
+      InputData.nonce,
+      InputData.signature,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
-    .then(() => {
-      return Promise.resolve();
-    })
-    .catch((error) => {
-      return Promise.reject(error);
-    });
+    .then(() => Promise.resolve())
+    .catch((error) => Promise.reject(error));
 };
 
 export {

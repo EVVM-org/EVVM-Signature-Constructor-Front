@@ -53,7 +53,7 @@ const executePresaleStaking = async (
   writeContract(config, {
     abi: Staking.abi,
     address: stakingAddress,
-    functionName: "goldenStaking",
+    functionName: "presaleStaking",
     args: [
       InputData.user,
       InputData.isStaking,
@@ -116,7 +116,7 @@ const executePublicServiceStaking = async (
   writeContract(config, {
     abi: Staking.abi,
     address: stakingAddress,
-    functionName: "publicStaking",
+    functionName: "publicServiceStaking",
     args: [
       InputData.user,
       InputData.service,

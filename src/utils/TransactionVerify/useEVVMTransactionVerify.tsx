@@ -9,61 +9,36 @@ import Evvm from "@/constants/abi/Evvm.json";
 
 const verifyPay = async (
   InputData: PayInputData,
-  evvmAddress: `0x${string}`,
-  asStaker: boolean
+  evvmAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No data to execute payment");
   }
 
-  if (InputData.priority) {
-    simulateContract(config, {
-      abi: Evvm.abi,
-      address: evvmAddress,
-      functionName: asStaker
-        ? "payMateStaking_async"
-        : "payNoMateStaking_async",
-      args: [
-        InputData.from,
-        InputData.to_address,
-        InputData.to_identity,
-        InputData.token,
-        InputData.amount,
-        InputData.priorityFee,
-        InputData.nonce,
-        InputData.executor,
-        InputData.signature,
-      ],
+  // Use the unified pay function with correct argument order and types
+  return simulateContract(config, {
+    abi: Evvm.abi,
+    address: evvmAddress,
+    functionName: "pay",
+    args: [
+      InputData.from,
+      InputData.to_address,
+      InputData.to_identity,
+      InputData.token,
+      InputData.amount,
+      InputData.priorityFee,
+      InputData.nonce,
+      !!InputData.priority, // priorityFlag as boolean
+      InputData.executor,
+      InputData.signature,
+    ],
+  })
+    .then(() => {
+      return Promise.resolve();
     })
-      .then(() => {
-        return Promise.resolve();
-      })
-      .catch((error) => {
-        return Promise.reject(error);
-      });
-  } else {
-    simulateContract(config, {
-      abi: Evvm.abi,
-      address: evvmAddress,
-      functionName: asStaker ? "payMateStaking_sync" : "payNoMateStaking_sync",
-      args: [
-        InputData.from,
-        InputData.to_address,
-        InputData.to_identity,
-        InputData.token,
-        InputData.amount,
-        InputData.priorityFee,
-        InputData.executor,
-        InputData.signature,
-      ],
-    })
-      .then(() => {
-        return Promise.resolve();
-      })
-      .catch((error) => {
-        return Promise.reject(error);
-      });
-  }
+    .catch((error) => {
+      return Promise.reject(error);
+    });
 };
 
 const verifyDispersePay = async (

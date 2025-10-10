@@ -70,7 +70,7 @@ export const PaySignaturesComponent = () => {
           signature,
         });
       },
-      (error) => console.error("Error signing payment:", error)
+      (error: Error) => console.error("Error signing payment:", error)
     );
   };
 

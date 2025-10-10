@@ -30,27 +30,23 @@ const verifyPreRegistrationUsername = async (
     return Promise.reject("No data to execute payment");
   }
 
-  simulateContract(config, {
+  return simulateContract(config, {
     abi: NameService.abi,
     address: mnsAddress,
     functionName: "preRegistrationUsername",
     args: [
-  InputData.user,
-  InputData.nonce,
-  InputData.hashPreRegisteredUsername,
-  InputData.priorityFee_EVVM,
-  InputData.signature,
-  InputData.nonce_EVVM,
-  InputData.priorityFlag_EVVM,
-  InputData.signature_EVVM,
+      InputData.user,
+      InputData.hashPreRegisteredUsername,
+      InputData.nonce,
+      InputData.signature,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
-    .then(() => {
-      return Promise.resolve();
-    })
-    .catch((error) => {
-      return Promise.reject(error);
-    });
+    .then(() => Promise.resolve())
+    .catch((error) => Promise.reject(error));
 };
 
 const verifyRegistrationUsername = async (
@@ -61,28 +57,24 @@ const verifyRegistrationUsername = async (
     return Promise.reject("No data to execute payment");
   }
 
-  simulateContract(config, {
+  return simulateContract(config, {
     abi: NameService.abi,
     address: mnsAddress,
     functionName: "registrationUsername",
     args: [
-  InputData.user,
-  InputData.nonce,
-  InputData.username,
-  InputData.clowNumber,
-  InputData.signature,
-  InputData.priorityFee_EVVM,
-  InputData.nonce_EVVM,
-  InputData.priorityFlag_EVVM,
-  InputData.signature_EVVM,
+      InputData.user,
+      InputData.username,
+      InputData.clowNumber,
+      InputData.nonce,
+      InputData.signature,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
-    .then(() => {
-      return Promise.resolve();
-    })
-    .catch((error) => {
-      return Promise.reject(error);
-    });
+    .then(() => Promise.resolve())
+    .catch((error) => Promise.reject(error));
 };
 
 const verifyMakeOffer = async (
@@ -93,29 +85,25 @@ const verifyMakeOffer = async (
     return Promise.reject("No data to execute payment");
   }
 
-  simulateContract(config, {
+  return simulateContract(config, {
     abi: NameService.abi,
     address: mnsAddress,
     functionName: "makeOffer",
     args: [
-  InputData.user,
-  InputData.nonce,
-  InputData.username,
-  InputData.amount,
-  InputData.expireDate,
-  InputData.priorityFee_EVVM,
-  InputData.signature,
-  InputData.nonce_EVVM,
-  InputData.priorityFlag_EVVM,
-  InputData.signature_EVVM,
+      InputData.user,
+      InputData.username,
+      InputData.expireDate,
+      InputData.amount,
+      InputData.nonce,
+      InputData.signature,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
-    .then(() => {
-      return Promise.resolve();
-    })
-    .catch((error) => {
-      return Promise.reject(error);
-    });
+    .then(() => Promise.resolve())
+    .catch((error) => Promise.reject(error));
 };
 
 const verifyWithdrawOffer = async (
@@ -126,28 +114,24 @@ const verifyWithdrawOffer = async (
     return Promise.reject("No data to execute payment");
   }
 
-  simulateContract(config, {
+  return simulateContract(config, {
     abi: NameService.abi,
     address: mnsAddress,
     functionName: "withdrawOffer",
     args: [
-  InputData.user,
-  InputData.nonce,
-  InputData.username,
-  InputData.offerID,
-  InputData.priorityFee_EVVM,
-  InputData.signature,
-  InputData.nonce_EVVM,
-  InputData.priorityFlag_EVVM,
-  InputData.signature_EVVM,
+      InputData.user,
+      InputData.username,
+      InputData.offerID,
+      InputData.nonce,
+      InputData.signature,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
-    .then(() => {
-      return Promise.resolve();
-    })
-    .catch((error) => {
-      return Promise.reject(error);
-    });
+    .then(() => Promise.resolve())
+    .catch((error) => Promise.reject(error));
 };
 
 const verifyAcceptOffer = async (
@@ -158,28 +142,24 @@ const verifyAcceptOffer = async (
     return Promise.reject("No data to execute payment");
   }
 
-  simulateContract(config, {
+  return simulateContract(config, {
     abi: NameService.abi,
     address: mnsAddress,
     functionName: "acceptOffer",
     args: [
-  InputData.user,
-  InputData.nonce,
-  InputData.username,
-  InputData.offerID,
-  InputData.priorityFee_EVVM,
-  InputData.signature,
-  InputData.nonce_EVVM,
-  InputData.priorityFlag_EVVM,
-  InputData.signature_EVVM,
+      InputData.user,
+      InputData.username,
+      InputData.offerID,
+      InputData.nonce,
+      InputData.signature,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
-    .then(() => {
-      return Promise.resolve();
-    })
-    .catch((error) => {
-      return Promise.reject(error);
-    });
+    .then(() => Promise.resolve())
+    .catch((error) => Promise.reject(error));
 };
 
 const verifyRenewUsername = async (
@@ -190,27 +170,23 @@ const verifyRenewUsername = async (
     return Promise.reject("No input to execute");
   }
 
-  simulateContract(config, {
+  return simulateContract(config, {
     abi: NameService.abi,
     address: mnsAddress,
     functionName: "renewUsername",
     args: [
-  InputData.user,
-  InputData.nonce,
-  InputData.username,
-  InputData.priorityFee_EVVM,
-  InputData.signature,
-  InputData.nonce_EVVM,
-  InputData.priorityFlag_EVVM,
-  InputData.signature_EVVM,
+      InputData.user,
+      InputData.username,
+      InputData.nonce,
+      InputData.signature,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
-    .then(() => {
-      return Promise.resolve();
-    })
-    .catch((error) => {
-      return Promise.reject(error);
-    });
+    .then(() => Promise.resolve())
+    .catch((error) => Promise.reject(error));
 };
 
 const verifyAddCustomMetadata = async (
@@ -221,28 +197,24 @@ const verifyAddCustomMetadata = async (
     return Promise.reject("No input to execute");
   }
 
-  simulateContract(config, {
+  return simulateContract(config, {
     abi: NameService.abi,
     address: mnsAddress,
     functionName: "addCustomMetadata",
     args: [
-  InputData.user,
-  InputData.nonce,
-  InputData.identity,
-  InputData.value,
-  InputData.priorityFee_EVVM,
-  InputData.signature,
-  InputData.nonce_EVVM,
-  InputData.priorityFlag_EVVM,
-  InputData.signature_EVVM,
+      InputData.user,
+      InputData.identity,
+      InputData.value,
+      InputData.nonce,
+      InputData.signature,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
-    .then(() => {
-      return Promise.resolve();
-    })
-    .catch((error) => {
-      return Promise.reject(error);
-    });
+    .then(() => Promise.resolve())
+    .catch((error) => Promise.reject(error));
 };
 
 const verifyRemoveCustomMetadata = async (
@@ -253,28 +225,24 @@ const verifyRemoveCustomMetadata = async (
     return Promise.reject("No input to execute");
   }
 
-  simulateContract(config, {
+  return simulateContract(config, {
     abi: NameService.abi,
     address: mnsAddress,
     functionName: "removeCustomMetadata",
     args: [
-  InputData.user,
-  InputData.nonce,
-  InputData.identity,
-  InputData.key,
-  InputData.priorityFee_EVVM,
-  InputData.signature,
-  InputData.nonce_EVVM,
-  InputData.priorityFlag_EVVM,
-  InputData.signature_EVVM,
+      InputData.user,
+      InputData.identity,
+      InputData.key,
+      InputData.nonce,
+      InputData.signature,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
-    .then(() => {
-      return Promise.resolve();
-    })
-    .catch((error) => {
-      return Promise.reject(error);
-    });
+    .then(() => Promise.resolve())
+    .catch((error) => Promise.reject(error));
 };
 
 const verifyFlushCustomMetadata = async (
@@ -285,27 +253,23 @@ const verifyFlushCustomMetadata = async (
     return Promise.reject("No input to execute");
   }
 
-  simulateContract(config, {
+  return simulateContract(config, {
     abi: NameService.abi,
     address: mnsAddress,
     functionName: "flushCustomMetadata",
     args: [
-  InputData.user,
-  InputData.nonce,
-  InputData.identity,
-  InputData.priorityFee_EVVM,
-  InputData.signature,
-  InputData.nonce_EVVM,
-  InputData.priorityFlag_EVVM,
-  InputData.signature_EVVM,
+      InputData.user,
+      InputData.identity,
+      InputData.nonce,
+      InputData.signature,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
-    .then(() => {
-      return Promise.resolve();
-    })
-    .catch((error) => {
-      return Promise.reject(error);
-    });
+    .then(() => Promise.resolve())
+    .catch((error) => Promise.reject(error));
 };
 
 const verifyFlushUsername = async (
@@ -316,27 +280,23 @@ const verifyFlushUsername = async (
     return Promise.reject("No input to execute");
   }
 
-  simulateContract(config, {
+  return simulateContract(config, {
     abi: NameService.abi,
     address: mnsAddress,
     functionName: "flushUsername",
     args: [
-  InputData.user,
-  InputData.username,
-  InputData.priorityFee_EVVM,
-  InputData.nonce,
-  InputData.signature,
-  InputData.nonce_EVVM,
-  InputData.priorityFlag_EVVM,
-  InputData.signature_EVVM,
+      InputData.user,
+      InputData.username,
+      InputData.nonce,
+      InputData.signature,
+      InputData.priorityFee_EVVM,
+      InputData.nonce_EVVM,
+      InputData.priorityFlag_EVVM,
+      InputData.signature_EVVM,
     ],
   })
-    .then(() => {
-      return Promise.resolve();
-    })
-    .catch((error) => {
-      return Promise.reject(error);
-    });
+    .then(() => Promise.resolve())
+    .catch((error) => Promise.reject(error));
 };
 
 export {

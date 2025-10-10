@@ -11,7 +11,7 @@ import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
 import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
 import { executePresaleStaking } from "@/utils/TransactionExecuter/useStakingTransactionExecuter";
-import { contractAddress, tokenAddress } from "@/constants/address";
+import { tokenAddress } from "@/constants/address";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import {
   PayInputData,

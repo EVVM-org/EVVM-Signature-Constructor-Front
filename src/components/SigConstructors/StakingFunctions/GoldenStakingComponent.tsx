@@ -9,7 +9,7 @@ import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
 import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector";
-import { contractAddress, tokenAddress } from "@/constants/address";
+import { tokenAddress } from "@/constants/address";
 import { executeGoldenStaking } from "@/utils/TransactionExecuter/useStakingTransactionExecuter";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import {

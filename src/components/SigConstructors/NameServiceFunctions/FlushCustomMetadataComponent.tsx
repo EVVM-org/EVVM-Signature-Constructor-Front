@@ -16,7 +16,7 @@ import {
 } from "@/utils/TypeInputStructures";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import NameService from "@/constants/abi/NameService.json";
-import { contractAddress, tokenAddress } from "@/constants/address";
+import { tokenAddress } from "@/constants/address";
 import { executeFlushCustomMetadata } from "@/utils/TransactionExecuter";
 
 type InfoData = {

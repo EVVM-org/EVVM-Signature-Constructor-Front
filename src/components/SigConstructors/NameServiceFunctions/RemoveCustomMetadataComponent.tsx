@@ -17,7 +17,7 @@ import {
 import NameService from "@/constants/abi/NameService.json";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import { executeRemoveCustomMetadata } from "@/utils/TransactionExecuter";
-import { contractAddress, tokenAddress } from "@/constants/address";
+import { tokenAddress } from "@/constants/address";
 
 type InfoData = {
   PayInputData: PayInputData;

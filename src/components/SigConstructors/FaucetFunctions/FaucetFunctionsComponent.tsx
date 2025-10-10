@@ -5,7 +5,7 @@ import { config } from "@/config/index";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import Evvm from "@/constants/abi/Evvm.json";
-import { contractAddress } from "@/constants/address";
+
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 
 interface FaucetFunctionsComponentProps {

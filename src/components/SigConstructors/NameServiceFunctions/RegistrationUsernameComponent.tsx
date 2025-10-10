@@ -13,7 +13,7 @@ import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModu
 import { PayInputData } from "@/utils/TypeInputStructures/evvmTypeInputStructure";
 import { RegistrationUsernameInputData } from "@/utils/TypeInputStructures/nameServiceTypeInputStructure";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import { contractAddress, tokenAddress } from "@/constants/address";
+import { tokenAddress } from "@/constants/address";
 import NameService from "@/constants/abi/NameService.json";
 import Evvm from "@/constants/abi/Evvm.json";
 import { executeRegistrationUsername } from "@/utils/TransactionExecuter/useNameServiceTransactionExecuter";

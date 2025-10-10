@@ -1,21 +1,6 @@
-const contractAddress = {
-  11155111: {
-    evvm: "0x5c66EB3CAAD38851C9c6291D77510b0Eaa8B3c84",
-    nameService: "0x7F41487e77D092BA53c980171C4ebc71d68DC5AE",
-    staking: "0x0fb1aD66636411bB50a33458a8De6507D9b270E8",
-    estimator: "0xF66464ccf2d0e56DFA15572c122C6474B0A1c82C",
-  },
-  421614: {
-    evvm: "0xaBee6F8014468e88035041E94d530838d2ce025C",
-    nameService: "0xfd54B984637AC288B8bd24AD0915Ef6fBaEA5400",
-    staking: "0xb39a3134D1714AcFa6d0Bc3C9235C09918bbe2a6",
-    estimator: "0xA319d1Ba0Eb0bd8aaeb7Fe931F3Ef70383fAA3A5",
-  },
-};
-
 const tokenAddress = {
   mate: "0x0000000000000000000000000000000000000001",
   ether: "0x0000000000000000000000000000000000000000",
 };
 
-export { contractAddress, tokenAddress };
+export { tokenAddress };

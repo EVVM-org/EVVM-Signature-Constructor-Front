@@ -13,7 +13,7 @@ import { AsStakerSelector } from "../InputsAndModules/AsStakerSelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
 import { PayInputData } from "@/utils/TypeInputStructures";
 import { executePay } from "@/utils/TransactionExecuter/useEVVMTransactionExecuter";
-import { contractAddress } from "@/constants/address";
+
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 
 interface PaySignaturesComponentProps {

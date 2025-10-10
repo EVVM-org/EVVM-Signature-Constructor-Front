@@ -16,7 +16,7 @@ import {
   RenewUsernameInputData,
 } from "@/utils/TypeInputStructures";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import { contractAddress, tokenAddress } from "@/constants/address";
+import { tokenAddress } from "@/constants/address";
 import { executeRenewUsername } from "@/utils/TransactionExecuter";
 
 type InfoData = {

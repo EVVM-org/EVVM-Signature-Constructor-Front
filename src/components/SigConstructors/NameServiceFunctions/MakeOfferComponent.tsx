@@ -12,7 +12,7 @@ import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModu
 import { DateInputField } from "../InputsAndModules/DateInputField";
 import { dateToUnixTimestamp } from "@/utils/dateToUnixTimestamp";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import { contractAddress, tokenAddress } from "@/constants/address";
+import { tokenAddress } from "@/constants/address";
 import { useNameServiceSignatureBuilder } from "@/utils/SignatureBuilder/useNameServiceSignatureBuilder";
 import { MakeOfferInputData, PayInputData } from "@/utils/TypeInputStructures";
 import { executeMakeOffer } from "@/utils/TransactionExecuter";

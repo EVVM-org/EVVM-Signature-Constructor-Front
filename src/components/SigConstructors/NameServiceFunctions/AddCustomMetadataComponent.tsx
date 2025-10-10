@@ -15,7 +15,7 @@ import {
   PayInputData,
 } from "@/utils/TypeInputStructures";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import { contractAddress, tokenAddress } from "@/constants/address";
+import { tokenAddress } from "@/constants/address";
 import { executeAddCustomMetadata } from "@/utils/TransactionExecuter";
 import NameService from "@/constants/abi/NameService.json";
 

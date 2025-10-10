@@ -14,7 +14,7 @@ import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { PayInputData } from "@/utils/TypeInputStructures/evvmTypeInputStructure";
 import { PreRegistrationUsernameInputData } from "@/utils/TypeInputStructures/nameServiceTypeInputStructure";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import { contractAddress, tokenAddress } from "@/constants/address";
+import { tokenAddress } from "@/constants/address";
 import { executePreRegistrationUsername } from "@/utils/TransactionExecuter/useNameServiceTransactionExecuter";
 
 type InfoData = {

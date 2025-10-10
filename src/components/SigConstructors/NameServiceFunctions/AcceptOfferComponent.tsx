@@ -15,7 +15,7 @@ import {
   PayInputData,
 } from "@/utils/TypeInputStructures";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import { contractAddress, tokenAddress } from "@/constants/address";
+import { tokenAddress } from "@/constants/address";
 import { executeAcceptOffer } from "@/utils/TransactionExecuter";
 
 type InfoData = {

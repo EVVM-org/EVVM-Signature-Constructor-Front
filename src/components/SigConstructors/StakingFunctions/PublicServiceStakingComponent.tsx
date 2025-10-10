@@ -10,7 +10,7 @@ import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
-import { contractAddress, tokenAddress } from "@/constants/address";
+import { tokenAddress } from "@/constants/address";
 import { executePublicServiceStaking } from "@/utils/TransactionExecuter/useStakingTransactionExecuter";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import {

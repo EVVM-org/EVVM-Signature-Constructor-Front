@@ -15,7 +15,7 @@ import {
   DispersePayMetadata,
 } from "@/utils/TypeInputStructures";
 import { executeDispersePay } from "@/utils/TransactionExecuter/useEVVMTransactionExecuter";
-import { contractAddress } from "@/constants/address";
+
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 
 interface DispersePayComponentProps {

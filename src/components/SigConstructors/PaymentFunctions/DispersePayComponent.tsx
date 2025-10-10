@@ -127,7 +127,7 @@ export const DispersePayComponent = ({ evvmID, evvmAddress }: DispersePayCompone
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Disperse payment"
-        link="https://www.evvm.org/docs/SignatureStructures/EVVM/DispersePaymentSignatureStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/EVVM/DispersePaySignatureStructure"
       />
       <br />
 

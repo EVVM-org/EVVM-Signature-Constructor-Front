@@ -5,7 +5,6 @@ import { config } from "@/config/index";
 import { useNameServiceSignatureBuilder } from "@/utils/SignatureBuilder/useNameServiceSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
-import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { TextInputField } from "../InputsAndModules/TextInputField";
@@ -114,7 +113,7 @@ export const AcceptOfferComponent = ({ evvmID, nameServiceAddress }: AcceptOffer
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Accept offer of username"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/acceptOfferStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/NameService/acceptOfferStructure"
       />
 
       <br />

@@ -123,7 +123,7 @@ export const PublicStakingComponent = ({ evvmID, stakingAddress }: PublicStaking
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Public Staking"
-        link="https://www.evvm.org/docs/SignatureStructures/SMate/StakingUnstakingStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/Staking/PublicServiceStakingStructure"
       />
       <br />
 

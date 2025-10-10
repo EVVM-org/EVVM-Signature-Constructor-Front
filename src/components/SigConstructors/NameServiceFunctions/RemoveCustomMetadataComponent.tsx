@@ -135,7 +135,7 @@ export const RemoveCustomMetadataComponent = ({ evvmID, nameServiceAddress }: Re
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Remove custom metadata of identity"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/removeCustomMetadataStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/NameService/removeCustomMetadataStructure"
       />
 
       <br />

@@ -5,15 +5,12 @@ import { config } from "@/config/index";
 import { useSignatureBuilder } from "@/utils/SignatureBuilder/useEVVMSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
-import { NumberInputField } from "@/components/SigConstructors/InputsAndModules/NumberInputField";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { ExecutorSelector } from "../InputsAndModules/ExecutorSelector";
-import { AsStakerSelector } from "../InputsAndModules/AsStakerSelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
 import { PayInputData } from "@/utils/TypeInputStructures";
 import { executePay } from "@/utils/TransactionExecuter/useEVVMTransactionExecuter";
-
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 
 interface PaySignaturesComponentProps {
@@ -103,7 +100,7 @@ export const PaySignaturesComponent = ({ evvmID, evvmAddress }: PaySignaturesCom
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Single payment"
-        link="https://www.evvm.org/docs/SignatureStructures/EVVM/SinglePaymentSignatureStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/EVVM/SinglePaymentSignatureStructure"
       />
       <br />
 

@@ -1,14 +1,24 @@
 module.exports = {
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    ecmaVersion: 2022,
+    sourceType: "module",
+  },
+  env: {
+    es6: true,
+    browser: true,
+    node: true,
+  },
+  plugins: ["@typescript-eslint", "@next/eslint-plugin-next"],
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@next/next/recommended",
+    "next/core-web-vitals"
+  ],
   rules: {
     "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-explicit-any": "off"
   },
-  parserOptions: {
-    ecmaVersion: 2022, // La versión de JavaScript que desea usar
-    sourceType: "module", // Permite el uso de "import" e "export"
-  },
-  extends: [
-    "eslint:recommended", // Reglas recomendadas por ESLint
-    "plugin:@typescript-eslint/recommended", // Reglas recomendadas para TypeScript
-    "plugin:@next/next/recommended",
-  ],
 };

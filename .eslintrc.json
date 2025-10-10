@@ -1,5 +1,10 @@
 {
   "parser": "babel-eslint",
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2020
+  },
+
   "extends": ["next/core-web-vitals", "next/typescript"],
   "plugins": ["@next/eslint-plugin-next"],
   "rules": {
@@ -7,6 +12,6 @@
     "@typescript-eslint/no-explicit-any": "off"
   },
   "env": {
-        "es6": true
-    }
+    "es6": true
+  }
 }

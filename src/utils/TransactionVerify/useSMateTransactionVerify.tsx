@@ -1,6 +1,6 @@
 import { simulateContract } from "@wagmi/core";
 import { config } from "@/config";
-import SMate from "@/constants/abi/SMate.json";
+import SMate from "@/constants/abi/Staking.json";
 import {
   GoldenStakingInputData,
   PresaleStakingInputData,
@@ -10,7 +10,7 @@ import {
 
 const verifyGoldenStaking = async (
   InputData: GoldenStakingInputData,
-  sMateAddress: `0x${string}`
+  stakingAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No data to execute payment");
@@ -18,9 +18,9 @@ const verifyGoldenStaking = async (
 
   simulateContract(config, {
     abi: SMate.abi,
-    address: sMateAddress,
+    address: stakingAddress,
     functionName: "goldenStaking",
-    args: [InputData.isStaking, InputData.amountOfSMate, InputData.signature],
+    args: [InputData.isStaking, InputData.amountOfStaking, InputData.signature_EVVM],
   })
     .then(() => {
       return Promise.resolve();
@@ -32,7 +32,7 @@ const verifyGoldenStaking = async (
 
 const verifyPresaleStaking = async (
   InputData: PresaleStakingInputData,
-  sMateAddress: `0x${string}`
+  stakingAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No data to execute payment");
@@ -40,14 +40,14 @@ const verifyPresaleStaking = async (
 
   simulateContract(config, {
     abi: SMate.abi,
-    address: sMateAddress,
+    address: stakingAddress,
     functionName: "goldenStaking",
     args: [
       InputData.isStaking,
       InputData.user,
       InputData.nonce,
       InputData.signature,
-      InputData.priorityFee_Evvm,
+      InputData.priorityFee_EVVM,
       InputData.nonce_EVVM,
       InputData.priorityFlag_EVVM,
       InputData.signature_EVVM,
@@ -63,7 +63,7 @@ const verifyPresaleStaking = async (
 
 const verifyPublicStaking = async (
   InputData: PublicStakingInputData,
-  sMateAddress: `0x${string}`
+  stakingAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No data to execute payment");
@@ -71,15 +71,15 @@ const verifyPublicStaking = async (
 
   simulateContract(config, {
     abi: SMate.abi,
-    address: sMateAddress,
+    address: stakingAddress,
     functionName: "publicStaking",
     args: [
       InputData.isStaking,
       InputData.user,
       InputData.nonce,
-      InputData.amountOfSMate,
+      InputData.amountOfStaking,
       InputData.signature,
-      InputData.priorityFee_Evvm,
+      InputData.priorityFee_EVVM,
       InputData.nonce_EVVM,
       InputData.priorityFlag_EVVM,
       InputData.signature_EVVM,
@@ -95,7 +95,7 @@ const verifyPublicStaking = async (
 
 const verifyPublicServiceStaking = async (
   InputData: PublicServiceStakingInputData,
-  sMateAddress: `0x${string}`
+  stakingAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No data to execute payment");
@@ -103,16 +103,16 @@ const verifyPublicServiceStaking = async (
 
   simulateContract(config, {
     abi: SMate.abi,
-    address: sMateAddress,
+    address: stakingAddress,
     functionName: "publicStaking",
     args: [
       InputData.isStaking,
       InputData.user,
       InputData.service,
       InputData.nonce,
-      InputData.amountOfSMate,
+      InputData.amountOfStaking,
       InputData.signature,
-      InputData.priorityFee_Evvm,
+      InputData.priorityFee_EVVM,
       InputData.nonce_EVVM,
       InputData.priorityFlag_EVVM,
       InputData.signature_EVVM,

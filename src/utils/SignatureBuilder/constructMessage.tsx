@@ -11,7 +11,7 @@
 function constructMessageForDepositFisher(
   isERC20: boolean,
   receiverAddress: string,
-  nonce: string,
+  nonce: bigint,
   tokenAddress: string,
   priorityFee: string,
   ammount: string
@@ -42,36 +42,25 @@ function constructMessageForDepositFisher(
  * @returns message for payMateStaking_async/sync or payNoMateStaking_async/sync
  */
 function buildMessageSignedForPay(
-  to: string,
-  tokenAddress: string,
-  amount: string,
-  priorityFee: string,
-  nonce: string,
+  evvmID: bigint,
+  to: `0x${string}` | string,
+  tokenAddress: `0x${string}`,
+  amount: bigint,
+  priorityFee: bigint,
+  nonce: bigint,
   priorityFlag: boolean,
-  executor: string
+  executor: `0x${string}`
 ): string {
-  const msg =
-    // is the function signature for async or sync nonce respectively
-    `${priorityFlag === true ? "f4e1895b" : "4faa1fa2"},` +
-    // check if is a address or a username if is use toLowerCase()
-    // to avoid case sensitivity issues to the address and if it isn't
-    // use the username as it is
+  const inputs: string =
     `${to.startsWith("0x") ? to.toLowerCase() : to},` +
-    // the token address is always an address so we use toLowerCase() to avoid case sensitivity issues
     `${tokenAddress.toLowerCase()},` +
-    // the amount is set all in decimal format
-    `${amount},` +
-    // the priority fee is set all in decimal format
-    `${priorityFee},` +
-    // the nonce to avoid replay attacks
-    `${nonce},` +
-    // the priority flag is set to "true" or "false" as a string
-    // false sync payment and true async payment
+    `${amount.toString()},` +
+    `${priorityFee.toString()},` +
+    `${nonce.toString()},` +
     `${priorityFlag ? "true" : "false"},` +
-    // the executor is the address of the fisher or service that will execute the transaction
-    // we use toLowerCase() to avoid case sensitivity issues
     `${executor.toLowerCase()}`;
-  return msg;
+
+  return basicMessageBuilder(evvmID.toString(), "pay", inputs);
 }
 
 /**
@@ -92,35 +81,32 @@ function buildMessageSignedForPay(
  * @returns A formatted string starting with 'ef83c1d6' followed by comma-separated parameters
  */
 function buildMessageSignedForDispersePay(
-  hashedEncodedData: string,
-  tokenAddress: string,
-  amount: string,
-  priorityFee: string,
-  nonce: string,
+  evvmID: bigint,
+  hashList: string,
+  tokenAddress: `0x${string}`,
+  amount: bigint,
+  priorityFee: bigint,
+  nonce: bigint,
   priorityFlag: boolean,
-  executor: string
+  executor: `0x${string}`
 ): string {
-  return (
-    // is the function signature for disperse pay
-    `ef83c1d6` +
-    // the hashed encoded data is the second parameter
-    // we use toUpperCase() to avoid case sensitivity issues and slice(2) to remove the '0X'
-    // and set the `0x` prefix
-    `${"0x" + hashedEncodedData.toUpperCase().slice(2)},` +
+  const inputs: string =
+    `${"0x" + hashList.toUpperCase().slice(2)},` +
     // the token address is always an address so we use toLowerCase() to avoid case sensitivity issues
     `${tokenAddress.toLowerCase()},` +
     // the amount is set all in decimal format
-    `${amount},` +
+    `${amount.toString()},` +
     // the priority fee is set all in decimal format
-    `${priorityFee},` +
+    `${priorityFee.toString()},` +
     // the nonce to avoid replay attacks
-    `${nonce},` +
+    `${nonce.toString()},` +
     // the priority flag is set to "true" or "false" as a string
     `${priorityFlag ? "true" : "false"},` +
     // the executor is the address of the fisher or service that will execute the transaction
     // we use toLowerCase() to avoid case sensitivity issues
-    `${executor.toLowerCase()}`
-  );
+    `${executor.toLowerCase()}`;
+
+  return basicMessageBuilder(evvmID.toString(), "dispersePay", inputs);
 }
 
 //・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈
@@ -132,44 +118,45 @@ function buildMessageSignedForDispersePay(
 //・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈
 
 function buildMessageSignedForPublicStaking(
+  evvmID: bigint,
   isStaking: boolean,
-  amountOfSMate: string,
-  nonce: string
+  amountOfSMate: bigint,
+  nonce: bigint
 ): string {
-  return (
-    "21cc1749," +
-    `${isStaking ? "true" : "false"},` +
-    `${amountOfSMate},` +
-    `${nonce}`
-  );
+  const inputs: string =
+    `${isStaking ? "true" : "false"},` + `${amountOfSMate.toString()},` + `${nonce.toString()}`;
+
+  return basicMessageBuilder(evvmID.toString(), "publicStaking", inputs);
 }
 
 function buildMessageSignedForPresaleStaking(
+  evvmID: bigint,
   isStaking: boolean,
-  amountOfSMate: string,
-  nonce: string
+  amountOfSMate: bigint,
+  nonce: bigint
 ): string {
-  return (
-    "c0f6e7d1," +
+  const inputs: string =
     `${isStaking ? "true" : "false"},` +
-    `${amountOfSMate},` +
-    `${nonce}`
-  );
+    `${amountOfSMate.toLocaleString()},` +
+    `${nonce.toLocaleString()}`;
+
+  return basicMessageBuilder(evvmID.toString(), "presaleStaking", inputs);
 }
 
-function buildMessageSignedForPublicServiceStaking(
+function buildMessageSignedForPublicServiceStake(
+  evvmID: bigint,
   serviceAddress: string,
   isStaking: boolean,
-  amountOfSMate: string,
-  nonce: string
+  amountOfSMate: bigint,
+  nonce: bigint
 ): string {
-  return (
-    "e2ccd470," +
+  const inputs: string =
     `${serviceAddress.toLowerCase()},` +
     `${isStaking ? "true" : "false"},` +
-    `${amountOfSMate},` +
-    `${nonce}`
-  );
+    `${amountOfSMate.toString()},` +
+    `${nonce.toString()}`;
+
+  return basicMessageBuilder(evvmID.toString(), "publicServiceStaking", inputs);
 }
 
 //・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈
@@ -181,118 +168,139 @@ function buildMessageSignedForPublicServiceStaking(
 //・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈・┈┈
 
 function buildMessageSignedForPreRegistrationUsername(
+  evvmID: bigint,
   hashUsername: string,
   nonceMNS: bigint
 ): string {
-  return (
-    "5d232a55," +
+  const inputs: string =
     `${
       hashUsername.toLowerCase().slice(0, 2) +
       hashUsername.toUpperCase().slice(2)
-    },` +
-    `${nonceMNS.toString()}`
+    },` + `${nonceMNS.toString()}`;
+
+  return basicMessageBuilder(
+    evvmID.toString(),
+    "preRegistrationUsername",
+    inputs
   );
 }
 
 function buildMessageSignedForRegistrationUsername(
+  evvmID: bigint,
   username: string,
   clowNumber: bigint,
   nonceMNS: bigint
 ): string {
-  return (
-    "afabc8db," +
-    `${username},` +
-    `${clowNumber.toString()},` +
-    `${nonceMNS.toString()}`
-  );
+  const inputs: string =
+    `${username},` + `${clowNumber.toString()},` + `${nonceMNS.toString()}`;
+
+  return basicMessageBuilder(evvmID.toString(), "registrationUsername", inputs);
 }
 
 function buildMessageSignedForMakeOffer(
+  evvmID: bigint,
   username: string,
   dateExpire: bigint,
   amount: bigint,
   nonceMNS: bigint
 ): string {
-  return (
-    "d82e5d8b," +
+  const inputs: string =
     `${username},` +
     `${dateExpire.toString()},` +
     `${amount.toString()},` +
-    `${nonceMNS.toString()}`
-  );
+    `${nonceMNS.toString()}`;
+
+  return basicMessageBuilder(evvmID.toString(), "makeOffer", inputs);
 }
 
 function buildMessageSignedForWithdrawOffer(
+  evvmID: bigint,
   username: string,
   offerId: bigint,
   mateNameServiceNonce: bigint
 ): string {
-  return (
-    "5761d8ed," +
+  const inputs: string =
     `${username},` +
     `${offerId.toString()},` +
-    `${mateNameServiceNonce.toString()}`
-  );
+    `${mateNameServiceNonce.toString()}`;
+
+  return basicMessageBuilder(evvmID.toString(), "withdrawOffer", inputs);
 }
 
 function buildMessageSignedForAcceptOffer(
+  evvmID: bigint,
   username: string,
   offerId: bigint,
   mateNameServiceNonce: bigint
 ): string {
-  return (
-    "8e3bde43," +
+  const inputs: string =
     `${username},` +
     `${offerId.toString()},` +
-    `${mateNameServiceNonce.toString()}`
-  );
+    `${mateNameServiceNonce.toString()}`;
+
+  return basicMessageBuilder(evvmID.toString(), "acceptOffer", inputs);
 }
 
 function buildMessageSignedForRenewUsername(
+  evvmID: bigint,
   username: string,
   mateNameServiceNonce: bigint
 ): string {
-  return "35723e23," + `${username},` + `${mateNameServiceNonce.toString()}`;
+  const inputs: string = `${username},` + `${mateNameServiceNonce.toString()}`;
+
+  return basicMessageBuilder(evvmID.toString(), "renewUsername", inputs);
 }
 
 function buildMessageSignedForAddCustomMetadata(
+  evvmID: bigint,
   identity: string,
   value: string,
   mateNameServiceNonce: bigint
 ): string {
-  return (
-    "4cfe021f," +
-    `${identity},` +
-    `${value},` +
-    `${mateNameServiceNonce.toString()}`
-  );
+  const inputs: string =
+    `${identity},` + `${value},` + `${mateNameServiceNonce.toString()}`;
+
+  return basicMessageBuilder(evvmID.toString(), "addCustomMetadata", inputs);
 }
 
 function buildMessageSignedForRemoveCustomMetadata(
+  evvmID: bigint,
   identity: string,
   key: bigint,
   nonceMNS: bigint
 ): string {
-  return (
-    "8adf3927," +
-    `${identity},` +
-    `${key.toString()},` +
-    `${nonceMNS.toString()}`
-  );
+  const inputs: string =
+    `${identity},` + `${key.toString()},` + `${nonceMNS.toString()}`;
+
+  return basicMessageBuilder(evvmID.toString(), "removeCustomMetadata", inputs);
 }
 
 function buildMessageSignedForFlushCustomMetadata(
+  evvmID: bigint,
   identity: string,
   nonceMNS: bigint
 ): string {
-  return "3ca44e54," + `${identity},` + `${nonceMNS.toString()}`;
+  const inputs: string = `${identity},` + `${nonceMNS.toString()}`;
+
+  return basicMessageBuilder(evvmID.toString(), "flushCustomMetadata", inputs);
 }
 
 function buildMessageSignedForFlushUsername(
+  evvmID: bigint,
   username: string,
   nonceMNS: bigint
 ): string {
-  return "044695cb," + `${username},` + `${nonceMNS.toString()}`;
+  const inputs: string = `${username},` + `${nonceMNS.toString()}`;
+
+  return basicMessageBuilder(evvmID.toString(), "flushUsername", inputs);
+}
+
+function basicMessageBuilder(
+  evvmID: string,
+  functionName: string,
+  inputs: string
+): string {
+  return evvmID + "," + functionName + "," + inputs;
 }
 
 export {
@@ -301,7 +309,7 @@ export {
   buildMessageSignedForDispersePay,
   buildMessageSignedForPublicStaking,
   buildMessageSignedForPresaleStaking,
-  buildMessageSignedForPublicServiceStaking,
+  buildMessageSignedForPublicServiceStake,
   buildMessageSignedForPreRegistrationUsername,
   buildMessageSignedForRegistrationUsername,
   buildMessageSignedForMakeOffer,
@@ -312,4 +320,5 @@ export {
   buildMessageSignedForRemoveCustomMetadata,
   buildMessageSignedForFlushCustomMetadata,
   buildMessageSignedForFlushUsername,
+  basicMessageBuilder,
 };

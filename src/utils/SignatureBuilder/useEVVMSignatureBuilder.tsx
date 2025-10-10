@@ -27,17 +27,19 @@ export const useSignatureBuilder = () => {
 
   // EVVM payment signature
   const signPay = (
+    evvmID: bigint,
     to: string,
-    tokenAddress: string,
-    amount: string,
-    priorityFee: string,
-    nonce: string,
+    tokenAddress: `0x${string}`,
+    amount: bigint,
+    priorityFee: bigint,
+    nonce: bigint,
     priorityFlag: boolean,
-    executor: string,
+    executor: `0x${string}`,
     onSuccess?: (signature: string) => void,
     onError?: (error: Error) => void
   ) => {
     const message = buildMessageSignedForPay(
+      evvmID,
       to,
       tokenAddress,
       amount,
@@ -58,18 +60,20 @@ export const useSignatureBuilder = () => {
 
   // EVVM disperse payment signature (multiple recipients)
   const signDispersePay = (
+    evvmID: bigint,
     toData: DispersePayMetadata[],
-    tokenAddress: string,
-    amount: string,
-    priorityFee: string,
-    nonce: string,
+    tokenAddress: `0x${string}`,
+    amount: bigint,
+    priorityFee: bigint,
+    nonce: bigint,
     priorityFlag: boolean,
-    executor: string,
+    executor: `0x${string}`,
     onSuccess?: (signature: string) => void,
     onError?: (error: Error) => void
   ) => {
     const hashedEncodedData = hashDispersePaymentUsersToPay(toData);
     const message = buildMessageSignedForDispersePay(
+      evvmID,
       "0x" + hashedEncodedData.toUpperCase().slice(2),
       tokenAddress,
       amount,

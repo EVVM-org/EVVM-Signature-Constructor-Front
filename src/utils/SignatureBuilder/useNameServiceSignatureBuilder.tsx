@@ -34,13 +34,11 @@ export const useNameServiceSignatureBuilder = () => {
 
   // NameService username pre-registration signature (dual signature if priority fee > 0)
   const signPreRegistrationUsername = (
-    addressNameService: string,
-
+    evvmID: bigint,
+    addressNameService: `0x${string}`,
     username: string,
     clowNumber: bigint,
-
     nonce: bigint,
-
     priorityFee_EVVM: bigint,
     nonce_EVVM: bigint,
     priorityFlag_EVVM_EVVM: boolean,
@@ -53,6 +51,7 @@ export const useNameServiceSignatureBuilder = () => {
     // Hash username with clown number for pre-registration
     const hashUsername = hashPreRegisteredUsername(username, clowNumber);
     const preRegistrationMessage = buildMessageSignedForPreRegistrationUsername(
+      evvmID,
       hashUsername,
       nonce
     );
@@ -69,11 +68,12 @@ export const useNameServiceSignatureBuilder = () => {
 
           // Payment signature for priority fee
           const payMessage = buildMessageSignedForPay(
+            evvmID,
             addressNameService,
             "0x0000000000000000000000000000000000000001",
-            "0",
-            priorityFee_EVVM.toString(),
-            nonce_EVVM.toString(),
+            BigInt(0),
+            priorityFee_EVVM,
+            nonce_EVVM,
             priorityFlag_EVVM_EVVM,
             addressNameService
           );
@@ -93,13 +93,12 @@ export const useNameServiceSignatureBuilder = () => {
   };
 
   const signRegistrationUsername = (
-    addressNameService: string,
+    evvmID: bigint,
+    addressNameService: `0x${string}`,
     username: string,
     clowNumber: bigint,
     nonce: bigint,
-
     mateReward: bigint,
-
     priorityFee_EVVM: bigint,
     nonce_EVVM: bigint,
     priorityFlag_EVVM: boolean,
@@ -107,6 +106,7 @@ export const useNameServiceSignatureBuilder = () => {
     onError?: (error: Error) => void
   ) => {
     const registrationMessage = buildMessageSignedForRegistrationUsername(
+      evvmID,
       username,
       clowNumber,
       nonce
@@ -118,11 +118,12 @@ export const useNameServiceSignatureBuilder = () => {
         onSuccess: (registrationSignature) => {
           // Payment signature for priority fee
           const payMessage = buildMessageSignedForPay(
+            evvmID,
             addressNameService,
             "0x0000000000000000000000000000000000000001",
-            (mateReward * BigInt(100)).toString(),
-            priorityFee_EVVM.toString(),
-            nonce_EVVM.toString(),
+            mateReward * BigInt(100),
+            priorityFee_EVVM,
+            nonce_EVVM,
             priorityFlag_EVVM,
             addressNameService
           );
@@ -142,13 +143,12 @@ export const useNameServiceSignatureBuilder = () => {
   };
 
   const signMakeOffer = (
-    addressNameService: string,
-
+    evvmID: bigint,
+    addressNameService: `0x${string}`,
     username: string,
     expirationDate: bigint,
     amount: bigint,
     nonce: bigint,
-
     priorityFee_EVVM: bigint,
     nonce_EVVM: bigint,
     priorityFlag_EVVM: boolean,
@@ -156,6 +156,7 @@ export const useNameServiceSignatureBuilder = () => {
     onError?: (error: Error) => void
   ) => {
     const makeOfferMessage = buildMessageSignedForMakeOffer(
+      evvmID,
       username,
       expirationDate,
       amount,
@@ -168,11 +169,12 @@ export const useNameServiceSignatureBuilder = () => {
         onSuccess: (makeOfferSignature) => {
           // Payment signature for priority fee
           const payMessage = buildMessageSignedForPay(
+            evvmID,
             addressNameService,
             "0x0000000000000000000000000000000000000001",
-            amount.toString(),
-            priorityFee_EVVM.toString(),
-            nonce_EVVM.toString(),
+            amount,
+            priorityFee_EVVM,
+            nonce_EVVM,
             priorityFlag_EVVM,
             addressNameService
           );
@@ -192,12 +194,11 @@ export const useNameServiceSignatureBuilder = () => {
   };
 
   const signWithdrawOffer = (
-    addressNameService: string,
-
+    evvmID: bigint,
+    addressNameService: `0x${string}`,
     username: string,
     offerId: bigint,
     nonce: bigint,
-
     priorityFee_EVVM: bigint,
     nonce_EVVM: bigint,
     priorityFlag_EVVM: boolean,
@@ -205,6 +206,7 @@ export const useNameServiceSignatureBuilder = () => {
     onError?: (error: Error) => void
   ) => {
     const withdrawOfferMessage = buildMessageSignedForWithdrawOffer(
+      evvmID,
       username,
       offerId,
       nonce
@@ -221,11 +223,12 @@ export const useNameServiceSignatureBuilder = () => {
           }
 
           const payMessage = buildMessageSignedForPay(
+            evvmID,
             addressNameService,
             "0x0000000000000000000000000000000000000001",
-            "0",
-            priorityFee_EVVM.toString(),
-            nonce_EVVM.toString(),
+            BigInt(0),
+            priorityFee_EVVM,
+            nonce_EVVM,
             priorityFlag_EVVM,
             addressNameService
           );
@@ -245,12 +248,11 @@ export const useNameServiceSignatureBuilder = () => {
   };
 
   const signAcceptOffer = (
-    addressNameService: string,
-
+    evvmID: bigint,
+    addressNameService: `0x${string}`,
     username: string,
     offerId: bigint,
     nonce: bigint,
-
     priorityFee_EVVM: bigint,
     nonce_EVVM: bigint,
     priorityFlag_EVVM: boolean,
@@ -258,6 +260,7 @@ export const useNameServiceSignatureBuilder = () => {
     onError?: (error: Error) => void
   ) => {
     const acceptOfferMessage = buildMessageSignedForAcceptOffer(
+      evvmID,
       username,
       offerId,
       nonce
@@ -274,11 +277,12 @@ export const useNameServiceSignatureBuilder = () => {
           }
 
           const payMessage = buildMessageSignedForPay(
+            evvmID,
             addressNameService,
             "0x0000000000000000000000000000000000000001",
-            "0",
-            priorityFee_EVVM.toString(),
-            nonce_EVVM.toString(),
+            BigInt(0),
+            priorityFee_EVVM,
+            nonce_EVVM,
             priorityFlag_EVVM,
             addressNameService
           );
@@ -298,12 +302,11 @@ export const useNameServiceSignatureBuilder = () => {
   };
 
   const signRenewUsername = (
-    addressNameService: string,
+    evvmID: bigint,
+    addressNameService: `0x${string}`,
     username: string,
     nonce: bigint,
-
     amountToRenew: bigint,
-
     priorityFee_EVVM: bigint,
     nonce_EVVM: bigint,
     priorityFlag_EVVM: boolean,
@@ -311,6 +314,7 @@ export const useNameServiceSignatureBuilder = () => {
     onError?: (error: Error) => void
   ) => {
     const renewUsernameMessage = buildMessageSignedForRenewUsername(
+      evvmID,
       username,
       nonce
     );
@@ -320,11 +324,12 @@ export const useNameServiceSignatureBuilder = () => {
       {
         onSuccess: (makeOfferSignature) => {
           const payMessage = buildMessageSignedForPay(
+            evvmID,
             addressNameService,
             "0x0000000000000000000000000000000000000001",
-            amountToRenew.toString(),
-            priorityFee_EVVM.toString(),
-            nonce_EVVM.toString(),
+            amountToRenew,
+            priorityFee_EVVM,
+            nonce_EVVM,
             priorityFlag_EVVM,
             addressNameService
           );
@@ -344,7 +349,8 @@ export const useNameServiceSignatureBuilder = () => {
   };
 
   const signAddCustomMetadata = (
-    addressNameService: string,
+    evvmID: bigint,
+    addressNameService: `0x${string}`,
     nonce: bigint,
     identity: string,
     value: string,
@@ -356,6 +362,7 @@ export const useNameServiceSignatureBuilder = () => {
     onError?: (error: Error) => void
   ) => {
     const customMetadataMessage = buildMessageSignedForAddCustomMetadata(
+      evvmID,
       identity,
       value,
       nonce
@@ -366,11 +373,12 @@ export const useNameServiceSignatureBuilder = () => {
       {
         onSuccess: (makeOfferSignature) => {
           const payMessage = buildMessageSignedForPay(
+            evvmID,
             addressNameService,
             "0x0000000000000000000000000000000000000001",
-            amountToAddCustomMetadata.toString(),
-            priorityFee_EVVM.toString(),
-            nonce_EVVM.toString(),
+            amountToAddCustomMetadata,
+            priorityFee_EVVM,
+            nonce_EVVM,
             priorityFlag_EVVM,
             addressNameService
           );
@@ -390,14 +398,12 @@ export const useNameServiceSignatureBuilder = () => {
   };
 
   const signRemoveCustomMetadata = (
-    addressNameService: string,
-
+    evvmID: bigint,
+    addressNameService: `0x${string}`,
     identity: string,
     key: bigint,
     nonce: bigint,
-
     amountToRemoveCustomMetadata: bigint,
-
     priorityFee_EVVM: bigint,
     nonce_EVVM: bigint,
     priorityFlag_EVVM: boolean,
@@ -405,17 +411,18 @@ export const useNameServiceSignatureBuilder = () => {
     onError?: (error: Error) => void
   ) => {
     const removeCustomMetadataMessage =
-      buildMessageSignedForRemoveCustomMetadata(identity, key, nonce);
+      buildMessageSignedForRemoveCustomMetadata(evvmID, identity, key, nonce);
     signMessage(
       { message: removeCustomMetadataMessage },
       {
         onSuccess: (makeOfferSignature) => {
           const payMessage = buildMessageSignedForPay(
+            evvmID,
             addressNameService,
             "0x0000000000000000000000000000000000000001",
-            amountToRemoveCustomMetadata.toString(),
-            priorityFee_EVVM.toString(),
-            nonce_EVVM.toString(),
+            amountToRemoveCustomMetadata,
+            priorityFee_EVVM,
+            nonce_EVVM,
             priorityFlag_EVVM,
             addressNameService
           );
@@ -435,14 +442,11 @@ export const useNameServiceSignatureBuilder = () => {
   };
 
   const signFlushCustomMetadata = (
-    addressNameService: string,
-
+    evvmID: bigint,
+    addressNameService: `0x${string}`,
     identity: string,
-
     nonce: bigint,
-
     priceToFlushCustomMetadata: bigint,
-
     priorityFee_EVVM: bigint,
     nonce_EVVM: bigint,
     priorityFlag_EVVM: boolean,
@@ -450,6 +454,7 @@ export const useNameServiceSignatureBuilder = () => {
     onError?: (error: Error) => void
   ) => {
     const flushCustomMetadataMessage = buildMessageSignedForFlushCustomMetadata(
+      evvmID,
       identity,
       nonce
     );
@@ -458,11 +463,12 @@ export const useNameServiceSignatureBuilder = () => {
       {
         onSuccess: (flushSignature) => {
           const payMessage = buildMessageSignedForPay(
+            evvmID,
             addressNameService,
             "0x0000000000000000000000000000000000000001",
-            priceToFlushCustomMetadata.toString(),
-            priorityFee_EVVM.toString(),
-            nonce_EVVM.toString(),
+            priceToFlushCustomMetadata,
+            priorityFee_EVVM,
+            nonce_EVVM,
             priorityFlag_EVVM,
             addressNameService
           );
@@ -482,13 +488,11 @@ export const useNameServiceSignatureBuilder = () => {
   };
 
   const signFlushUsername = (
-    addressNameService: string,
-
+    evvmID: bigint,
+    addressNameService: `0x${string}`,
     username: string,
     nonce: bigint,
-
     priceToFlushUsername: bigint,
-
     priorityFee_EVVM: bigint,
     nonce_EVVM: bigint,
     priorityFlag_EVVM: boolean,
@@ -496,6 +500,7 @@ export const useNameServiceSignatureBuilder = () => {
     onError?: (error: Error) => void
   ) => {
     const flushCustomMetadataMessage = buildMessageSignedForFlushUsername(
+      evvmID,
       username,
       nonce
     );
@@ -504,11 +509,12 @@ export const useNameServiceSignatureBuilder = () => {
       {
         onSuccess: (flushSignature) => {
           const payMessage = buildMessageSignedForPay(
+            evvmID,
             addressNameService,
             "0x0000000000000000000000000000000000000001",
-            priceToFlushUsername.toString(),
-            priorityFee_EVVM.toString(),
-            nonce_EVVM.toString(),
+            priceToFlushUsername,
+            priorityFee_EVVM,
+            nonce_EVVM,
             priorityFlag_EVVM,
             addressNameService
           );

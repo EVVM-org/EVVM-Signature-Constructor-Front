@@ -2,7 +2,7 @@ import { useSignMessage } from "wagmi";
 import {
   buildMessageSignedForPay,
   buildMessageSignedForPresaleStaking,
-  buildMessageSignedForPublicServiceStaking,
+  buildMessageSignedForPublicServiceStake,
   buildMessageSignedForPublicStaking,
 } from "./constructMessage";
 import { keccak256, encodePacked, encodeAbiParameters, sha256 } from "viem";
@@ -27,20 +27,20 @@ export const useStakingSignatureBuilder = () => {
 
   // staking golden staking signature (5083 EVVM per stake)
   const signGoldenStaking = (
-    stakingAddress: string,
-    stakingAmount: number,
-    nonceEVVM: string,
+    evvmID: bigint,
+    stakingAddress: `0x${string}`,
+    totalPrice: bigint,
+    nonceEVVM: bigint,
     priorityFlag: boolean,
     onSuccess?: (signature: string) => void,
     onError?: (error: Error) => void
   ) => {
     const message = buildMessageSignedForPay(
+      evvmID,
       stakingAddress,
       "0x0000000000000000000000000000000000000001", // Native token address
-      (stakingAmount * (5083 * 10 ** 18)).toLocaleString("fullwide", {
-        useGrouping: false,
-      }),
-      "0",
+      totalPrice,
+      BigInt(0),
       nonceEVVM,
       priorityFlag,
       stakingAddress
@@ -57,28 +57,25 @@ export const useStakingSignatureBuilder = () => {
 
   // staking presale staking signature (dual signature: payment + staking)
   const signPresaleStaking = (
-    stakingAddress: string,
-
+    evvmID: bigint,
+    stakingAddress: `0x${string}`,
     isStaking: boolean,
-    nonce: string,
-    
-    priorityFee_EVVM: string,
-    nonce_EVVM: string,
+    nonce: bigint,
+    priorityFee_EVVM: bigint,
+    totalPrice: bigint,
+    nonce_EVVM: bigint,
     priorityFlag_EVVM: boolean,
-    
-    
     onSuccess?: (paySignature: string, stakingSignature: string) => void,
     onError?: (error: Error) => void
   ) => {
     // First signature: payment
     const payMessage = buildMessageSignedForPay(
+      evvmID,
       stakingAddress,
       "0x0000000000000000000000000000000000000001",
       isStaking
-        ? (1 * (5083 * 10 ** 18)).toLocaleString("fullwide", {
-            useGrouping: false,
-          })
-        : "0",
+        ? totalPrice
+        : BigInt(0),
       priorityFee_EVVM,
       nonce_EVVM,
       priorityFlag_EVVM,
@@ -91,8 +88,9 @@ export const useStakingSignatureBuilder = () => {
         onSuccess: (paySignature) => {
           // Second signature: staking
           const stakingMessage = buildMessageSignedForPresaleStaking(
+            evvmID,
             isStaking,
-            "1",
+            BigInt(1),
             nonce
           );
 
@@ -112,25 +110,26 @@ export const useStakingSignatureBuilder = () => {
 
   // staking public staking signature (dual signature: payment + staking)
   const signPublicStaking = (
-    stakingAddress: string,
+    evvmID: bigint,
+    stakingAddress: `0x${string}`,
     isStaking: boolean,
-    stakingAmount: number,
-    nonceSMATE: string,
-    priorityFee: string,
-    nonceEVVM: string,
+    stakingAmount: bigint,
+    nonceStaking: bigint,
+    totalPrice: bigint,
+    priorityFee: bigint,
+    nonceEVVM: bigint,
     priorityFlag: boolean,
     onSuccess?: (paySignature: string, stakingSignature: string) => void,
     onError?: (error: Error) => void
   ) => {
     // First signature: payment
     const payMessage = buildMessageSignedForPay(
+      evvmID,
       stakingAddress,
       "0x0000000000000000000000000000000000000001",
       isStaking
-        ? (stakingAmount * (5083 * 10 ** 18)).toLocaleString("fullwide", {
-            useGrouping: false,
-          })
-        : "0",
+        ? totalPrice
+        : BigInt(0),
       priorityFee,
       nonceEVVM,
       priorityFlag,
@@ -143,9 +142,10 @@ export const useStakingSignatureBuilder = () => {
         onSuccess: (paySignature) => {
           // Second signature: staking
           const stakingMessage = buildMessageSignedForPublicStaking(
+            evvmID,
             isStaking,
-            stakingAmount.toString(),
-            nonceSMATE
+            stakingAmount,
+            nonceStaking
           );
 
           signMessage(
@@ -164,26 +164,26 @@ export const useStakingSignatureBuilder = () => {
 
   // staking public service staking signature (dual signature: payment + staking for specific service)
   const signPublicServiceStaking = (
-    stakingAddress: string,
+    evvmID: bigint,
+    stakingAddress: `0x${string}`,
     serviceAddress: string,
     isStaking: boolean,
-    stakingAmount: number,
-    nonce: string,
-    priorityFee_EVVM: string,
-    nonce_EVVM: string,
+    stakingAmount: bigint,
+    nonce: bigint,
+    priorityFee_EVVM: bigint,
+    nonce_EVVM: bigint,
     priorityFlag_EVVM: boolean,
     onSuccess?: (paySignature: string, stakingSignature: string) => void,
     onError?: (error: Error) => void
   ) => {
     // First signature: payment
     const payMessage = buildMessageSignedForPay(
+      evvmID,
       stakingAddress,
-      "0x0000000000000000000000000000000000000001",
+      "0x0000000000000000000000000000000000000001" as `0x${string}`,
       isStaking
-        ? (stakingAmount * (5083 * 10 ** 18)).toLocaleString("fullwide", {
-            useGrouping: false,
-          })
-        : "0",
+        ? stakingAmount * BigInt(5083 * 10 ** 18)
+        : BigInt(0),
       priorityFee_EVVM,
       nonce_EVVM,
       priorityFlag_EVVM,
@@ -195,10 +195,11 @@ export const useStakingSignatureBuilder = () => {
       {
         onSuccess: (paySignature) => {
           // Second signature: service staking
-          const stakingMessage = buildMessageSignedForPublicServiceStaking(
+          const stakingMessage = buildMessageSignedForPublicServiceStake(
+            evvmID,
             serviceAddress,
             isStaking,
-            stakingAmount.toString(),
+            stakingAmount,
             nonce
           );
 

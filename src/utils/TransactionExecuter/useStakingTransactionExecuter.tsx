@@ -10,7 +10,7 @@ import {
 
 const executeGoldenStaking = async (
   InputData: GoldenStakingInputData,
-  sMateAddress: `0x${string}`
+  stakingAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No data to execute payment");
@@ -18,7 +18,7 @@ const executeGoldenStaking = async (
 
   writeContract(config, {
     abi: Staking.abi,
-    address: sMateAddress,
+    address: stakingAddress,
     functionName: "goldenStaking",
     args: [
       InputData.isStaking,
@@ -36,7 +36,7 @@ const executeGoldenStaking = async (
 
 const executePresaleStaking = async (
   InputData: PresaleStakingInputData,
-  sMateAddress: `0x${string}`
+  stakingAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No data to execute payment");
@@ -44,7 +44,7 @@ const executePresaleStaking = async (
 
   writeContract(config, {
     abi: Staking.abi,
-    address: sMateAddress,
+    address: stakingAddress,
     functionName: "goldenStaking",
     args: [
       InputData.user,
@@ -67,7 +67,7 @@ const executePresaleStaking = async (
 
 const executePublicStaking = async (
   InputData: PublicStakingInputData,
-  sMateAddress: `0x${string}`
+  stakingAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No data to execute payment");
@@ -75,7 +75,7 @@ const executePublicStaking = async (
 
   writeContract(config, {
     abi: Staking.abi,
-    address: sMateAddress,
+    address: stakingAddress,
     functionName: "publicStaking",
     args: [
       InputData.user,
@@ -99,7 +99,7 @@ const executePublicStaking = async (
 
 const executePublicServiceStaking = async (
   InputData: PublicServiceStakingInputData,
-  sMateAddress: `0x${string}`
+  stakingAddress: `0x${string}`
 ) => {
   if (!InputData) {
     return Promise.reject("No data to execute payment");
@@ -107,7 +107,7 @@ const executePublicServiceStaking = async (
 
   writeContract(config, {
     abi: Staking.abi,
-    address: sMateAddress,
+    address: stakingAddress,
     functionName: "publicStaking",
     args: [
       InputData.user,

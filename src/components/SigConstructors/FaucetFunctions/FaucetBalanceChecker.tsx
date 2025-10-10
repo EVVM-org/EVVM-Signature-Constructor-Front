@@ -38,7 +38,7 @@ export const FaucetBalanceChecker: React.FC<FaucetBalanceCheckerProps> = ({ evvm
 
   return (
     <div className="flex flex-col items-center mt-4">
-      <h2>Check Faucet Balance</h2>
+      <h2>Check Balance</h2>
       <AddressInputField
         label="User address"
         inputId="faucetBalance_user"

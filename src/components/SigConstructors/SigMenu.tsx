@@ -342,7 +342,7 @@ export const SigMenu = () => {
           }}
           value={menu}
         >
-          <option value="faucet">Faucet functions</option>
+          <option value="faucet">Faucet and Balance functions</option>
           <option value="pay">Payment signatures</option>
           <option value="staking">Staking signatures</option>
           <option value="mns">MNS signatures</option>

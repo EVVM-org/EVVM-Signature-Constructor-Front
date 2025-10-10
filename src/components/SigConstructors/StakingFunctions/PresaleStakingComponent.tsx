@@ -5,7 +5,6 @@ import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/Titl
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
-import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
 import { getAccount } from "@wagmi/core";
@@ -36,7 +35,6 @@ export const PresaleStakingComponent = ({ evvmID, stakingAddress }: PresaleStaki
 
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null);
 
-  let account = getAccount(config);
 
   const makeSig = async () => {
     const walletData = await getAccountWithRetry(config);

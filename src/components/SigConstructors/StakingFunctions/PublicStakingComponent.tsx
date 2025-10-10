@@ -29,7 +29,6 @@ interface PublicStakingComponentProps {
 }
 
 export const PublicStakingComponent = ({ evvmID, stakingAddress }: PublicStakingComponentProps) => {
-  const account = getAccount(config);
   const { signPublicStaking } = useStakingSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");

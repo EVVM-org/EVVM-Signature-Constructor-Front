@@ -125,7 +125,7 @@ export const PreRegistrationUsernameComponent = ({ evvmID, nameServiceAddress }:
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Pre-registration of username"
-        link="https://www.evvm.info/docs/SignatureStructures/NameService/preRegistrationUsernameStructure"
+        link="https://www.evvm.org/docs/SignatureStructures/MNS/preRegistrationUsernameStructure"
       />
 
       <br />

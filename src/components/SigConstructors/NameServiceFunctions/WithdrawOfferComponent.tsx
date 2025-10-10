@@ -117,7 +117,7 @@ export const WithdrawOfferComponent = ({ evvmID, nameServiceAddress }: WithdrawO
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Withdraw offer of username"
-        link="https://www.evvm.info/docs/SignatureStructures/NameService/withdrawOfferStructure"
+        link="https://www.evvm.org/docs/SignatureStructures/MNS/withdrawOfferStructure"
       />
 
       <br />

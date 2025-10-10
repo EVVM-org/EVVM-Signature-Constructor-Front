@@ -5,6 +5,7 @@ import { config } from "@/config/index";
 import { useNameServiceSignatureBuilder } from "@/utils/SignatureBuilder/useNameServiceSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
+import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { TextInputField } from "../InputsAndModules/TextInputField";
@@ -131,7 +132,7 @@ export const FlushCustomMetadataComponent = ({ evvmID, nameServiceAddress }: Flu
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Flush Custom Metadata of Identity"
-        link="https://www.evvm.info/docs/SignatureStructures/NameService/flushCustomMetadataStructure"
+        link="https://www.evvm.org/docs/SignatureStructures/MNS/flushCustomMetadataStructure"
       />
 
       <br />

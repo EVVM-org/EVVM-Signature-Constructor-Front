@@ -153,7 +153,7 @@ export const RenewUsernameComponent = ({ evvmID, nameServiceAddress }: RenewUser
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Renewal of username"
-        link="https://www.evvm.info/docs/SignatureStructures/NameService/renewUsernameStructure"
+        link="https://www.evvm.org/docs/SignatureStructures/MNS/renewUsernameStructure"
       />
       <br />
       

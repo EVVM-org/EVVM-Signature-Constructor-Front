@@ -140,7 +140,7 @@ pnpm lint
 - [Reown Documentation](https://docs.reown.com)
 - [Wagmi Documentation](https://wagmi.sh)
 - [Next.js Documentation](https://nextjs.org/docs)
-- [EVVM Documentation](https://www.evvm.info/docs/SignatureStructures/)
+- [EVVM Documentation](https://www.evvm.org/docs/SignatureStructures/)
 
 
 ## Usage

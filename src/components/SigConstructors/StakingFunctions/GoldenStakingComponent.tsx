@@ -22,7 +22,12 @@ type InfoData = {
   GoldenStakingInputData: GoldenStakingInputData;
 };
 
-export const GoldenStakingComponent = () => {
+interface GoldenStakingComponentProps {
+  evvmID: string;
+  stakingAddress: string;
+}
+
+export const GoldenStakingComponent = ({ evvmID, stakingAddress }: GoldenStakingComponentProps) => {
   let account = getAccount(config);
   const { signGoldenStaking } = useStakingSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
@@ -36,10 +41,11 @@ export const GoldenStakingComponent = () => {
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
+
     const formData = {
-      evvmID: getValue("evvmIDInput_GoldenStaking"),
+      evvmID: evvmID,
       nonce: getValue("nonceInput_GoldenStaking"),
-      stakingAddress: getValue("stakingAddressInput_GoldenStaking"),
+      stakingAddress: stakingAddress,
       amountOfStaking: Number(getValue("amountOfStakingInput_GoldenStaking")),
     };
 
@@ -99,26 +105,10 @@ export const GoldenStakingComponent = () => {
       <h1>Golden staking</h1>
       <br />
 
-      {/* EVVM ID Input */}
-      <NumberInputField
-        label="EVVM ID"
-        inputId="evvmIDInput_GoldenStaking"
-        placeholder="Enter EVVM ID"
-      />
+      {/* EVVM ID is now passed as a prop */}
 
-      {/* Recipient configuration section */}
-      <AddressInputField
-        label="staking Address"
-        inputId="stakingAddressInput_GoldenStaking"
-        placeholder="Enter staking address"
-        defaultValue={
-          (account.chain?.id &&
-            contractAddress[account.chain.id as keyof typeof contractAddress]
-              ?.staking) ||
-          ""
-        }
-      />
-      <br />
+
+      {/* stakingAddress is now passed as a prop */}
 
       {/* Configuration Section */}
       <StakingActionSelector onChange={setIsStaking} />

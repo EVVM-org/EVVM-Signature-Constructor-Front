@@ -79,6 +79,9 @@ function buildMessageSignedForPay(
   priorityFlag: boolean,
   executor: `0x${string}`
 ): string {
+  if (typeof to !== "string" || !to) {
+    throw new Error("Invalid 'to' address passed to buildMessageSignedForPay: value is undefined or not a string");
+  }
   const inputs: string =
     `${to.startsWith("0x") ? to.toLowerCase() : to},` +
     `${tokenAddress.toLowerCase()},` +

@@ -8,7 +8,11 @@ import Evvm from "@/constants/abi/Evvm.json";
 import { contractAddress } from "@/constants/address";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 
-export const FaucetFunctionsComponent = () => {
+interface FaucetFunctionsComponentProps {
+  evvmAddress: string;
+}
+
+export const FaucetFunctionsComponent = ({evvmAddress }: FaucetFunctionsComponentProps) => {
   const account = getAccount(config);
 
   const executeFaucet = async () => {
@@ -19,7 +23,7 @@ export const FaucetFunctionsComponent = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
-      evvmAddress: getValue("evvmAddressInput_faucet"),
+      evvmAddress: evvmAddress,
       user: getValue("addressGive_faucet"),
       token: getValue("tokenAddress_faucet"),
       quantity: getValue("amountTokenInput_faucet"),
@@ -28,7 +32,7 @@ export const FaucetFunctionsComponent = () => {
     writeContract(config, {
       abi: Evvm.abi,
       address: formData.evvmAddress as `0x${string}`,
-      functionName: "_addBalance",
+      functionName: "addBalance",
       args: [formData.user, formData.token, formData.quantity],
     })
       .then(() => {
@@ -44,20 +48,12 @@ export const FaucetFunctionsComponent = () => {
       <h1>Faucet</h1>
       <br />
 
-      <AddressInputField
-        label="EVVM Address"
-        inputId="evvmAddressInput_faucet"
-        placeholder="Enter EVVM address"
-        defaultValue={
-          contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.evvm || ""
-        }
-      />
+
 
       <AddressInputField
         label="Address to give tokens to"
         inputId="addressGive_faucet"
-        placeholder="Enter token address"
+        placeholder="Enter address"
       />
 
       <AddressInputField

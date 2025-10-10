@@ -22,7 +22,13 @@ type InfoData = {
   MakeOfferInputData: MakeOfferInputData;
 };
 
-export const MakeOfferComponent = () => {
+
+interface MakeOfferComponentProps {
+  evvmID: string;
+  nameServiceAddress: string;
+}
+
+export const MakeOfferComponent = ({ evvmID, nameServiceAddress }: MakeOfferComponentProps) => {
   const { signMakeOffer } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
@@ -35,9 +41,10 @@ export const MakeOfferComponent = () => {
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
+
     const formData = {
-      evvmID: getValue("evvmIDInput_makeOffer"),
-      addressNameService: getValue("nameServiceAddressInput_makeOffer"),
+      evvmId: evvmID,
+      addressNameService: nameServiceAddress,
       nonceNameService: getValue("nonceNameServiceInput_makeOffer"),
       username: getValue("usernameInput_makeOffer"),
       amount: getValue("amountInput_makeOffer"),
@@ -48,7 +55,7 @@ export const MakeOfferComponent = () => {
     };
 
     signMakeOffer(
-      BigInt(formData.evvmID),
+      BigInt(formData.evvmId),
       formData.addressNameService as `0x${string}`,
       formData.username,
       BigInt(formData.expireDate),
@@ -115,17 +122,8 @@ export const MakeOfferComponent = () => {
 
       <br />
 
-      <AddressInputField
-        label="NameService Address"
-        inputId="nameServiceAddressInput_makeOffer"
-        placeholder="Enter NameService address"
-        defaultValue={
-          contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.nameService || ""
-        }
-      />
 
-      <br />
+
 
       <NumberInputWithGenerator
         label="NameService Nonce"

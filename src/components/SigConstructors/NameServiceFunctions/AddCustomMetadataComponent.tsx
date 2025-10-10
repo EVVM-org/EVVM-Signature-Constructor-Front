@@ -24,7 +24,13 @@ type InfoData = {
   AddCustomMetadataInputData: AddCustomMetadataInputData;
 };
 
-export const AddCustomMetadataComponent = () => {
+
+interface AddCustomMetadataComponentProps {
+  evvmID: string;
+  nameServiceAddress: string;
+}
+
+export const AddCustomMetadataComponent = ({ evvmID, nameServiceAddress }: AddCustomMetadataComponentProps) => {
   const { signAddCustomMetadata } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
@@ -32,16 +38,22 @@ export const AddCustomMetadataComponent = () => {
   const [amountToAddCustomMetadata, setAmountToAddCustomMetadata] =
     React.useState<bigint | null>(null);
 
-  const getValue = (id: string) =>
-    (document.getElementById(id) as HTMLInputElement).value;
+  const getValue = (id: string) => {
+    const el = document.getElementById(id) as HTMLInputElement | null;
+    if (!el) {
+      throw new Error(`Input element with id '${id}' not found. Ensure the input is rendered and the id is correct.`);
+    }
+    return el.value;
+  };
 
   const makeSig = async () => {
     const walletData = await getAccountWithRetry(config);
     if (!walletData) return;
 
+
     const formData = {
-      evvmID: getValue("evvmIDInput_addCustomMetadata"),
-      addressNameService: getValue("nameServiceAddressInput_addCustomMetadata"),
+      evvmId: evvmID,
+      addressNameService: nameServiceAddress,
       nonceNameService: getValue("nonceNameServiceInput_addCustomMetadata"),
       identity: getValue("identityInput_addCustomMetadata"),
       schema: getValue("schemaInput_addCustomMetadata"),
@@ -57,7 +69,7 @@ export const AddCustomMetadataComponent = () => {
     getPriceToAddCustomMetadata()
       .then(() => {
         signAddCustomMetadata(
-          BigInt(formData.evvmID),
+          BigInt(formData.evvmId),
           formData.addressNameService as `0x${string}`,
           BigInt(formData.nonceNameService),
           formData.identity,
@@ -107,8 +119,7 @@ export const AddCustomMetadataComponent = () => {
   };
 
   const getPriceToAddCustomMetadata = async () => {
-    let nameServiceAddress = getValue("nameServiceAddressInput_addCustomMetadata");
-
+    // Use nameServiceAddress from props, not input
     if (!nameServiceAddress) {
       setAmountToAddCustomMetadata(null);
     } else {
@@ -155,23 +166,9 @@ export const AddCustomMetadataComponent = () => {
       <br />
 
 
-      <NumberInputField
-        label="EVVM ID"
-        inputId="evvmIDInput_addCustomMetadata"
-        placeholder="Enter your evvmID"
-      />
 
-      <AddressInputField
-        label="Name Service Address"
-        inputId="nameServiceAddressInput_addCustomMetadata"
-        placeholder="Enter NameService address"
-        defaultValue={
-          contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.nameService || ""
-        }
-      />
 
-      <br />
+
 
       <NumberInputWithGenerator
         label="NameService Nonce"

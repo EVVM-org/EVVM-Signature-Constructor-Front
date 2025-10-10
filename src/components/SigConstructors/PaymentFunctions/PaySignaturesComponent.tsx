@@ -16,7 +16,12 @@ import { executePay } from "@/utils/TransactionExecuter/useEVVMTransactionExecut
 import { contractAddress } from "@/constants/address";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 
-export const PaySignaturesComponent = () => {
+interface PaySignaturesComponentProps {
+  evvmID: string;
+  evvmAddress: string;
+}
+
+export const PaySignaturesComponent = ({ evvmID, evvmAddress }: PaySignaturesComponentProps) => {
   const { signPay } = useSignatureBuilder();
   let account = getAccount(config);
 
@@ -34,7 +39,7 @@ export const PaySignaturesComponent = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
-      evvmID: getValue("evvmIDInput_Pay"),
+      evvmID: evvmID,
       nonce: getValue("nonceInput_Pay"),
       tokenAddress: getValue("tokenAddress_Pay"),
       to: getValue(isUsingUsernames ? "toUsername" : "toAddress"),
@@ -80,16 +85,12 @@ export const PaySignaturesComponent = () => {
       return;
     }
 
-    const evvmAddress = (
-      document.getElementById("evvmAddressInput_Pay") as HTMLInputElement
-    ).value as `0x${string}`;
-
     if (!evvmAddress) {
       console.error("EVVM address is not provided");
       return;
     }
 
-    executePay(dataToGet, evvmAddress, asStaker)
+    executePay(dataToGet, evvmAddress as `0x${string}`, asStaker)
       .then(() => {
         console.log("Payment executed successfully");
       })
@@ -106,24 +107,7 @@ export const PaySignaturesComponent = () => {
       />
       <br />
 
-      {/* EVVM ID Input */}
-      <NumberInputField
-        label="EVVM ID"
-        inputId="evvmIDInput_Pay"
-        placeholder="Enter EVVM ID"
-      />
-
-      {/* Address Input */}
-      <AddressInputField
-        label="EVVM Address"
-        inputId="evvmAddressInput_Pay"
-        placeholder="Enter EVVM address"
-        defaultValue={
-          contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.evvm || ""
-        }
-      />
-      <br />
+      {/* EVVM ID and Address are now passed as props */}
 
       {/* Recipient configuration section */}
       <div style={{ marginBottom: "1rem" }}>

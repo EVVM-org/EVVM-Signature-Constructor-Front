@@ -24,72 +24,89 @@ type InfoData = {
   RenewUsernameInputData: RenewUsernameInputData;
 };
 
-export const RenewUsernameComponent = () => {
+
+interface RenewUsernameComponentProps {
+  evvmID: string;
+  nameServiceAddress: string;
+}
+
+export const RenewUsernameComponent = ({ evvmID, nameServiceAddress }: RenewUsernameComponentProps) => {
+  if (!nameServiceAddress || typeof nameServiceAddress !== "string" || !nameServiceAddress.startsWith("0x")) {
+    throw new Error("Invalid or missing nameServiceAddress prop in RenewUsernameComponent. It must be a valid 0x-prefixed string.");
+  }
   const { signRenewUsername } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
   const [amountToRenew, setAmountToRenew] = React.useState<bigint | null>(null);
 
-  const getValue = (id: string) =>
-    (document.getElementById(id) as HTMLInputElement).value;
+
 
   const makeSig = async () => {
     const walletData = await getAccountWithRetry(config);
     if (!walletData) return;
 
+    // Get values from input fields except evvmID and evvmAddress, which come from props
+    const getValue = (id: string) => {
+      const el = document.getElementById(id) as HTMLInputElement | null;
+      if (!el) {
+        throw new Error(`Input element with id '${id}' not found. Ensure the input is rendered and the id is correct.`);
+      }
+      return el.value;
+    };
     const formData = {
-      evvmID: getValue("evvmIDInput_renewUsername"),
-      addressNameService: getValue("nameServiceAddressInput_renewUsername"),
-      nonceNameService: getValue("nonceNameServiceInput_renewUsername"),
+      evvmId: BigInt(evvmID),
+      addressNameService: nameServiceAddress,
       username: getValue("usernameInput_renewUsername"),
-      amountToRenew: getValue("amountToRenew_renewUsername"),
-      priorityFee_EVVM: getValue("priorityFeeInput_renewUsername"),
-      nonceEVVM: getValue("nonceEVVMInput_renewUsername"),
+      nonceNameService: BigInt(getValue("nonceNameServiceInput_renewUsername")),
+      amountToRenew: BigInt(getValue("amountToRenew_renewUsername")),
+      priorityFee_EVVM: BigInt(getValue("priorityFeeInput_renewUsername")),
+      nonceEVVM: BigInt(getValue("nonceEVVMInput_renewUsername")),
       priorityFlag: priority === "high",
     };
 
     signRenewUsername(
-      BigInt(formData.evvmID),
+      formData.evvmId,
       formData.addressNameService as `0x${string}`,
       formData.username,
-      BigInt(formData.nonceNameService),
-      BigInt(formData.amountToRenew),
-      BigInt(formData.priorityFee_EVVM),
-      BigInt(formData.nonceEVVM),
+      formData.nonceNameService,
+      formData.amountToRenew,
+      formData.priorityFee_EVVM,
+      formData.nonceEVVM,
       formData.priorityFlag,
-      (paySignature, renewUsernameSignature) => {
+      (paySignature: string, renewUsernameSignature: string) => {
         setDataToGet({
           PayInputData: {
             from: walletData.address as `0x${string}`,
             to_address: formData.addressNameService as `0x${string}`,
             to_identity: "",
             token: tokenAddress.mate as `0x${string}`,
-            amount: BigInt(formData.priorityFee_EVVM),
+            amount: formData.priorityFee_EVVM,
             priorityFee: BigInt(0),
-            nonce: BigInt(formData.nonceEVVM),
+            nonce: formData.nonceEVVM,
             priority: priority === "high",
             executor: formData.addressNameService as `0x${string}`,
             signature: paySignature,
           },
           RenewUsernameInputData: {
             user: walletData.address as `0x${string}`,
-            nonce: BigInt(formData.nonceNameService),
+            nonce: formData.nonceNameService,
             username: formData.username,
-            priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
+            priorityFee_EVVM: formData.priorityFee_EVVM,
             signature: renewUsernameSignature,
-            nonce_EVVM: BigInt(formData.nonceEVVM),
+            nonce_EVVM: formData.nonceEVVM,
             priorityFlag_EVVM: formData.priorityFlag,
             signature_EVVM: paySignature,
           },
         });
       },
-      (error) => console.error("Error signing payment:", error)
+      (error: Error) => console.error("Error signing payment:", error)
     );
   };
 
   const readAmountToRenew = async () => {
-    let nameServiceAddress = getValue("nameServiceAddressInput_renewUsername");
+
+    const getValue = (id: string) => (document.getElementById(id) as HTMLInputElement).value;
 
     if (!nameServiceAddress) {
       setAmountToRenew(null);
@@ -111,13 +128,18 @@ export const RenewUsernameComponent = () => {
     }
   };
 
+  // Handler for username change
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    readAmountToRenew();
+  };
+
+  // Handler for executing the transaction
   const execute = async () => {
     if (!dataToGet) {
       console.error("No data to execute payment");
       return;
     }
     const nameServiceAddress = dataToGet.PayInputData.to_address;
-
     executeRenewUsername(dataToGet.RenewUsernameInputData, nameServiceAddress)
       .then(() => {
         console.log("Renew username executed successfully");
@@ -127,74 +149,42 @@ export const RenewUsernameComponent = () => {
       });
   };
 
-  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    readAmountToRenew();
-  };
-
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Renewal of username"
         link="https://www.evvm.org/docs/SignatureStructures/MNS/renewUsernameStructure"
       />
-
       <br />
-
-
-      <NumberInputField
-        label="EVVM ID"
-        inputId="evvmIDInput_renewUsername"
-        placeholder="Enter your evvmID"
-      />
-
-      <AddressInputField
-        label="NameService Address"
-        inputId="nameServiceAddressInput_renewUsername"
-        placeholder="Enter NameService address"
-        defaultValue={
-          contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.nameService || ""
-        }
-      />
-
-      <br />
-
+      
       <NumberInputWithGenerator
         label="NameService Nonce"
         inputId="nonceNameServiceInput_renewUsername"
         placeholder="Enter nonce"
       />
-
       <TextInputField
         label="Username"
         inputId="usernameInput_renewUsername"
         placeholder="Enter username"
         onChange={handleUsernameChange}
       />
-
       <NumberInputField
         label="Amount to Renew"
         inputId="amountToRenew_renewUsername"
         placeholder="Enter amount to renew"
         defaultValue={amountToRenew !== null ? amountToRenew.toString() : ""}
       />
-
       <NumberInputField
         label="Priority fee"
         inputId="priorityFeeInput_renewUsername"
         placeholder="Enter priority fee"
       />
-
       <NumberInputWithGenerator
         label="EVVM Nonce"
         inputId="nonceEVVMInput_renewUsername"
         placeholder="Enter nonce"
       />
-
-      {/* Priority configuration */}
       <PrioritySelector onPriorityChange={setPriority} />
-
-      {/* Create signature button */}
       <button
         onClick={makeSig}
         style={{
@@ -204,7 +194,6 @@ export const RenewUsernameComponent = () => {
       >
         Make signature
       </button>
-
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
@@ -212,4 +201,5 @@ export const RenewUsernameComponent = () => {
       />
     </div>
   );
-};
+
+}

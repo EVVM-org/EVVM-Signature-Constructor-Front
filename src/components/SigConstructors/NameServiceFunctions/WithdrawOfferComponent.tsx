@@ -23,7 +23,13 @@ type InfoData = {
   WithdrawOfferInputData: WithdrawOfferInputData;
 };
 
-export const WithdrawOfferComponent = () => {
+
+interface WithdrawOfferComponentProps {
+  evvmID: string;
+  nameServiceAddress: string;
+}
+
+export const WithdrawOfferComponent = ({ evvmID, nameServiceAddress }: WithdrawOfferComponentProps) => {
   const { signWithdrawOffer } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
@@ -36,9 +42,10 @@ export const WithdrawOfferComponent = () => {
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
+
     const formData = {
-      evvmID: getValue("evvmIDInput_withdrawOffer"),
-      addressNameService: getValue("nameServiceAddressInput_withdrawOffer"),
+      evvmId: evvmID,
+      addressNameService: nameServiceAddress,
       nonceNameService: getValue("nonceNameServiceInput_withdrawOffer"),
       username: getValue("usernameInput_withdrawOffer"),
       offerId: getValue("offerIdInput_withdrawOffer"),
@@ -48,7 +55,7 @@ export const WithdrawOfferComponent = () => {
     };
 
     signWithdrawOffer(
-      BigInt(formData.evvmID),
+      BigInt(formData.evvmId),
       formData.addressNameService as `0x${string}`,
       formData.username,
       BigInt(formData.offerId),
@@ -115,17 +122,7 @@ export const WithdrawOfferComponent = () => {
 
       <br />
 
-      <AddressInputField
-        label="NameService Address"
-        inputId="nameServiceAddressInput_withdrawOffer"
-        placeholder="Enter NameService address"
-        defaultValue={
-          contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.nameService || ""
-        }
-      />
 
-      <br />
 
       <NumberInputWithGenerator
         label="NameService Nonce"
@@ -157,11 +154,7 @@ export const WithdrawOfferComponent = () => {
         placeholder="Enter nonce"
       />
 
-      <NumberInputField
-        label="EVVM ID"
-        inputId="evvmIDInput_withdrawOffer"
-        placeholder="Enter EVVM ID"
-      />
+
 
       {/* Priority configuration */}
       <PrioritySelector onPriorityChange={setPriority} />

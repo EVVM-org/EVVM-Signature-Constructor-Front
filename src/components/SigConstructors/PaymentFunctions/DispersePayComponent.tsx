@@ -18,7 +18,12 @@ import { executeDispersePay } from "@/utils/TransactionExecuter/useEVVMTransacti
 import { contractAddress } from "@/constants/address";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 
-export const DispersePayComponent = () => {
+interface DispersePayComponentProps {
+  evvmID: string;
+  evvmAddress: string;
+}
+
+export const DispersePayComponent = ({ evvmID, evvmAddress }: DispersePayComponentProps) => {
   let account = getAccount(config);
   const [isUsingExecutorDisperse, setIsUsingExecutorDisperse] =
     React.useState(false);
@@ -42,7 +47,7 @@ export const DispersePayComponent = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
-      evvmID: getValue("evvmIDInput_DispersePay"),
+      evvmID: evvmID,
       tokenAddress: getValue("tokenAddressDispersePay"),
       amount: getValue("amountTokenInputSplit"),
       priorityFee: getValue("priorityFeeInputSplit"),
@@ -104,18 +109,12 @@ export const DispersePayComponent = () => {
       return;
     }
 
-    const evvmAddress = (
-      document.getElementById(
-        "evvmAddressInput_DispersePay"
-      ) as HTMLInputElement
-    ).value as `0x${string}`;
-
     if (!evvmAddress) {
       console.error("EVVM address is not provided");
       return;
     }
 
-    executeDispersePay(dataToGet, evvmAddress)
+  executeDispersePay(dataToGet, evvmAddress as `0x${string}`)
       .then(() => {
         console.log("Disperse payment executed successfully");
       })
@@ -129,26 +128,6 @@ export const DispersePayComponent = () => {
       <TitleAndLink
         title="Disperse payment"
         link="https://www.evvm.org/docs/SignatureStructures/EVVM/DispersePaymentSignatureStructure"
-      />
-      <br />
-
-      {/* EVVM ID Input */}
-      <NumberInputField
-        label="EVVM ID"
-        inputId="evvmIDInput_DispersePay"
-        placeholder="Enter EVVM ID"
-      />
-      <br />
-
-      {/* Address Input */}
-      <AddressInputField
-        label="EVVM Address"
-        inputId="evvmAddressInput_DispersePay"
-        placeholder="Enter EVVM address"
-        defaultValue={
-          contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.evvm || ""
-        }
       />
       <br />
 

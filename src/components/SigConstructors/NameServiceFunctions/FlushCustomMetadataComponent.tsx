@@ -24,7 +24,13 @@ type InfoData = {
   FlushCustomMetadataInputData: FlushCustomMetadataInputData;
 };
 
-export const FlushCustomMetadataComponent = () => {
+
+interface FlushCustomMetadataComponentProps {
+  evvmID: string;
+  nameServiceAddress: string;
+}
+
+export const FlushCustomMetadataComponent = ({ evvmID, nameServiceAddress }: FlushCustomMetadataComponentProps) => {
   const { signFlushCustomMetadata } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
@@ -37,11 +43,10 @@ export const FlushCustomMetadataComponent = () => {
     const walletData = await getAccountWithRetry(config);
     if (!walletData) return;
 
+
     const formData = {
-      evvmID: getValue("evvmIDInput_flushCustomMetadata"),
-      addressNameService: getValue(
-        "nameServiceAddressInput_flushCustomMetadata"
-      ),
+      evvmId: evvmID,
+      addressNameService: nameServiceAddress,
       nonceNameService: getValue("nonceNameServiceInput_flushCustomMetadata"),
       identity: getValue("identityInput_flushCustomMetadata"),
       priorityFee_EVVM: getValue("priorityFeeInput_flushCustomMetadata"),
@@ -62,7 +67,7 @@ export const FlushCustomMetadataComponent = () => {
         }
 
         signFlushCustomMetadata(
-          BigInt(formData.evvmID),
+          BigInt(formData.evvmId),
           formData.addressNameService as `0x${string}`,
           formData.identity,
           BigInt(formData.nonceNameService),
@@ -133,23 +138,9 @@ export const FlushCustomMetadataComponent = () => {
       <br />
 
 
-      <NumberInputField
-        label="EVVM ID"
-        inputId="evvmIDInput_flushCustomMetadata"
-        placeholder="Enter your evvmID"
-      />
 
-      <AddressInputField
-        label="NameService Address"
-        inputId="nameServiceAddressInput_flushCustomMetadata"
-        placeholder="Enter NameService address"
-        defaultValue={
-          contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.nameService || ""
-        }
-      />
 
-      <br />
+
 
       {/* Nonce section with automatic generator */}
 

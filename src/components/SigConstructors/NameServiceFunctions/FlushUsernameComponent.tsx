@@ -24,7 +24,13 @@ type InfoData = {
   FlushUsernameInputData: FlushUsernameInputData;
 };
 
-export const FlushUsernameComponent = () => {
+
+interface FlushUsernameComponentProps {
+  evvmID: string;
+  nameServiceAddress: string;
+}
+
+export const FlushUsernameComponent = ({ evvmID, nameServiceAddress }: FlushUsernameComponentProps) => {
   const { signFlushUsername } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
@@ -37,9 +43,10 @@ export const FlushUsernameComponent = () => {
     const walletData = await getAccountWithRetry(config);
     if (!walletData) return;
 
+
     const formData = {
-      evvmID: getValue("evvmIDInput_flushUsername"),
-      addressNameService: getValue("nameServiceAddressInput_flushUsername"),
+      evvmId: evvmID,
+      addressNameService: nameServiceAddress,
       nonceNameService: getValue("nonceNameServiceInput_flushUsername"),
       username: getValue("usernameInput_flushUsername"),
       priorityFee_EVVM: getValue("priorityFeeInput_flushUsername"),
@@ -60,7 +67,7 @@ export const FlushUsernameComponent = () => {
           return;
         }
         signFlushUsername(
-          BigInt(formData.evvmID),
+          BigInt(formData.evvmId),
           formData.addressNameService as `0x${string}`,
           formData.username,
           BigInt(formData.nonceNameService),
@@ -129,21 +136,9 @@ export const FlushUsernameComponent = () => {
       <br />
 
 
-      <NumberInputField
-        label="EVVM ID"
-        inputId="evvmIDInput_flushUsername"
-        placeholder="Enter your evvmID"
-      />
 
-      <AddressInputField
-        label="NameService Address"
-        inputId="nameServiceAddressInput_flushUsername"
-        placeholder="Enter NameService address"
-        defaultValue={
-          contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.nameService || ""
-        }
-      />
+
+
 
       {/* Nonce section with automatic generator */}
 

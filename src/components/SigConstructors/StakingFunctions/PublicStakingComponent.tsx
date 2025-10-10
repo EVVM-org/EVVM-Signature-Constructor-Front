@@ -23,7 +23,12 @@ type InputData = {
   PayInputData: PayInputData;
 };
 
-export const PublicStakingComponent = () => {
+interface PublicStakingComponentProps {
+  evvmID: string;
+  stakingAddress: string;
+}
+
+export const PublicStakingComponent = ({ evvmID, stakingAddress }: PublicStakingComponentProps) => {
   let account = getAccount(config);
   const { signPublicStaking } = useStakingSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
@@ -38,8 +43,8 @@ export const PublicStakingComponent = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
-      evvmID: getValue("evvmIDInput_PublicStaking"),
-      stakingAddress: getValue("stakingAddressInput_PublicStaking"),
+      evvmID: evvmID,
+  stakingAddress: stakingAddress,
       nonceEVVM: getValue("nonceEVVMInput_PublicStaking"),
       nonceStaking: getValue("nonceStakingInput_PublicStaking"),
       amountOfStaking: Number(getValue("amountOfStakingInput_PublicStaking")),
@@ -122,23 +127,10 @@ export const PublicStakingComponent = () => {
       />
       <br />
 
-      {/* EVVM ID Input */}
-      <NumberInputField
-        label="EVVM ID"
-        inputId="evvmIDInput_PublicStaking"
-        placeholder="Enter EVVM ID"
-      />
+      {/* EVVM ID is now passed as a prop */}
 
-      <AddressInputField
-        label="staking Address"
-        inputId="stakingAddressInput_PublicStaking"
-        placeholder="Enter staking address"
-        defaultValue={
-          contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.staking || ""
-        }
-      />
-      <br />
+
+      {/* stakingAddress is now passed as a prop */}
 
       {/* Configuration Section */}
       <StakingActionSelector onChange={setIsStaking} />

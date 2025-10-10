@@ -23,45 +23,58 @@ type InfoData = {
   RegistrationUsernameInputData: RegistrationUsernameInputData;
 };
 
-export const RegistrationUsernameComponent = () => {
+interface RegistrationUsernameComponentProps {
+  evvmID: string;
+  nameServiceAddress: string;
+}
+
+export const RegistrationUsernameComponent = ({
+  evvmID,
+  nameServiceAddress,
+}: RegistrationUsernameComponentProps) => {
   const { signRegistrationUsername } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
-  const [rewardAmount, setRewardAmount] = React.useState<bigint | null>(
-    null
-  );
+  const [rewardAmount, setRewardAmount] = React.useState<bigint | null>(null);
 
-  const getValue = (id: string) =>
-    (document.getElementById(id) as HTMLInputElement).value;
+  const getValue = (id: string) => {
+    const el = document.getElementById(id) as HTMLInputElement | null;
+    if (!el) {
+      throw new Error(`Input element with id '${id}' not found. Ensure the input is rendered and the id is correct.`);
+    }
+    return el.value;
+  };
 
   const makeSig = async () => {
     const walletData = await getAccountWithRetry(config);
     if (!walletData) return;
 
     const formData = {
-      evvmID: getValue("evvmIDInput_registrationUsername"),
-      addressNameService: getValue("nameServiceAddressInput_registrationUsername"),
-      nonceNameService: getValue("nonceNameServiceInput_registrationUsername"),
+      evvmId: BigInt(evvmID),
+      addressNameService: nameServiceAddress,
+      nonceNameService: BigInt(getValue("nonceNameServiceInput_registrationUsername")),
       username: getValue("usernameInput_registrationUsername"),
-      clowNumber: getValue("clowNumberInput_registrationUsername"),
-      priorityFee_EVVM: getValue("priorityFeeInput_registrationUsername"),
-      nonceEVVM: getValue("nonceEVVMInput_registrationUsername"),
+      clowNumber: BigInt(getValue("clowNumberInput_registrationUsername")),
+      priorityFee_EVVM: BigInt(getValue("priorityFeeInput_registrationUsername")),
+      nonceEVVM: BigInt(getValue("nonceEVVMInput_registrationUsername")),
       priorityFlag: priority === "high",
     };
 
     readRewardAmount()
       .then(() => {
         signRegistrationUsername(
-          BigInt(formData.evvmID),
-          formData.addressNameService as `0x${string}`,
-          formData.username,
-          BigInt(formData.clowNumber),
-          BigInt(formData.nonceNameService),
-          rewardAmount as bigint,
-          BigInt(formData.priorityFee_EVVM),
-          BigInt(formData.nonceEVVM),
-          formData.priorityFlag,
+          {
+            evvmId: formData.evvmId,
+            addressNameService: formData.addressNameService as `0x${string}`,
+            username: formData.username,
+            clowNumber: formData.clowNumber,
+            nonce: formData.nonceNameService,
+            mateReward: rewardAmount as bigint,
+            priorityFee_EVVM: formData.priorityFee_EVVM,
+            nonce_EVVM: formData.nonceEVVM,
+            priorityFlag_EVVM: formData.priorityFlag,
+          },
           (paySignature: string, registrationUsernameSignature: string) => {
             setDataToGet({
               PayInputData: {
@@ -69,16 +82,16 @@ export const RegistrationUsernameComponent = () => {
                 to_address: formData.addressNameService as `0x${string}`,
                 to_identity: "",
                 token: tokenAddress.mate as `0x${string}`,
-                amount: BigInt(rewardAmount as bigint) * BigInt(100),
-                priorityFee: BigInt(formData.priorityFee_EVVM),
-                nonce: BigInt(formData.nonceEVVM),
+                amount: (rewardAmount ? rewardAmount * BigInt(100) : BigInt(0)),
+                priorityFee: formData.priorityFee_EVVM,
+                nonce: formData.nonceEVVM,
                 priority: priority === "high",
                 executor: formData.addressNameService as `0x${string}`,
                 signature: paySignature,
               },
               RegistrationUsernameInputData: {
                 user: walletData.address as `0x${string}`,
-                nonce: BigInt(formData.nonceNameService),
+                nonce: formData.nonceNameService,
                 username: formData.username,
                 clowNumber: BigInt(formData.clowNumber),
                 signature: registrationUsernameSignature,
@@ -99,8 +112,7 @@ export const RegistrationUsernameComponent = () => {
   };
 
   const readRewardAmount = async () => {
-    let nameServiceAddress = getValue("nameServiceAddressInput_registration");
-
+    // Use the prop directly instead of a missing input
     if (!nameServiceAddress) {
       setRewardAmount(null);
     } else {
@@ -123,9 +135,7 @@ export const RegistrationUsernameComponent = () => {
           })
             .then((reward) => {
               console.log("Mate reward amount:", reward);
-              setRewardAmount(
-                reward ? BigInt(reward.toString()) : null
-              );
+              setRewardAmount(reward ? BigInt(reward.toString()) : null);
             })
             .catch((error) => {
               console.error("Error reading mate reward amount:", error);
@@ -166,20 +176,6 @@ export const RegistrationUsernameComponent = () => {
       />
 
       <br />
-
-      <AddressInputField
-        label="NameService Address"
-        inputId="nameServiceAddressInput_registrationUsername"
-        placeholder="Enter NameService address"
-        defaultValue={
-          contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.nameService || ""
-        }
-      />
-
-      <br />
-
-      {/* Nonce section with automatic generator */}
 
       <NumberInputWithGenerator
         label="NameService Nonce"

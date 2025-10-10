@@ -23,7 +23,13 @@ type InfoData = {
   AcceptOfferInputData: AcceptOfferInputData;
 };
 
-export const AcceptOfferComponent = () => {
+
+interface AcceptOfferComponentProps {
+  evvmID: string;
+  nameServiceAddress: string;
+}
+
+export const AcceptOfferComponent = ({ evvmID, nameServiceAddress }: AcceptOfferComponentProps) => {
   const { signAcceptOffer } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
@@ -36,9 +42,10 @@ export const AcceptOfferComponent = () => {
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
+
     const formData = {
-      evvmID: getValue("evvmIDInput_acceptOffer"),
-      addressNameService: getValue("nameServiceAddressInput_acceptOffer"),
+      evvmId: evvmID,
+      addressNameService: nameServiceAddress,
       username: getValue("usernameInput_acceptOffer"),
       offerId: getValue("offerIdInput_acceptOffer"),
       nonce: getValue("nonceInput_acceptOffer"),
@@ -48,7 +55,7 @@ export const AcceptOfferComponent = () => {
     };
 
     signAcceptOffer(
-      BigInt(formData.evvmID),
+      BigInt(formData.evvmId),
       formData.addressNameService as `0x${string}`,
       formData.username,
       BigInt(formData.offerId),
@@ -113,23 +120,9 @@ export const AcceptOfferComponent = () => {
       <br />
 
 
-      <NumberInputField
-        label="EVVM ID"
-        inputId="evvmIDInput_acceptOffer"
-        placeholder="Enter your evvmID"
-      />
 
-      <AddressInputField
-        label="MNS Address"
-        inputId="nameServiceAddressInput_acceptOffer"
-        placeholder="Enter MNS address"
-        defaultValue={
-          contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.nameService || ""
-        }
-      />
 
-      <br />
+
 
       <NumberInputWithGenerator
         label="MNS Nonce"

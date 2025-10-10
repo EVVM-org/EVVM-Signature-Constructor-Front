@@ -22,7 +22,13 @@ type InfoData = {
   PreRegistrationUsernameInputData: PreRegistrationUsernameInputData;
 };
 
-export const PreRegistrationUsernameComponent = () => {
+
+interface PreRegistrationUsernameComponentProps {
+  evvmID: string;
+  nameServiceAddress: string;
+}
+
+export const PreRegistrationUsernameComponent = ({ evvmID, nameServiceAddress }: PreRegistrationUsernameComponentProps) => {
   const { signPreRegistrationUsername } = useNameServiceSignatureBuilder();
   let account = getAccount(config);
 
@@ -36,9 +42,10 @@ export const PreRegistrationUsernameComponent = () => {
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
+
     const formData = {
-      evvmID: getValue("evvmIDInput_preRegistration"),
-      addressNameService: getValue("nameServiceAddressInput_preRegistration"),
+      evvmId: evvmID,
+      addressNameService: nameServiceAddress,
       username: getValue("usernameInput_preRegistration"),
       nonce: getValue("nonceNameServiceInput_preRegistration"),
       clowNumber: getValue("clowNumberInput_preRegistration"),
@@ -48,14 +55,16 @@ export const PreRegistrationUsernameComponent = () => {
     };
 
     signPreRegistrationUsername(
-      BigInt(formData.evvmID),
-      formData.addressNameService as `0x${string}`,
-      formData.username,
-      BigInt(formData.clowNumber),
-      BigInt(formData.nonce),
-      BigInt(formData.priorityFee_EVVM),
-      BigInt(formData.nonce_EVVM),
-      formData.priorityFlag_EVVM,
+      {
+        evvmId: BigInt(formData.evvmId),
+        addressNameService: formData.addressNameService as `0x${string}`,
+        username: formData.username,
+        clowNumber: BigInt(formData.clowNumber),
+        nonce: BigInt(formData.nonce),
+        priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
+        nonce_EVVM: BigInt(formData.nonce_EVVM),
+        priorityFlag_EVVM_EVVM: formData.priorityFlag_EVVM,
+      },
       (paySignature, preRegistrationSignature) => {
         const hashUsername = hashPreRegisteredUsername(
           formData.username,
@@ -123,23 +132,9 @@ export const PreRegistrationUsernameComponent = () => {
 
       {/* Address Input */}
 
-      <NumberInputField
-        label="EVVM ID"
-        inputId="evvmIDInput_preRegistration"
-        placeholder="Enter your evvmID"
-      />
 
-      <AddressInputField
-        label="NameService Address"
-        inputId="nameServiceAddressInput_preRegistration"
-        placeholder="Enter NameService address"
-        defaultValue={
-          contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.nameService || ""
-        }
-      />
 
-      <br />
+
 
       {/* Nonce section with automatic generator */}
 

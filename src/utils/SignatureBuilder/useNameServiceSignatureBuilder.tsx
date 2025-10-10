@@ -177,14 +177,16 @@ export const useNameServiceSignatureBuilder = () => {
 
   // NameService username pre-registration signature (dual signature if priority fee > 0)
   const signPreRegistrationUsername = (
-    evvmID: bigint,
-    addressNameService: `0x${string}`,
-    username: string,
-    clowNumber: bigint,
-    nonce: bigint,
-    priorityFee_EVVM: bigint,
-    nonce_EVVM: bigint,
-    priorityFlag_EVVM_EVVM: boolean,
+    formData: {
+      evvmId: bigint,
+      addressNameService: `0x${string}`,
+      username: string,
+      clowNumber: bigint,
+      nonce: bigint,
+      priorityFee_EVVM: bigint,
+      nonce_EVVM: bigint,
+      priorityFlag_EVVM_EVVM: boolean,
+    },
     onSuccess?: (
       paySignature: string,
       preRegistrationSignature: string
@@ -192,11 +194,11 @@ export const useNameServiceSignatureBuilder = () => {
     onError?: (error: Error) => void
   ) => {
     // Hash username with clown number for pre-registration
-    const hashUsername = hashPreRegisteredUsername(username, clowNumber);
+    const hashUsername = hashPreRegisteredUsername(formData.username, formData.clowNumber);
     const preRegistrationMessage = buildMessageSignedForPreRegistrationUsername(
-      evvmID,
+      formData.evvmId,
       hashUsername,
-      nonce
+      formData.nonce
     );
 
     signMessage(
@@ -204,21 +206,21 @@ export const useNameServiceSignatureBuilder = () => {
       {
         onSuccess: (preRegistrationSignature) => {
           // If no priority fee, skip payment signature
-          if (priorityFee_EVVM === BigInt(0)) {
+          if (formData.priorityFee_EVVM === BigInt(0)) {
             onSuccess?.("", preRegistrationSignature);
             return;
           }
 
           // Payment signature for priority fee
           const payMessage = buildMessageSignedForPay(
-            evvmID,
-            addressNameService,
+            formData.evvmId,
+            formData.addressNameService,
             "0x0000000000000000000000000000000000000001",
             BigInt(0),
-            priorityFee_EVVM,
-            nonce_EVVM,
-            priorityFlag_EVVM_EVVM,
-            addressNameService
+            formData.priorityFee_EVVM,
+            formData.nonce_EVVM,
+            formData.priorityFlag_EVVM_EVVM,
+            formData.addressNameService
           );
 
           signMessage(
@@ -236,23 +238,25 @@ export const useNameServiceSignatureBuilder = () => {
   };
 
   const signRegistrationUsername = (
-    evvmID: bigint,
-    addressNameService: `0x${string}`,
-    username: string,
-    clowNumber: bigint,
-    nonce: bigint,
-    mateReward: bigint,
-    priorityFee_EVVM: bigint,
-    nonce_EVVM: bigint,
-    priorityFlag_EVVM: boolean,
+    formData: {
+      evvmId: bigint,
+      addressNameService: `0x${string}`,
+      username: string,
+      clowNumber: bigint,
+      nonce: bigint,
+      mateReward: bigint,
+      priorityFee_EVVM: bigint,
+      nonce_EVVM: bigint,
+      priorityFlag_EVVM: boolean,
+    },
     onSuccess?: (paySignature: string, registrationSignature: string) => void,
     onError?: (error: Error) => void
   ) => {
     const registrationMessage = buildMessageSignedForRegistrationUsername(
-      evvmID,
-      username,
-      clowNumber,
-      nonce
+      formData.evvmId,
+      formData.username,
+      formData.clowNumber,
+      formData.nonce
     );
 
     signMessage(
@@ -261,14 +265,14 @@ export const useNameServiceSignatureBuilder = () => {
         onSuccess: (registrationSignature) => {
           // Payment signature for priority fee
           const payMessage = buildMessageSignedForPay(
-            evvmID,
-            addressNameService,
+            formData.evvmId,
+            formData.addressNameService,
             "0x0000000000000000000000000000000000000001",
-            mateReward * BigInt(100),
-            priorityFee_EVVM,
-            nonce_EVVM,
-            priorityFlag_EVVM,
-            addressNameService
+            formData.mateReward * BigInt(100),
+            formData.priorityFee_EVVM,
+            formData.nonce_EVVM,
+            formData.priorityFlag_EVVM,
+            formData.addressNameService
           );
 
           signMessage(

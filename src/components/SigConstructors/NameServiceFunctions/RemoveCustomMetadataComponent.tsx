@@ -24,7 +24,13 @@ type InfoData = {
   RemoveCustomMetadataInputData: RemoveCustomMetadataInputData;
 };
 
-export const RemoveCustomMetadataComponent = () => {
+
+interface RemoveCustomMetadataComponentProps {
+  evvmID: string;
+  nameServiceAddress: string;
+}
+
+export const RemoveCustomMetadataComponent = ({ evvmID, nameServiceAddress }: RemoveCustomMetadataComponentProps) => {
   const { signRemoveCustomMetadata } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
@@ -37,9 +43,10 @@ export const RemoveCustomMetadataComponent = () => {
     const walletData = await getAccountWithRetry(config);
     if (!walletData) return;
 
+
     const formData = {
-      evvmID: getValue("evvmIDInput_removeCustomMetadata"),
-      addressNameService: getValue("nameServiceAddressInput_removeCustomMetadata"),
+      evvmId: evvmID,
+      addressNameService: nameServiceAddress,
       nonceNameService: getValue("nonceNameServiceInput_removeCustomMetadata"),
       identity: getValue("identityInput_removeCustomMetadata"),
       key: getValue("keyInput_removeCustomMetadata"),
@@ -60,7 +67,7 @@ export const RemoveCustomMetadataComponent = () => {
           return;
         }
         signRemoveCustomMetadata(
-          BigInt(formData.evvmID),
+          BigInt(formData.evvmId),
           formData.addressNameService as `0x${string}`,
           formData.identity,
           BigInt(formData.key),
@@ -133,15 +140,7 @@ export const RemoveCustomMetadataComponent = () => {
 
       <br />
 
-      <AddressInputField
-        label="NameService Address"
-        inputId="nameServiceAddressInput_removeCustomMetadata"
-        placeholder="Enter NameService address"
-        defaultValue={
-          contractAddress[account.chain?.id as keyof typeof contractAddress]
-            ?.nameService || ""
-        }
-      />
+
 
       <br />
 
@@ -175,11 +174,7 @@ export const RemoveCustomMetadataComponent = () => {
         placeholder="Enter nonce"
       />
 
-      <NumberInputField
-        label="EVVM ID"
-        inputId="evvmIDInput_removeCustomMetadata"
-        placeholder="Enter EVVM ID"
-      />
+
 
       {/* Priority configuration */}
       <PrioritySelector onPriorityChange={setPriority} />

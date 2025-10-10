@@ -40,29 +40,29 @@ export const RegistrationUsernameComponent = () => {
     if (!walletData) return;
 
     const formData = {
-      addressNameService: getValue("nameServiceAddressInput_registration"),
-      nonceNameService: getValue("nonceNameServiceInput_registration"),
-      username: getValue("usernameInput_registration"),
-      clowNumber: getValue("clowNumberInput_registration"),
-      priorityFee_EVVM: getValue("priorityFeeInput_registration"),
-      nonceEVVM: getValue("nonceEVVMInput_registration"),
+      evvmID: getValue("evvmIDInput_registrationUsername"),
+      addressNameService: getValue("nameServiceAddressInput_registrationUsername"),
+      nonceNameService: getValue("nonceNameServiceInput_registrationUsername"),
+      username: getValue("usernameInput_registrationUsername"),
+      clowNumber: getValue("clowNumberInput_registrationUsername"),
+      priorityFee_EVVM: getValue("priorityFeeInput_registrationUsername"),
+      nonceEVVM: getValue("nonceEVVMInput_registrationUsername"),
       priorityFlag: priority === "high",
     };
 
     readRewardAmount()
       .then(() => {
         signRegistrationUsername(
-          formData.addressNameService,
+          BigInt(formData.evvmID),
+          formData.addressNameService as `0x${string}`,
           formData.username,
           BigInt(formData.clowNumber),
           BigInt(formData.nonceNameService),
-          rewardAmount
-            ? BigInt(rewardAmount)
-            : BigInt(5000000000000000000),
+          rewardAmount as bigint,
           BigInt(formData.priorityFee_EVVM),
           BigInt(formData.nonceEVVM),
           formData.priorityFlag,
-          (paySignature, registrationSignature) => {
+          (paySignature: string, registrationUsernameSignature: string) => {
             setDataToGet({
               PayInputData: {
                 from: walletData.address as `0x${string}`,
@@ -81,7 +81,7 @@ export const RegistrationUsernameComponent = () => {
                 nonce: BigInt(formData.nonceNameService),
                 username: formData.username,
                 clowNumber: BigInt(formData.clowNumber),
-                signature: registrationSignature,
+                signature: registrationUsernameSignature,
                 priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
                 nonce_EVVM: BigInt(formData.nonceEVVM),
                 priorityFlag_EVVM: formData.priorityFlag,
@@ -169,7 +169,7 @@ export const RegistrationUsernameComponent = () => {
 
       <AddressInputField
         label="NameService Address"
-        inputId="nameServiceAddressInput_registration"
+        inputId="nameServiceAddressInput_registrationUsername"
         placeholder="Enter NameService address"
         defaultValue={
           contractAddress[account.chain?.id as keyof typeof contractAddress]
@@ -183,31 +183,31 @@ export const RegistrationUsernameComponent = () => {
 
       <NumberInputWithGenerator
         label="NameService Nonce"
-        inputId="nonceNameServiceInput_registration"
+        inputId="nonceNameServiceInput_registrationUsername"
         placeholder="Enter nonce"
       />
 
       <NumberInputField
         label="Clow Number"
-        inputId="clowNumberInput_registration"
+        inputId="clowNumberInput_registrationUsername"
         placeholder="Enter clow number"
       />
 
       <TextInputField
         label="Username"
-        inputId="usernameInput_registration"
+        inputId="usernameInput_registrationUsername"
         placeholder="Enter username"
       />
 
       <NumberInputField
         label="Priority fee"
-        inputId="priorityFeeInput_registration"
+        inputId="priorityFeeInput_registrationUsername"
         placeholder="Enter priority fee"
       />
 
       <NumberInputWithGenerator
         label="EVVM Nonce"
-        inputId="nonceEVVMInput_registration"
+        inputId="nonceEVVMInput_registrationUsername"
         placeholder="Enter nonce"
       />
 

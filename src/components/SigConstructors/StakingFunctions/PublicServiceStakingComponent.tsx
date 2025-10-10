@@ -38,6 +38,7 @@ export const PublicServiceStakingComponent = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
+      evvmID: getValue("evvmIDInput_PublicServiceStaking"),
       stakingAddress: getValue("stakingAddressInput_PublicServiceStaking"),
       serviceAddress: getValue("serviceAddressInput_PublicServiceStaking"),
       amountOfStaking: Number(
@@ -45,7 +46,7 @@ export const PublicServiceStakingComponent = () => {
       ),
       priorityFee: getValue("priorityFeeInput_PublicServiceStaking"),
       nonceEVVM: getValue("nonceEVVMInput_PublicServiceStaking"),
-      nonceSMATE: getValue("nonceSMATEInput_PublicServiceStaking"),
+      nonceStaking: getValue("nonceStakingInput_PublicServiceStaking"),
     };
 
     const amountOfToken = (formData.amountOfStaking * 10 ** 18).toLocaleString(
@@ -56,21 +57,22 @@ export const PublicServiceStakingComponent = () => {
     );
 
     signPublicServiceStaking(
-      formData.stakingAddress,
+      BigInt(formData.evvmID),
+      formData.stakingAddress as `0x${string}`,
       formData.serviceAddress,
       isStaking,
-      formData.amountOfStaking,
-      formData.nonceSMATE,
-      formData.priorityFee,
-      formData.nonceEVVM,
+      BigInt(formData.amountOfStaking),
+      BigInt(formData.nonceStaking),
+      BigInt(formData.priorityFee),
+      BigInt(formData.nonceEVVM),
       priority === "high",
-      (paySignature, stakingSignature) => {
+      (paySignature: string, stakingSignature: string) => {
         setDataToGet({
           PublicServiceStakingInputData: {
             isStaking: isStaking,
             user: walletData.address as `0x${string}`,
             service: formData.serviceAddress as `0x${string}`,
-            nonce: BigInt(formData.nonceSMATE),
+            nonce: BigInt(formData.nonceStaking),
             amountOfStaking: BigInt(formData.amountOfStaking),
             signature: stakingSignature,
             priorityFee_EVVM: BigInt(formData.priorityFee),
@@ -124,6 +126,13 @@ export const PublicServiceStakingComponent = () => {
       />
       <br />
 
+      {/* EVVM ID Input */}
+      <NumberInputField
+        label="EVVM ID"
+        inputId="evvmIDInput_PublicServiceStaking"
+        placeholder="Enter EVVM ID"
+      />
+
       {/* Address Input */}
       <AddressInputField
         label="staking Address"
@@ -155,7 +164,7 @@ export const PublicServiceStakingComponent = () => {
 
       <NumberInputWithGenerator
         label="staking Nonce"
-        inputId="nonceSMATEInput_PublicServiceStaking"
+        inputId="nonceStakingInput_PublicServiceStaking"
         placeholder="Enter nonce"
       />
 

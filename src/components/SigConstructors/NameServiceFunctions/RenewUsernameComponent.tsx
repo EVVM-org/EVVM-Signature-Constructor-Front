@@ -39,6 +39,7 @@ export const RenewUsernameComponent = () => {
     if (!walletData) return;
 
     const formData = {
+      evvmID: getValue("evvmIDInput_renewUsername"),
       addressNameService: getValue("nameServiceAddressInput_renewUsername"),
       nonceNameService: getValue("nonceNameServiceInput_renewUsername"),
       username: getValue("usernameInput_renewUsername"),
@@ -49,7 +50,8 @@ export const RenewUsernameComponent = () => {
     };
 
     signRenewUsername(
-      formData.addressNameService,
+      BigInt(formData.evvmID),
+      formData.addressNameService as `0x${string}`,
       formData.username,
       BigInt(formData.nonceNameService),
       BigInt(formData.amountToRenew),
@@ -137,6 +139,13 @@ export const RenewUsernameComponent = () => {
       />
 
       <br />
+
+
+      <NumberInputField
+        label="EVVM ID"
+        inputId="evvmIDInput_renewUsername"
+        placeholder="Enter your evvmID"
+      />
 
       <AddressInputField
         label="NameService Address"

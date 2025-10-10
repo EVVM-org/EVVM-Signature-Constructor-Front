@@ -42,6 +42,7 @@ export const DispersePayComponent = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
+      evvmID: getValue("evvmIDInput_DispersePay"),
       tokenAddress: getValue("tokenAddressDispersePay"),
       amount: getValue("amountTokenInputSplit"),
       priorityFee: getValue("priorityFeeInputSplit"),
@@ -70,14 +71,15 @@ export const DispersePayComponent = () => {
     }
 
     signDispersePay(
+      BigInt(formData.evvmID),
       toData,
-      formData.tokenAddress,
-      formData.amount,
-      formData.priorityFee,
-      formData.nonce,
+      formData.tokenAddress as `0x${string}`,
+      BigInt(formData.amount),
+      BigInt(formData.priorityFee),
+      BigInt(formData.nonce),
       priorityDisperse === "high",
-      formData.executor,
-      (dispersePaySignature) => {
+      formData.executor as `0x${string}`,
+      (dispersePaySignature: string) => {
         setDataToGet({
           from: walletData.address as `0x${string}`,
           toData,
@@ -90,7 +92,7 @@ export const DispersePayComponent = () => {
           signature: dispersePaySignature,
         });
       },
-      (error) => {
+      (error: Error) => {
         console.error("Error signing disperse payment:", error);
       }
     );
@@ -126,7 +128,15 @@ export const DispersePayComponent = () => {
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Disperse payment"
-        link="https://www.evvm.org/docs/SignatureStructures/EVVM/DispersePaySignatureStructure"
+        link="https://www.evvm.org/docs/SignatureStructures/EVVM/DispersePaymentSignatureStructure"
+      />
+      <br />
+
+      {/* EVVM ID Input */}
+      <NumberInputField
+        label="EVVM ID"
+        inputId="evvmIDInput_DispersePay"
+        placeholder="Enter EVVM ID"
       />
       <br />
 

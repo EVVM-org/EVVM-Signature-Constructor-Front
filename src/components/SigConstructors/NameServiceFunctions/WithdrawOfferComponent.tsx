@@ -37,6 +37,7 @@ export const WithdrawOfferComponent = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
+      evvmID: getValue("evvmIDInput_withdrawOffer"),
       addressNameService: getValue("nameServiceAddressInput_withdrawOffer"),
       nonceNameService: getValue("nonceNameServiceInput_withdrawOffer"),
       username: getValue("usernameInput_withdrawOffer"),
@@ -47,14 +48,15 @@ export const WithdrawOfferComponent = () => {
     };
 
     signWithdrawOffer(
-      formData.addressNameService,
+      BigInt(formData.evvmID),
+      formData.addressNameService as `0x${string}`,
       formData.username,
       BigInt(formData.offerId),
       BigInt(formData.nonceNameService),
       BigInt(formData.priorityFee_EVVM),
       BigInt(formData.nonce_EVVM),
       formData.priorityFlag_EVVM,
-      (paySignature, withdrawOfferSignature) => {
+      (paySignature: string, withdrawOfferSignature: string) => {
         setDataToGet({
           PayInputData: {
             from: walletData.address as `0x${string}`,
@@ -153,6 +155,12 @@ export const WithdrawOfferComponent = () => {
         label="EVVM Nonce"
         inputId="nonceEVVMInput_withdrawOffer"
         placeholder="Enter nonce"
+      />
+
+      <NumberInputField
+        label="EVVM ID"
+        inputId="evvmIDInput_withdrawOffer"
+        placeholder="Enter EVVM ID"
       />
 
       {/* Priority configuration */}

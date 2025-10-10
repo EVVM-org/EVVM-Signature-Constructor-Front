@@ -38,9 +38,10 @@ export const PublicStakingComponent = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
+      evvmID: getValue("evvmIDInput_PublicStaking"),
       stakingAddress: getValue("stakingAddressInput_PublicStaking"),
       nonceEVVM: getValue("nonceEVVMInput_PublicStaking"),
-      nonceSMATE: getValue("nonceSMATEInput_PublicStaking"),
+      nonceStaking: getValue("nonceStakingInput_PublicStaking"),
       amountOfStaking: Number(getValue("amountOfStakingInput_PublicStaking")),
       priorityFee: getValue("priorityFeeInput_PublicStaking"),
     };
@@ -56,19 +57,21 @@ export const PublicStakingComponent = () => {
 
     // Sign message
     signPublicStaking(
-      formData.stakingAddress,
+      BigInt(formData.evvmID),
+      formData.stakingAddress as `0x${string}`,
       isStaking,
-      formData.amountOfStaking,
-      formData.nonceSMATE,
-      formData.priorityFee,
-      formData.nonceEVVM,
+      BigInt(formData.amountOfStaking),
+      BigInt(formData.nonceStaking),
+      amountOfToken,
+      BigInt(formData.priorityFee),
+      BigInt(formData.nonceEVVM),
       priority === "high",
-      (paySignature, stakingSignature) => {
+      (paySignature: string, stakingSignature: string) => {
         setDataToGet({
           PublicStakingInputData: {
             isStaking: isStaking,
             user: walletData.address as `0x${string}`,
-            nonce: BigInt(formData.nonceSMATE),
+            nonce: BigInt(formData.nonceStaking),
             amountOfStaking: BigInt(formData.amountOfStaking),
             signature: stakingSignature,
             priorityFee_EVVM: BigInt(formData.priorityFee),
@@ -90,7 +93,7 @@ export const PublicStakingComponent = () => {
           },
         });
       },
-      (error) => console.error("Error signing presale staking:", error)
+      (error: Error) => console.error("Error signing presale staking:", error)
     );
   };
 
@@ -118,9 +121,17 @@ export const PublicStakingComponent = () => {
         link="https://www.evvm.org/docs/SignatureStructures/SMate/StakingUnstakingStructure"
       />
       <br />
+
+      {/* EVVM ID Input */}
+      <NumberInputField
+        label="EVVM ID"
+        inputId="evvmIDInput_PublicStaking"
+        placeholder="Enter EVVM ID"
+      />
+
       <AddressInputField
         label="staking Address"
-        inputId="stakingAddressInput_publicStaking"
+        inputId="stakingAddressInput_PublicStaking"
         placeholder="Enter staking address"
         defaultValue={
           contractAddress[account.chain?.id as keyof typeof contractAddress]
@@ -141,7 +152,7 @@ export const PublicStakingComponent = () => {
 
       <NumberInputWithGenerator
         label="staking Nonce"
-        inputId="nonceSMATEInput_PublicStaking"
+        inputId="nonceStakingInput_PublicStaking"
         placeholder="Enter nonce"
       />
 

@@ -37,6 +37,7 @@ export const PreRegistrationUsernameComponent = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
+      evvmID: getValue("evvmIDInput_preRegistration"),
       addressNameService: getValue("nameServiceAddressInput_preRegistration"),
       username: getValue("usernameInput_preRegistration"),
       nonce: getValue("nonceNameServiceInput_preRegistration"),
@@ -47,7 +48,8 @@ export const PreRegistrationUsernameComponent = () => {
     };
 
     signPreRegistrationUsername(
-      formData.addressNameService,
+      BigInt(formData.evvmID),
+      formData.addressNameService as `0x${string}`,
       formData.username,
       BigInt(formData.clowNumber),
       BigInt(formData.nonce),
@@ -120,6 +122,13 @@ export const PreRegistrationUsernameComponent = () => {
       <br />
 
       {/* Address Input */}
+
+      <NumberInputField
+        label="EVVM ID"
+        inputId="evvmIDInput_preRegistration"
+        placeholder="Enter your evvmID"
+      />
+
       <AddressInputField
         label="NameService Address"
         inputId="nameServiceAddressInput_preRegistration"

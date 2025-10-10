@@ -38,6 +38,7 @@ export const FlushCustomMetadataComponent = () => {
     if (!walletData) return;
 
     const formData = {
+      evvmID: getValue("evvmIDInput_flushCustomMetadata"),
       addressNameService: getValue(
         "nameServiceAddressInput_flushCustomMetadata"
       ),
@@ -61,7 +62,8 @@ export const FlushCustomMetadataComponent = () => {
         }
 
         signFlushCustomMetadata(
-          formData.addressNameService,
+          BigInt(formData.evvmID),
+          formData.addressNameService as `0x${string}`,
           formData.identity,
           BigInt(formData.nonceNameService),
           price as bigint,
@@ -129,6 +131,13 @@ export const FlushCustomMetadataComponent = () => {
       />
 
       <br />
+
+
+      <NumberInputField
+        label="EVVM ID"
+        inputId="evvmIDInput_flushCustomMetadata"
+        placeholder="Enter your evvmID"
+      />
 
       <AddressInputField
         label="NameService Address"

@@ -37,6 +37,7 @@ export const AcceptOfferComponent = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
+      evvmID: getValue("evvmIDInput_acceptOffer"),
       addressNameService: getValue("nameServiceAddressInput_acceptOffer"),
       username: getValue("usernameInput_acceptOffer"),
       offerId: getValue("offerIdInput_acceptOffer"),
@@ -47,7 +48,8 @@ export const AcceptOfferComponent = () => {
     };
 
     signAcceptOffer(
-      formData.addressNameService,
+      BigInt(formData.evvmID),
+      formData.addressNameService as `0x${string}`,
       formData.username,
       BigInt(formData.offerId),
       BigInt(formData.nonce),
@@ -109,6 +111,13 @@ export const AcceptOfferComponent = () => {
       />
 
       <br />
+
+
+      <NumberInputField
+        label="EVVM ID"
+        inputId="evvmIDInput_acceptOffer"
+        placeholder="Enter your evvmID"
+      />
 
       <AddressInputField
         label="MNS Address"

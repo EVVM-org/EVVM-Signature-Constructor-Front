@@ -38,6 +38,7 @@ export const FlushUsernameComponent = () => {
     if (!walletData) return;
 
     const formData = {
+      evvmID: getValue("evvmIDInput_flushUsername"),
       addressNameService: getValue("nameServiceAddressInput_flushUsername"),
       nonceNameService: getValue("nonceNameServiceInput_flushUsername"),
       username: getValue("usernameInput_flushUsername"),
@@ -59,7 +60,8 @@ export const FlushUsernameComponent = () => {
           return;
         }
         signFlushUsername(
-          formData.addressNameService,
+          BigInt(formData.evvmID),
+          formData.addressNameService as `0x${string}`,
           formData.username,
           BigInt(formData.nonceNameService),
           priceToFlushUsername as bigint,
@@ -125,6 +127,13 @@ export const FlushUsernameComponent = () => {
       />
 
       <br />
+
+
+      <NumberInputField
+        label="EVVM ID"
+        inputId="evvmIDInput_flushUsername"
+        placeholder="Enter your evvmID"
+      />
 
       <AddressInputField
         label="NameService Address"

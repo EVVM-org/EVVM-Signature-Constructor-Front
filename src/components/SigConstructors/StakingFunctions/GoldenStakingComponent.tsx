@@ -37,6 +37,7 @@ export const GoldenStakingComponent = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
+      evvmID: getValue("evvmIDInput_GoldenStaking"),
       nonce: getValue("nonceInput_GoldenStaking"),
       stakingAddress: getValue("stakingAddressInput_GoldenStaking"),
       amountOfStaking: Number(getValue("amountOfStakingInput_GoldenStaking")),
@@ -48,11 +49,12 @@ export const GoldenStakingComponent = () => {
 
     // Sign and set data
     signGoldenStaking(
-      formData.stakingAddress,
-      formData.amountOfStaking,
-      formData.nonce,
+      BigInt(formData.evvmID),
+      formData.stakingAddress as `0x${string}`,
+      amountOfToken,
+      BigInt(formData.nonce),
       priority === "high",
-      (signaturePay) => {
+      (signaturePay: string) => {
         setDataToGet({
           PayInputData: {
             from: walletData.address as `0x${string}`,
@@ -96,6 +98,13 @@ export const GoldenStakingComponent = () => {
     <div className="flex flex-1 flex-col justify-center items-center">
       <h1>Golden staking</h1>
       <br />
+
+      {/* EVVM ID Input */}
+      <NumberInputField
+        label="EVVM ID"
+        inputId="evvmIDInput_GoldenStaking"
+        placeholder="Enter EVVM ID"
+      />
 
       {/* Recipient configuration section */}
       <AddressInputField

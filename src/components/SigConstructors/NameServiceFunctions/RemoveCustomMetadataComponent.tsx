@@ -38,9 +38,8 @@ export const RemoveCustomMetadataComponent = () => {
     if (!walletData) return;
 
     const formData = {
-      addressNameService: getValue(
-        "nameServiceAddressInput_removeCustomMetadata"
-      ),
+      evvmID: getValue("evvmIDInput_removeCustomMetadata"),
+      addressNameService: getValue("nameServiceAddressInput_removeCustomMetadata"),
       nonceNameService: getValue("nonceNameServiceInput_removeCustomMetadata"),
       identity: getValue("identityInput_removeCustomMetadata"),
       key: getValue("keyInput_removeCustomMetadata"),
@@ -61,7 +60,8 @@ export const RemoveCustomMetadataComponent = () => {
           return;
         }
         signRemoveCustomMetadata(
-          formData.addressNameService,
+          BigInt(formData.evvmID),
+          formData.addressNameService as `0x${string}`,
           formData.identity,
           BigInt(formData.key),
           BigInt(formData.nonceNameService),
@@ -69,7 +69,7 @@ export const RemoveCustomMetadataComponent = () => {
           BigInt(formData.priorityFee_EVVM),
           BigInt(formData.nonceEVVM),
           formData.priorityFlag,
-          (paySignature, removeCustomMetadataSignature) => {
+          (paySignature: string, removeCustomMetadataSignature: string) => {
             setDataToGet({
               PayInputData: {
                 from: walletData.address as `0x${string}`,
@@ -173,6 +173,12 @@ export const RemoveCustomMetadataComponent = () => {
         label="EVVM Nonce"
         inputId="nonceEVVMInput_removeCustomMetadata"
         placeholder="Enter nonce"
+      />
+
+      <NumberInputField
+        label="EVVM ID"
+        inputId="evvmIDInput_removeCustomMetadata"
+        placeholder="Enter EVVM ID"
       />
 
       {/* Priority configuration */}

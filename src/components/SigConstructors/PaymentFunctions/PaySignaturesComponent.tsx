@@ -5,6 +5,7 @@ import { config } from "@/config/index";
 import { useSignatureBuilder } from "@/utils/SignatureBuilder/useEVVMSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
+import { NumberInputField } from "@/components/SigConstructors/InputsAndModules/NumberInputField";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { ExecutorSelector } from "../InputsAndModules/ExecutorSelector";
@@ -33,6 +34,7 @@ export const PaySignaturesComponent = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
+      evvmID: getValue("evvmIDInput_Pay"),
       nonce: getValue("nonceInput_Pay"),
       tokenAddress: getValue("tokenAddress_Pay"),
       to: getValue(isUsingUsernames ? "toUsername" : "toAddress"),
@@ -44,14 +46,15 @@ export const PaySignaturesComponent = () => {
     };
 
     signPay(
-      formData.amount,
+      BigInt(formData.evvmID),
       formData.to,
-      formData.tokenAddress,
-      formData.priorityFee,
-      formData.nonce,
+      formData.tokenAddress as `0x${string}`,
+      BigInt(formData.amount),
+      BigInt(formData.priorityFee),
+      BigInt(formData.nonce),
       priority === "high",
-      formData.executor,
-      (signature) => {
+      formData.executor as `0x${string}`,
+      (signature: string) => {
         setDataToGet({
           from: walletData.address as `0x${string}`,
           to_address: (formData.to.startsWith("0x")
@@ -102,6 +105,13 @@ export const PaySignaturesComponent = () => {
         link="https://www.evvm.org/docs/SignatureStructures/EVVM/SinglePaymentSignatureStructure"
       />
       <br />
+
+      {/* EVVM ID Input */}
+      <NumberInputField
+        label="EVVM ID"
+        inputId="evvmIDInput_Pay"
+        placeholder="Enter EVVM ID"
+      />
 
       {/* Address Input */}
       <AddressInputField

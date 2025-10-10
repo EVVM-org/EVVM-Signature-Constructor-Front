@@ -41,10 +41,11 @@ export const PresaleStakingComponent = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
+      evvmID: getValue("evvmIDInput_presaleStaking"),
       stakingAddress: getValue("stakingAddressInput_presaleStaking"),
       priorityFee_EVVM: getValue("priorityFeeInput_presaleStaking"),
       nonce_EVVM: getValue("nonceEVVMInput_presaleStaking"),
-      nonce: getValue("nonceSMATEInput_presaleStaking"),
+      nonce: getValue("nonceStakingInput_presaleStaking"),
       priorityFlag_EVVM: priority === "high",
     };
 
@@ -56,13 +57,15 @@ export const PresaleStakingComponent = () => {
     );
 
     signPresaleStaking(
-      formData.stakingAddress,
+      BigInt(formData.evvmID),
+      formData.stakingAddress as `0x${string}`,
       isStaking,
-      formData.nonce,
-      formData.priorityFee_EVVM,
-      formData.nonce_EVVM,
+      BigInt(formData.nonce),
+      BigInt(formData.priorityFee_EVVM),
+      BigInt(amountOfToken),
+      BigInt(formData.nonce_EVVM),
       formData.priorityFlag_EVVM,
-      (paySignature, stakingSignature) => {
+      (paySignature: string, stakingSignature: string) => {
         setDataToGet({
           PresaleStakingInputData: {
             isStaking: isStaking,
@@ -88,7 +91,7 @@ export const PresaleStakingComponent = () => {
           },
         });
       },
-      (error) => console.error("Error signing presale staking:", error)
+      (error: Error) => console.error("Error signing presale staking:", error)
     );
   };
 
@@ -117,6 +120,13 @@ export const PresaleStakingComponent = () => {
       />
       <br />
 
+      {/* EVVM ID Input */}
+      <NumberInputField
+        label="EVVM ID"
+        inputId="evvmIDInput_presaleStaking"
+        placeholder="Enter EVVM ID"
+      />
+
       {/* Address Input */}
       <AddressInputField
         label="staking Address"
@@ -142,7 +152,7 @@ export const PresaleStakingComponent = () => {
 
       <NumberInputWithGenerator
         label="staking Nonce"
-        inputId="nonceSMATEInput_presaleStaking"
+        inputId="nonceStakingInput_presaleStaking"
         placeholder="Enter nonce"
       />
 

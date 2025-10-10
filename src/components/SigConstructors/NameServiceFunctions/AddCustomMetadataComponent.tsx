@@ -40,6 +40,7 @@ export const AddCustomMetadataComponent = () => {
     if (!walletData) return;
 
     const formData = {
+      evvmID: getValue("evvmIDInput_addCustomMetadata"),
       addressNameService: getValue("nameServiceAddressInput_addCustomMetadata"),
       nonceNameService: getValue("nonceNameServiceInput_addCustomMetadata"),
       identity: getValue("identityInput_addCustomMetadata"),
@@ -56,14 +57,15 @@ export const AddCustomMetadataComponent = () => {
     getPriceToAddCustomMetadata()
       .then(() => {
         signAddCustomMetadata(
-          formData.addressNameService,
+          BigInt(formData.evvmID),
+          formData.addressNameService as `0x${string}`,
           BigInt(formData.nonceNameService),
           formData.identity,
           valueCustomMetadata,
           amountToAddCustomMetadata
             ? BigInt(amountToAddCustomMetadata)
             : BigInt(5000000000000000000 * 10),
-          BigInt(formData.priorityFeeForFisher),
+          BigInt(formData.priorityFee_EVVM),
           BigInt(formData.nonceEVVM),
           formData.priorityFlag,
           (paySignature, addCustomMetadataSignature) => {
@@ -76,7 +78,7 @@ export const AddCustomMetadataComponent = () => {
                 amount: amountToAddCustomMetadata
                   ? BigInt(amountToAddCustomMetadata)
                   : BigInt(5000000000000000000 * 10),
-                priorityFee: BigInt(formData.priorityFeeForFisher),
+                priorityFee: BigInt(formData.priorityFee_EVVM),
                 nonce: BigInt(formData.nonceEVVM),
                 priority: priority === "high",
                 executor: formData.addressNameService as `0x${string}`,
@@ -88,7 +90,7 @@ export const AddCustomMetadataComponent = () => {
                 value: valueCustomMetadata,
                 nonce: BigInt(formData.nonceNameService),
                 signature: addCustomMetadataSignature,
-                priorityFee_EVVM: BigInt(formData.priorityFeeForFisher),
+                priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
                 nonce_EVVM: BigInt(formData.nonceEVVM),
                 priorityFlag_EVVM: formData.priorityFlag,
                 signature_EVVM: paySignature,
@@ -151,6 +153,13 @@ export const AddCustomMetadataComponent = () => {
       />
 
       <br />
+
+
+      <NumberInputField
+        label="EVVM ID"
+        inputId="evvmIDInput_addCustomMetadata"
+        placeholder="Enter your evvmID"
+      />
 
       <AddressInputField
         label="Name Service Address"

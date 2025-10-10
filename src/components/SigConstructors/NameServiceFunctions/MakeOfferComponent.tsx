@@ -36,6 +36,7 @@ export const MakeOfferComponent = () => {
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
+      evvmID: getValue("evvmIDInput_makeOffer"),
       addressNameService: getValue("nameServiceAddressInput_makeOffer"),
       nonceNameService: getValue("nonceNameServiceInput_makeOffer"),
       username: getValue("usernameInput_makeOffer"),
@@ -47,7 +48,8 @@ export const MakeOfferComponent = () => {
     };
 
     signMakeOffer(
-      formData.addressNameService,
+      BigInt(formData.evvmID),
+      formData.addressNameService as `0x${string}`,
       formData.username,
       BigInt(formData.expireDate),
       BigInt(formData.amount),
@@ -55,7 +57,7 @@ export const MakeOfferComponent = () => {
       BigInt(formData.priorityFee_EVVM),
       BigInt(formData.nonceEVVM),
       formData.priorityFlag,
-      (paySignature, makeOfferSignature) => {
+      (paySignature: string, makeOfferSignature: string) => {
         setDataToGet({
           PayInputData: {
             from: walletData.address as `0x${string}`,

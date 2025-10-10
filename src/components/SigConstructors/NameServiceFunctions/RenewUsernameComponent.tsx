@@ -32,7 +32,11 @@ interface RenewUsernameComponentProps {
 
 export const RenewUsernameComponent = ({ evvmID, nameServiceAddress }: RenewUsernameComponentProps) => {
   if (!nameServiceAddress || typeof nameServiceAddress !== "string" || !nameServiceAddress.startsWith("0x")) {
-    throw new Error("Invalid or missing nameServiceAddress prop in RenewUsernameComponent. It must be a valid 0x-prefixed string.");
+    return (
+      <div style={{ color: 'red', fontWeight: 600, padding: '1rem', textAlign: 'center' }}>
+        Invalid or missing NameService address. Please connect a valid EVVM contract first.
+      </div>
+    );
   }
   const { signRenewUsername } = useNameServiceSignatureBuilder();
   const account = getAccount(config);

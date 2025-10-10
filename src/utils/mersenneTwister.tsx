@@ -7,9 +7,8 @@ function mersenneTwister(seed: number) {
   const LOWER_MASK = 0x7fffffff;
   const MAG01 = [0, MATRIX_A];
 
-  let mt = new Uint32Array(N);
+  const mt = new Uint32Array(N);
   let mti = 0;
-
   mt[0] = seed >>> 0;
   for (mti = 1; mti < N; mti++) {
     mt[mti] = (1812433253 * (mt[mti - 1] ^ (mt[mti - 1] >>> 30)) + mti) >>> 0;
@@ -48,8 +47,8 @@ function mersenneTwister(seed: number) {
   function real1() {
     return int32() * (1.0 / 4294967295.0); // Divided by 2^32-1
   }
-
-  /* Generates a random number on [0,1)-real-interval. */
+      const a = int32() >>> 5,
+        b = int32() >>> 6;
   function real2() {
     return int32() * (1.0 / 4294967296.0); // Divided by 2^32
   }

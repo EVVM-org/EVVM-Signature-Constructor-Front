@@ -6,7 +6,7 @@ import { useStakingSignatureBuilder } from "@/utils/SignatureBuilder/useStakingS
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
 import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector";
-import { AddressInputField } from "../InputsAndModules/AddressInputField";
+// ...existing code...
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
@@ -29,7 +29,7 @@ interface PublicStakingComponentProps {
 }
 
 export const PublicStakingComponent = ({ evvmID, stakingAddress }: PublicStakingComponentProps) => {
-  let account = getAccount(config);
+  const account = getAccount(config);
   const { signPublicStaking } = useStakingSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");

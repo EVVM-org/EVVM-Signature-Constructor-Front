@@ -65,7 +65,7 @@ import {
   buildMessageSignedForPublicServiceStake,
   buildMessageSignedForPublicStaking,
 } from "./constructMessage";
-import { keccak256, encodePacked, encodeAbiParameters, sha256 } from "viem";
+// ...existing code...
 
 export const useStakingSignatureBuilder = () => {
   const { signMessage, ...rest } = useSignMessage();

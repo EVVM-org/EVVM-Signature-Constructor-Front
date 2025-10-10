@@ -7,7 +7,6 @@ module.exports = {
   extends: [
     "eslint:recommended", // Reglas recomendadas por ESLint
     "plugin:@typescript-eslint/recommended", // Reglas recomendadas para TypeScript
-    "prettier", // Asegura que Prettier y ESLint no entren en conflicto
     'plugin:@next/next/recommended',
   ],
 

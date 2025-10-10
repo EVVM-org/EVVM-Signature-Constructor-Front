@@ -54,7 +54,7 @@ export const SigMenu = () => {
   // Fetch summary info for EVVM contract: evvmID, stakingAddress, and NameService address
   const fetchEvvmSummary = async () => {
     if (!evvmAddress) {
-      alert("Por favor ingresa una dirección EVVM válida");
+  alert("Please enter a valid EVVM address");
       return;
     }
     setLoadingIDs(true);
@@ -99,7 +99,7 @@ export const SigMenu = () => {
       setStakingAddress("");
       setNameserviceAddress("");
       alert(
-        "No se pudo obtener los datos (evvmID, stakingAddress, NameService address)"
+        "Could not fetch data (evvmID, stakingAddress, NameService address)"
       );
     } finally {
       setLoadingIDs(false);
@@ -229,7 +229,7 @@ export const SigMenu = () => {
     >
       <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
         <h2 style={{ fontWeight: 700, fontSize: 22, margin: 0, color: "#222" }}>
-          EVVM Signature Constructor
+          EVVM Signature Toolkit
         </h2>
         {evvmID && stakingAddress && nameserviceAddress ? (
           <div
@@ -295,7 +295,7 @@ export const SigMenu = () => {
               }}
               disabled={loadingIDs}
             >
-              {loadingIDs ? "Cargando..." : "Obtener datos"}
+              {loadingIDs ? "Loading..." : "Connect EVVM"}
             </button>
           </div>
         )}
@@ -321,7 +321,7 @@ export const SigMenu = () => {
             width: "100%",
           }}
         >
-          Selecciona una función:
+          Select a function:
         </label>
         <select
           id="sig-menu-select"

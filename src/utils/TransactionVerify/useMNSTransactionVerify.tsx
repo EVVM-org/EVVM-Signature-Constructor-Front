@@ -35,16 +35,6 @@ const verifyPreRegistrationUsername = async (
     address: mnsAddress,
     functionName: "preRegistrationUsername",
     args: [
-<<<<<<< HEAD
-      InputData.user,
-      InputData.nonce,
-      InputData.hashPreRegisteredUsername,
-      InputData.priorityFee_EVVM,
-      InputData.signature,
-      InputData.nonce_EVVM,
-      InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM,
-=======
   InputData.user,
   InputData.nonce,
   InputData.hashPreRegisteredUsername,
@@ -53,7 +43,6 @@ const verifyPreRegistrationUsername = async (
   InputData.nonce_EVVM,
   InputData.priorityFlag_EVVM,
   InputData.signature_EVVM,
->>>>>>> 6d4a5055bda408f757e1ab4fdeb7f8bd8a7cc96b
     ],
   })
     .then(() => {
@@ -77,17 +66,6 @@ const verifyRegistrationUsername = async (
     address: mnsAddress,
     functionName: "registrationUsername",
     args: [
-<<<<<<< HEAD
-      InputData.user,
-      InputData.nonce,
-      InputData.username,
-      InputData.clowNumber,
-      InputData.signature,
-      InputData.priorityFee_EVVM,
-      InputData.nonce_EVVM,
-      InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM,
-=======
   InputData.user,
   InputData.nonce,
   InputData.username,
@@ -97,7 +75,6 @@ const verifyRegistrationUsername = async (
   InputData.nonce_EVVM,
   InputData.priorityFlag_EVVM,
   InputData.signature_EVVM,
->>>>>>> 6d4a5055bda408f757e1ab4fdeb7f8bd8a7cc96b
     ],
   })
     .then(() => {
@@ -121,18 +98,6 @@ const verifyMakeOffer = async (
     address: mnsAddress,
     functionName: "makeOffer",
     args: [
-<<<<<<< HEAD
-      InputData.user,
-      InputData.nonce,
-      InputData.username,
-      InputData.amount,
-      InputData.expireDate,
-      InputData.priorityFee_EVVM,
-      InputData.signature,
-      InputData.nonce_EVVM,
-      InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM,
-=======
   InputData.user,
   InputData.nonce,
   InputData.username,
@@ -143,7 +108,6 @@ const verifyMakeOffer = async (
   InputData.nonce_EVVM,
   InputData.priorityFlag_EVVM,
   InputData.signature_EVVM,
->>>>>>> 6d4a5055bda408f757e1ab4fdeb7f8bd8a7cc96b
     ],
   })
     .then(() => {
@@ -167,17 +131,6 @@ const verifyWithdrawOffer = async (
     address: mnsAddress,
     functionName: "withdrawOffer",
     args: [
-<<<<<<< HEAD
-      InputData.user,
-      InputData.nonce,
-      InputData.username,
-      InputData.offerID,
-      InputData.priorityFee_EVVM,
-      InputData.signature,
-      InputData.nonce_EVVM,
-      InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM,
-=======
   InputData.user,
   InputData.nonce,
   InputData.username,
@@ -187,7 +140,6 @@ const verifyWithdrawOffer = async (
   InputData.nonce_EVVM,
   InputData.priorityFlag_EVVM,
   InputData.signature_EVVM,
->>>>>>> 6d4a5055bda408f757e1ab4fdeb7f8bd8a7cc96b
     ],
   })
     .then(() => {
@@ -211,17 +163,6 @@ const verifyAcceptOffer = async (
     address: mnsAddress,
     functionName: "acceptOffer",
     args: [
-<<<<<<< HEAD
-      InputData.user,
-      InputData.nonce,
-      InputData.username,
-      InputData.offerID,
-      InputData.priorityFee_EVVM,
-      InputData.signature,
-      InputData.nonce_EVVM,
-      InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM,
-=======
   InputData.user,
   InputData.nonce,
   InputData.username,
@@ -231,7 +172,6 @@ const verifyAcceptOffer = async (
   InputData.nonce_EVVM,
   InputData.priorityFlag_EVVM,
   InputData.signature_EVVM,
->>>>>>> 6d4a5055bda408f757e1ab4fdeb7f8bd8a7cc96b
     ],
   })
     .then(() => {
@@ -255,16 +195,6 @@ const verifyRenewUsername = async (
     address: mnsAddress,
     functionName: "renewUsername",
     args: [
-<<<<<<< HEAD
-      InputData.user,
-      InputData.nonce,
-      InputData.username,
-      InputData.priorityFee_EVVM,
-      InputData.signature,
-      InputData.nonce_EVVM,
-      InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM,
-=======
   InputData.user,
   InputData.nonce,
   InputData.username,
@@ -273,7 +203,6 @@ const verifyRenewUsername = async (
   InputData.nonce_EVVM,
   InputData.priorityFlag_EVVM,
   InputData.signature_EVVM,
->>>>>>> 6d4a5055bda408f757e1ab4fdeb7f8bd8a7cc96b
     ],
   })
     .then(() => {
@@ -297,17 +226,6 @@ const verifyAddCustomMetadata = async (
     address: mnsAddress,
     functionName: "addCustomMetadata",
     args: [
-<<<<<<< HEAD
-      InputData.user,
-      InputData.nonce,
-      InputData.identity,
-      InputData.value,
-      InputData.priorityFee_EVVM,
-      InputData.signature,
-      InputData.nonce_EVVM,
-      InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM,
-=======
   InputData.user,
   InputData.nonce,
   InputData.identity,
@@ -317,7 +235,6 @@ const verifyAddCustomMetadata = async (
   InputData.nonce_EVVM,
   InputData.priorityFlag_EVVM,
   InputData.signature_EVVM,
->>>>>>> 6d4a5055bda408f757e1ab4fdeb7f8bd8a7cc96b
     ],
   })
     .then(() => {
@@ -341,17 +258,6 @@ const verifyRemoveCustomMetadata = async (
     address: mnsAddress,
     functionName: "removeCustomMetadata",
     args: [
-<<<<<<< HEAD
-      InputData.user,
-      InputData.nonce,
-      InputData.identity,
-      InputData.key,
-      InputData.priorityFee_EVVM,
-      InputData.signature,
-      InputData.nonce_EVVM,
-      InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM,
-=======
   InputData.user,
   InputData.nonce,
   InputData.identity,
@@ -361,7 +267,6 @@ const verifyRemoveCustomMetadata = async (
   InputData.nonce_EVVM,
   InputData.priorityFlag_EVVM,
   InputData.signature_EVVM,
->>>>>>> 6d4a5055bda408f757e1ab4fdeb7f8bd8a7cc96b
     ],
   })
     .then(() => {
@@ -385,16 +290,6 @@ const verifyFlushCustomMetadata = async (
     address: mnsAddress,
     functionName: "flushCustomMetadata",
     args: [
-<<<<<<< HEAD
-      InputData.user,
-      InputData.nonce,
-      InputData.identity,
-      InputData.priorityFee_EVVM,
-      InputData.signature,
-      InputData.nonce_EVVM,
-      InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM,
-=======
   InputData.user,
   InputData.nonce,
   InputData.identity,
@@ -403,7 +298,6 @@ const verifyFlushCustomMetadata = async (
   InputData.nonce_EVVM,
   InputData.priorityFlag_EVVM,
   InputData.signature_EVVM,
->>>>>>> 6d4a5055bda408f757e1ab4fdeb7f8bd8a7cc96b
     ],
   })
     .then(() => {
@@ -427,16 +321,6 @@ const verifyFlushUsername = async (
     address: mnsAddress,
     functionName: "flushUsername",
     args: [
-<<<<<<< HEAD
-      InputData.user,
-      InputData.username,
-      InputData.priorityFee_EVVM,
-      InputData.nonce,
-      InputData.signature,
-      InputData.nonce_EVVM,
-      InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM,
-=======
   InputData.user,
   InputData.username,
   InputData.priorityFee_EVVM,
@@ -445,7 +329,6 @@ const verifyFlushUsername = async (
   InputData.nonce_EVVM,
   InputData.priorityFlag_EVVM,
   InputData.signature_EVVM,
->>>>>>> 6d4a5055bda408f757e1ab4fdeb7f8bd8a7cc96b
     ],
   })
     .then(() => {

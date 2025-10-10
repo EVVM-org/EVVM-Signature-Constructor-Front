@@ -71,16 +71,16 @@ pnpm run dev
 #### Golden Staking
 1. Navigate to "Staking signatures"
 2. Select staking or unstaking action
-3. Enter sMate address and amount
+3. Enter staking address and amount
 4. Generate nonce and set priority
 5. Create signature
 
 #### Presale Staking
 1. Choose staking/unstaking action
-2. Enter sMate address and amount
-3. Generate both EVVM and sMate nonces
+2. Enter staking address and amount
+3. Generate both EVVM and staking nonces
 4. Set priority fee and priority level
-5. Create dual signatures (EVVM + sMate)
+5. Create dual signatures (EVVM + staking)
 
 ## Configuration
 

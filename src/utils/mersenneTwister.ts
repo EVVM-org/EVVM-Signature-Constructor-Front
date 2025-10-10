@@ -43,27 +43,13 @@ function mersenneTwister(seed: number) {
     return y >>> 0;
   }
 
-  /* Generates a random number on [0,1]-real-interval. */
-  function real1() {
-    return int32() * (1.0 / 4294967295.0); // Divided by 2^32-1
-  }
-      const a = int32() >>> 5,
-        b = int32() >>> 6;
-  function real2() {
-    return int32() * (1.0 / 4294967296.0); // Divided by 2^32
-  }
-
-  /* Generates a random number on (0,1)-real-interval. */
-  function real3() {
-    return (int32() + 0.5) * (1.0 / 4294967296.0); // Divided by 2^32
-  }
-
   /* Generates a random number on [0,1) with 53-bit resolution. */
   function res53() {
-    return (a * 67108864.0 + b) * (1.0 / 9007199254740992.0);
+    // Removed unused variables 'a' and 'b'
+    return (int32() >>> 5) * 67108864.0 + (int32() >>> 6) * (1.0 / 9007199254740992.0);
   }
 
-  return { int32, real1, real2, real3, res53 };
+  return { int32, res53 };
 }
 
 export default mersenneTwister;

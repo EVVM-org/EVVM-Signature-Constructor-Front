@@ -17,7 +17,6 @@ import Evvm from "@/constants/abi/Evvm.json";
 const executePay = async (
   InputData: PayInputData,
   evvmAddress: `0x${string}`,
-  _asStaker: boolean // no longer used, kept for compatibility
 ) => {
   if (!InputData) {
     return Promise.reject("No data to execute payment");

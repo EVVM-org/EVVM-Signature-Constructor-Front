@@ -61,6 +61,8 @@ export const RegistrationUsernameComponent = ({
       priorityFlag: priority === "high",
     };
 
+    await readRewardAmount();
+
     readRewardAmount()
       .then(() => {
         signRegistrationUsername(

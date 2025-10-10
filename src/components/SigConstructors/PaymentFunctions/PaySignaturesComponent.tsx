@@ -29,7 +29,7 @@ export const PaySignaturesComponent = ({ evvmID, evvmAddress }: PaySignaturesCom
   const [isUsingExecutor, setIsUsingExecutor] = React.useState(false);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<PayInputData | null>(null);
-  const [asStaker, setAsStaker] = React.useState(false);
+
 
   const makeSig = async () => {
     const walletData = await getAccountWithRetry(config);
@@ -90,7 +90,7 @@ export const PaySignaturesComponent = ({ evvmID, evvmAddress }: PaySignaturesCom
       return;
     }
 
-    executePay(dataToGet, evvmAddress as `0x${string}`, asStaker)
+    executePay(dataToGet, evvmAddress as `0x${string}`)
       .then(() => {
         console.log("Payment executed successfully");
       })
@@ -188,9 +188,6 @@ export const PaySignaturesComponent = ({ evvmID, evvmAddress }: PaySignaturesCom
       {/* Priority configuration */}
 
       <PrioritySelector onPriorityChange={setPriority} />
-
-      {/* As Staker configuration */}
-      <AsStakerSelector onAsStakerChange={setAsStaker} />
 
       {/* Create signature button */}
       <button

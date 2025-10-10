@@ -1,3 +1,146 @@
+/**
+ * useNameServiceSignatureBuilder
+ *
+ * React hook for building and signing NameService messages (offers, registration, metadata, etc).
+ * Provides functions for each NameService action, using wagmi's useSignMessage for EIP-191 signatures.
+ * Includes dual-signature logic for priority fee payments.
+ *
+ * @returns Object with signature builder functions for NameService actions.
+ */
+  /**
+   * Signs a generic EIP-191 message.
+   * @param message Message to sign
+   * @param onSuccess Callback for successful signature
+   * @param onError Callback for error
+   */
+  /**
+   * Signs a NameService username pre-registration message.
+   * If priorityFee_EVVM > 0, also signs a payment message for the priority fee.
+   * @param addressNameService NameService contract address
+   * @param username Username to pre-register
+   * @param clowNumber Unique clown number
+   * @param nonce Nonce for pre-registration
+   * @param priorityFee_EVVM Priority fee for EVVM
+   * @param nonce_EVVM Nonce for EVVM payment
+   * @param priorityFlag_EVVM_EVVM Priority flag for EVVM payment
+   * @param onSuccess Callback with paySignature and preRegistrationSignature
+   * @param onError Callback for error
+   */
+  /**
+   * Signs a NameService username registration message.
+   * If priorityFee_EVVM > 0, also signs a payment message for the priority fee.
+   * @param addressNameService NameService contract address
+   * @param username Username to register
+   * @param clowNumber Unique clown number
+   * @param nonce Nonce for registration
+   * @param priorityFee_EVVM Priority fee for EVVM
+   * @param nonce_EVVM Nonce for EVVM payment
+   * @param priorityFlag_EVVM_EVVM Priority flag for EVVM payment
+   * @param onSuccess Callback with paySignature and registrationSignature
+   * @param onError Callback for error
+   */
+  /**
+   * Signs a NameService make offer message.
+   * If priorityFee_EVVM > 0, also signs a payment message for the priority fee.
+   * @param addressNameService NameService contract address
+   * @param username Username to make offer for
+   * @param expireDate Offer expiration date
+   * @param amount Offer amount
+   * @param nonce Nonce for offer
+   * @param priorityFee_EVVM Priority fee for EVVM
+   * @param nonce_EVVM Nonce for EVVM payment
+   * @param priorityFlag_EVVM_EVVM Priority flag for EVVM payment
+   * @param onSuccess Callback with paySignature and makeOfferSignature
+   * @param onError Callback for error
+   */
+  /**
+   * Signs a NameService withdraw offer message.
+   * If priorityFee_EVVM > 0, also signs a payment message for the priority fee.
+   * @param addressNameService NameService contract address
+   * @param username Username to withdraw offer for
+   * @param offerID Offer ID
+   * @param nonce Nonce for withdrawal
+   * @param priorityFee_EVVM Priority fee for EVVM
+   * @param nonce_EVVM Nonce for EVVM payment
+   * @param priorityFlag_EVVM_EVVM Priority flag for EVVM payment
+   * @param onSuccess Callback with paySignature and withdrawOfferSignature
+   * @param onError Callback for error
+   */
+  /**
+   * Signs a NameService accept offer message.
+   * If priorityFee_EVVM > 0, also signs a payment message for the priority fee.
+   * @param addressNameService NameService contract address
+   * @param username Username to accept offer for
+   * @param offerID Offer ID
+   * @param nonce Nonce for acceptance
+   * @param priorityFee_EVVM Priority fee for EVVM
+   * @param nonce_EVVM Nonce for EVVM payment
+   * @param priorityFlag_EVVM_EVVM Priority flag for EVVM payment
+   * @param onSuccess Callback with paySignature and acceptOfferSignature
+   * @param onError Callback for error
+   */
+  /**
+   * Signs a NameService renew username message.
+   * If priorityFee_EVVM > 0, also signs a payment message for the priority fee.
+   * @param addressNameService NameService contract address
+   * @param username Username to renew
+   * @param nonce Nonce for renewal
+   * @param priorityFee_EVVM Priority fee for EVVM
+   * @param nonce_EVVM Nonce for EVVM payment
+   * @param priorityFlag_EVVM_EVVM Priority flag for EVVM payment
+   * @param onSuccess Callback with paySignature and renewUsernameSignature
+   * @param onError Callback for error
+   */
+  /**
+   * Signs a NameService add custom metadata message.
+   * If priorityFee_EVVM > 0, also signs a payment message for the priority fee.
+   * @param addressNameService NameService contract address
+   * @param identity Identity string
+   * @param value Metadata value
+   * @param nonce Nonce for addition
+   * @param priorityFee_EVVM Priority fee for EVVM
+   * @param nonce_EVVM Nonce for EVVM payment
+   * @param priorityFlag_EVVM_EVVM Priority flag for EVVM payment
+   * @param onSuccess Callback with paySignature and addCustomMetadataSignature
+   * @param onError Callback for error
+   */
+  /**
+   * Signs a NameService remove custom metadata message.
+   * If priorityFee_EVVM > 0, also signs a payment message for the priority fee.
+   * @param addressNameService NameService contract address
+   * @param identity Identity string
+   * @param key Metadata key
+   * @param nonce Nonce for removal
+   * @param priorityFee_EVVM Priority fee for EVVM
+   * @param nonce_EVVM Nonce for EVVM payment
+   * @param priorityFlag_EVVM_EVVM Priority flag for EVVM payment
+   * @param onSuccess Callback with paySignature and removeCustomMetadataSignature
+   * @param onError Callback for error
+   */
+  /**
+   * Signs a NameService flush custom metadata message.
+   * If priorityFee_EVVM > 0, also signs a payment message for the priority fee.
+   * @param addressNameService NameService contract address
+   * @param identity Identity string
+   * @param nonce Nonce for flush
+   * @param priorityFee_EVVM Priority fee for EVVM
+   * @param nonce_EVVM Nonce for EVVM payment
+   * @param priorityFlag_EVVM_EVVM Priority flag for EVVM payment
+   * @param onSuccess Callback with paySignature and flushCustomMetadataSignature
+   * @param onError Callback for error
+   */
+  /**
+   * Signs a NameService flush username message.
+   * If priorityFee_EVVM > 0, also signs a payment message for the priority fee.
+   * @param addressNameService NameService contract address
+   * @param username Username to flush
+   * @param nonce Nonce for flush
+   * @param priorityFee_EVVM Priority fee for EVVM
+   * @param nonce_EVVM Nonce for EVVM payment
+   * @param priorityFlag_EVVM_EVVM Priority flag for EVVM payment
+   * @param onSuccess Callback with paySignature and flushUsernameSignature
+   * @param onError Callback for error
+   */
 import { useSignMessage } from "wagmi";
 import {
   buildMessageSignedForAcceptOffer,

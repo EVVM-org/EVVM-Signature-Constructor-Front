@@ -1,3 +1,11 @@
+/**
+ * useEVVMTransactionExecuter
+ *
+ * Functions to execute EVVM payment and disperse payment transactions via smart contract.
+ * Each function calls the contract for a specific EVVM action using wagmi's writeContract.
+ * Returns a Promise that resolves on success or rejects on error.
+ * Input types match the contract ABI.
+ */
 import { writeContract } from "@wagmi/core";
 import {
   DispersePayInputData,

@@ -1,3 +1,63 @@
+/**
+ * useStakingSignatureBuilder
+ *
+ * React hook for building and signing Staking messages (golden, presale, public, service).
+ * Provides functions for each staking action, using wagmi's useSignMessage for EIP-191 signatures.
+ * Includes logic for single and dual signature staking flows.
+ *
+ * @returns Object with signature builder functions for staking actions.
+ */
+  /**
+   * Signs a generic EIP-191 message.
+   * @param message Message to sign
+   * @param onSuccess Callback for successful signature
+   * @param onError Callback for error
+   */
+  /**
+   * Signs a golden staking message (single signature, 5083 EVVM per stake).
+   * @param stakingAddress Staking contract address
+   * @param stakingAmount Amount to stake
+   * @param nonceEVVM Nonce for staking
+   * @param priorityFlag Priority flag (async/sync)
+   * @param onSuccess Callback for successful signature
+   * @param onError Callback for error
+   */
+  /**
+   * Signs a presale staking message (dual signature: payment + staking).
+   * @param stakingAddress Staking contract address
+   * @param isStaking Boolean flag for staking
+   * @param nonce Nonce for staking
+   * @param priorityFee_EVVM Priority fee for EVVM
+   * @param nonce_EVVM Nonce for EVVM payment
+   * @param priorityFlag_EVVM Priority flag for EVVM payment
+   * @param onSuccess Callback with paySignature and stakingSignature
+   * @param onError Callback for error
+   */
+  /**
+   * Signs a public staking message (dual signature: payment + staking).
+   * @param stakingAddress Staking contract address
+   * @param isStaking Boolean flag for staking
+   * @param amount Amount to stake
+   * @param nonce Nonce for staking
+   * @param priorityFee_EVVM Priority fee for EVVM
+   * @param nonce_EVVM Nonce for EVVM payment
+   * @param priorityFlag_EVVM Priority flag for EVVM payment
+   * @param onSuccess Callback with paySignature and stakingSignature
+   * @param onError Callback for error
+   */
+  /**
+   * Signs a public service staking message (dual signature: payment + staking).
+   * @param stakingAddress Staking contract address
+   * @param service Service address
+   * @param isStaking Boolean flag for staking
+   * @param amount Amount to stake
+   * @param nonce Nonce for staking
+   * @param priorityFee_EVVM Priority fee for EVVM
+   * @param nonce_EVVM Nonce for EVVM payment
+   * @param priorityFlag_EVVM Priority flag for EVVM payment
+   * @param onSuccess Callback with paySignature and stakingSignature
+   * @param onError Callback for error
+   */
 import { useSignMessage } from "wagmi";
 import {
   buildMessageSignedForPay,

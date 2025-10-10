@@ -1,3 +1,4 @@
+// Gets wallet account with retries if address is undefined.
 import { getAccount } from "@wagmi/core";
 
 /**

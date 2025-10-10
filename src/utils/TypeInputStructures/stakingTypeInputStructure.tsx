@@ -1,3 +1,9 @@
+/**
+ * Staking Type Input Structures
+ *
+ * Type definitions for Staking input data (golden, presale, public, service).
+ * Used for type safety and contract interaction.
+ */
 type GoldenStakingInputData = {
   isStaking: boolean;
   amountOfStaking: bigint;

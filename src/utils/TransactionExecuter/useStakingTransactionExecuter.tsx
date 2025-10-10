@@ -1,3 +1,11 @@
+/**
+ * useStakingTransactionExecuter
+ *
+ * Functions to execute Staking transactions (golden, presale, public, service).
+ * Each function calls the contract for a specific staking action using wagmi's writeContract.
+ * Returns a Promise that resolves on success or rejects on error.
+ * Input types match the contract ABI.
+ */
 import { writeContract } from "@wagmi/core";
 import { config } from "@/config";
 import Staking from "@/constants/abi/Staking.json";

@@ -1,3 +1,9 @@
+/**
+ * NameService Type Input Structures
+ *
+ * Type definitions for NameService input data (registration, offers, metadata, etc).
+ * Used for type safety and contract interaction.
+ */
 type PreRegistrationUsernameInputData = {
   user: `0x${string}`;
   hashPreRegisteredUsername: string;

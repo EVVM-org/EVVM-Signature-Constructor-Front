@@ -1,5 +1,17 @@
+/**
+ * useSMateTransactionVerify
+ *
+ * Functions to simulate/verify Staking transactions (golden, presale, public, service).
+ * Each function simulates a contract call for a specific staking action using wagmi's simulateContract.
+ * Returns a Promise that resolves on success or rejects on error.
+ * Input types match the contract ABI.
+ */
 import { simulateContract } from "@wagmi/core";
 import { config } from "@/config";
+<<<<<<< HEAD
+=======
+// SMate.json ABI does not exist, using Staking.json ABI instead
+>>>>>>> 6d4a5055bda408f757e1ab4fdeb7f8bd8a7cc96b
 import SMate from "@/constants/abi/Staking.json";
 import {
   GoldenStakingInputData,
@@ -43,6 +55,7 @@ const verifyPresaleStaking = async (
     address: stakingAddress,
     functionName: "goldenStaking",
     args: [
+<<<<<<< HEAD
       InputData.isStaking,
       InputData.user,
       InputData.nonce,
@@ -51,6 +64,16 @@ const verifyPresaleStaking = async (
       InputData.nonce_EVVM,
       InputData.priorityFlag_EVVM,
       InputData.signature_EVVM,
+=======
+  InputData.isStaking,
+  InputData.user,
+  InputData.nonce,
+  InputData.signature,
+  InputData.priorityFee_EVVM,
+  InputData.nonce_EVVM,
+  InputData.priorityFlag_EVVM,
+  InputData.signature_EVVM,
+>>>>>>> 6d4a5055bda408f757e1ab4fdeb7f8bd8a7cc96b
     ],
   })
     .then(() => {
@@ -74,6 +97,7 @@ const verifyPublicStaking = async (
     address: stakingAddress,
     functionName: "publicStaking",
     args: [
+<<<<<<< HEAD
       InputData.isStaking,
       InputData.user,
       InputData.nonce,
@@ -83,6 +107,17 @@ const verifyPublicStaking = async (
       InputData.nonce_EVVM,
       InputData.priorityFlag_EVVM,
       InputData.signature_EVVM,
+=======
+  InputData.isStaking,
+  InputData.user,
+  InputData.nonce,
+  InputData.amountOfStaking,
+  InputData.signature,
+  InputData.priorityFee_EVVM,
+  InputData.nonce_EVVM,
+  InputData.priorityFlag_EVVM,
+  InputData.signature_EVVM,
+>>>>>>> 6d4a5055bda408f757e1ab4fdeb7f8bd8a7cc96b
     ],
   })
     .then(() => {
@@ -106,6 +141,7 @@ const verifyPublicServiceStaking = async (
     address: stakingAddress,
     functionName: "publicStaking",
     args: [
+<<<<<<< HEAD
       InputData.isStaking,
       InputData.user,
       InputData.service,
@@ -116,6 +152,18 @@ const verifyPublicServiceStaking = async (
       InputData.nonce_EVVM,
       InputData.priorityFlag_EVVM,
       InputData.signature_EVVM,
+=======
+  InputData.isStaking,
+  InputData.user,
+  InputData.service,
+  InputData.nonce,
+  InputData.amountOfStaking,
+  InputData.signature,
+  InputData.priorityFee_EVVM,
+  InputData.nonce_EVVM,
+  InputData.priorityFlag_EVVM,
+  InputData.signature_EVVM,
+>>>>>>> 6d4a5055bda408f757e1ab4fdeb7f8bd8a7cc96b
     ],
   })
     .then(() => {

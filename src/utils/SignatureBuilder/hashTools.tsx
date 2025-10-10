@@ -1,3 +1,4 @@
+// Functions to hash payment and username data for EVVM and NameService.
 import { keccak256, encodePacked, encodeAbiParameters, sha256 } from "viem";
 import { DispersePayMetadata } from "../TypeInputStructures/evvmTypeInputStructure";
 

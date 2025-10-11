@@ -115,9 +115,9 @@ export const GoldenStakingComponent = ({ evvmID, stakingAddress }: GoldenStaking
 
       {/* Basic input fields */}
       <NumberInputField
-        label="Amount of sMATE"
+        label={isStaking ? "Amount of MATE to stake" : "Amount of MATE to unstake"}
         inputId="amountOfStakingInput_GoldenStaking"
-        placeholder="Enter amount of sMATE"
+        placeholder="Enter amount"
       />
 
       {/* Priority configuration */}

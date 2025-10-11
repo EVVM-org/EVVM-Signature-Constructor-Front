@@ -16,6 +16,7 @@ import {
   PayInputData,
   PresaleStakingInputData,
 } from "@/utils/TypeInputStructures";
+import { HelperInfo } from "../InputsAndModules/HelperInfo";
 
 type InputData = {
   PresaleStakingInputData: PresaleStakingInputData;
@@ -27,14 +28,16 @@ interface PresaleStakingComponentProps {
   stakingAddress: string;
 }
 
-export const PresaleStakingComponent = ({ evvmID, stakingAddress }: PresaleStakingComponentProps) => {
+export const PresaleStakingComponent = ({
+  evvmID,
+  stakingAddress,
+}: PresaleStakingComponentProps) => {
   const { signPresaleStaking } = useStakingSignatureBuilder();
 
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
 
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null);
-
 
   const makeSig = async () => {
     const walletData = await getAccountWithRetry(config);
@@ -52,12 +55,9 @@ export const PresaleStakingComponent = ({ evvmID, stakingAddress }: PresaleStaki
       priorityFlag_EVVM: priority === "high",
     };
 
-    const amountOfToken = (1 * 10 ** 18).toLocaleString(
-      "fullwide",
-      {
-        useGrouping: false,
-      }
-    );
+    const amountOfToken = (1 * 10 ** 18).toLocaleString("fullwide", {
+      useGrouping: false,
+    });
 
     signPresaleStaking(
       BigInt(formData.evvmID),
@@ -125,7 +125,6 @@ export const PresaleStakingComponent = ({ evvmID, stakingAddress }: PresaleStaki
 
       {/* EVVM ID is now passed as a prop */}
 
-
       {/* stakingAddress is now passed as a prop */}
 
       {/* Configuration Section */}
@@ -133,13 +132,19 @@ export const PresaleStakingComponent = ({ evvmID, stakingAddress }: PresaleStaki
 
       {/* Nonce Generators */}
 
-      
-
       <NumberInputWithGenerator
         label="staking Nonce"
         inputId="nonceStakingInput_presaleStaking"
         placeholder="Enter nonce"
       />
+
+      <HelperInfo label="About presale staking">
+        <div>
+          <strong>
+            A presale staker can stake/unstake one sMATE per transaction.
+          </strong>
+        </div>
+      </HelperInfo>
 
       <NumberInputField
         label="Priority fee"

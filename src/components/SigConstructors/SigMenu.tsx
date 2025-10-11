@@ -152,8 +152,8 @@ export const SigMenu = () => {
 
   // Pass evvmID, evvmAddress, and stakingAddress as props to all components
   const FaucetFunctions = [
-    <FaucetBalanceChecker key="faucetBalance" evvmAddress={evvmAddress} />,
     <FaucetFunctionsComponent key="faucet" evvmAddress={evvmAddress} />,
+    <FaucetBalanceChecker key="faucetBalance" evvmAddress={evvmAddress} />,
   ];
 
   const payComponents = [
@@ -435,7 +435,6 @@ export const SigMenu = () => {
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-
         {components.map((Component, index) => (
           <div
             key={index}

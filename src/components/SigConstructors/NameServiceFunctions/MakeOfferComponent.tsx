@@ -164,6 +164,7 @@ export const MakeOfferComponent = ({ evvmID, nameServiceAddress }: MakeOfferComp
         label="EVVM Nonce"
         inputId="nonceEVVMInput_makeOffer"
         placeholder="Enter nonce"
+        showRandomBtn={priority === "low"}
       />
 
       {/* Create signature button */}

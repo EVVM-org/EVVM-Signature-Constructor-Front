@@ -10,7 +10,6 @@ import { DispersePayComponent } from "./PaymentFunctions/DispersePayComponent";
 import { GoldenStakingComponent } from "./StakingFunctions/GoldenStakingComponent";
 import { PresaleStakingComponent } from "./StakingFunctions/PresaleStakingComponent";
 import { PublicStakingComponent } from "./StakingFunctions/PublicStakingComponent";
-import { PublicServiceStakingComponent } from "./StakingFunctions/PublicServiceStakingComponent";
 import { PreRegistrationUsernameComponent } from "./NameServiceFunctions/PreRegistrationUsernameComponent";
 import { RegistrationUsernameComponent } from "./NameServiceFunctions/RegistrationUsernameComponent";
 import { MakeOfferComponent } from "./NameServiceFunctions/MakeOfferComponent";
@@ -183,11 +182,6 @@ export const SigMenu = () => {
     />,
     <PublicStakingComponent
       key="public"
-      evvmID={evvmID}
-      stakingAddress={stakingAddress}
-    />,
-    <PublicServiceStakingComponent
-      key="publicService"
       evvmID={evvmID}
       stakingAddress={stakingAddress}
     />,

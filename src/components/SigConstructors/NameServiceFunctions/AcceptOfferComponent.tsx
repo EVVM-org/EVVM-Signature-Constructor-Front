@@ -144,16 +144,15 @@ export const AcceptOfferComponent = ({
         placeholder="Enter priority fee"
       />
 
-    
       {/* Priority configuration */}
       <PrioritySelector onPriorityChange={setPriority} />
 
-        <NumberInputWithGenerator
+      <NumberInputWithGenerator
         label="EVVM Nonce"
         inputId="nonceEVVMInput_acceptOffer"
         placeholder="Enter nonce"
+        showRandomBtn={priority === "low"}
       />
-
 
       {/* Create signature button */}
       <button

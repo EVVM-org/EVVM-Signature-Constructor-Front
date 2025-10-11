@@ -154,6 +154,7 @@ export const PresaleStakingComponent = ({ evvmID, stakingAddress }: PresaleStaki
         label="EVVM Nonce"
         inputId="nonceEVVMInput_presaleStaking"
         placeholder="Enter nonce"
+        showRandomBtn={priority === "low"}
       />
 
       {/* Action Button */}

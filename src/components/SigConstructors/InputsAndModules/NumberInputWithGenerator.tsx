@@ -7,6 +7,7 @@ interface NumberInputWithGeneratorProps {
   inputId: string;
   placeholder?: string;
   buttonText?: string;
+  showRandomBtn?: boolean;
 }
 
 export const NumberInputWithGenerator: React.FC<
@@ -16,6 +17,7 @@ export const NumberInputWithGenerator: React.FC<
   inputId,
   placeholder = "Enter number",
   buttonText = `Generate Random ${label}`,
+  showRandomBtn = true,
 }) => {
   const generateRandomNumber = () => {
     const seed = Math.floor(Math.random() + Date.now());
@@ -26,21 +28,24 @@ export const NumberInputWithGenerator: React.FC<
   };
 
   return (
-    <div style={{ marginBottom: "1rem" }}>
+    <div style={{ marginBottom: "1rem", marginTop: "1rem" }}>
       <p>
         {label}:{" "}
-        <button
-          className={styles.numberWithGeneratorButton}
-          onClick={generateRandomNumber}
-        >
-          {buttonText}
-        </button>
+            
+        {showRandomBtn && (
+          <button
+            className={styles.numberWithGeneratorButton}
+            onClick={generateRandomNumber}
+          >
+            {buttonText}
+          </button>
+        )}
         <input
-          type="number"
-          placeholder={placeholder}
-          id={inputId}
-          className={styles.numberWithGeneratorInput}
-        />
+            type="number"
+            placeholder={placeholder}
+            id={inputId}
+            className={styles.numberWithGeneratorInput}
+          />
       </p>
     </div>
   );

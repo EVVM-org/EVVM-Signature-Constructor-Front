@@ -212,6 +212,7 @@ export const RegistrationUsernameComponent = ({
         label="EVVM Nonce"
         inputId="nonceEVVMInput_registrationUsername"
         placeholder="Enter nonce"
+        showRandomBtn={priority === "low"}
       />
 
       {/* Create signature button */}

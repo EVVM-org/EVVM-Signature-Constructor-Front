@@ -151,6 +151,7 @@ export const WithdrawOfferComponent = ({
         label="EVVM Nonce"
         inputId="nonceEVVMInput_withdrawOffer"
         placeholder="Enter nonce"
+        showRandomBtn={priority === "low"}
       />
       {/* Create signature button */}
       <button

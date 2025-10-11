@@ -168,6 +168,7 @@ export const PreRegistrationUsernameComponent = ({
         label="NameService Nonce"
         inputId="nonceNameServiceInput_preRegistration"
         placeholder="Enter nonce"
+        showRandomBtn={priority === "low"}
       />
 
       {/* Create signature button */}

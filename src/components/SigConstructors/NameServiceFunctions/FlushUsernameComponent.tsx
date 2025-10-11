@@ -169,6 +169,7 @@ export const FlushUsernameComponent = ({ evvmID, nameServiceAddress }: FlushUser
         label="EVVM Nonce"
         inputId="nonceEVVMInput_flushUsername"
         placeholder="Enter nonce"
+        showRandomBtn={priority === "low"}
       />
 
       {/* Create signature button */}

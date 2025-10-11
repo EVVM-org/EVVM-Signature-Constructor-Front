@@ -163,6 +163,7 @@ export const PublicStakingComponent = ({ evvmID, stakingAddress }: PublicStaking
         label="EVVM Nonce"
         inputId="nonceEVVMInput_PublicStaking"
         placeholder="Enter nonce"
+        showRandomBtn={priority === "low"}
       />
 
       {/* Action Button */}

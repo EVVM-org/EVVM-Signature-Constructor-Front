@@ -129,6 +129,7 @@ export const GoldenStakingComponent = ({ evvmID, stakingAddress }: GoldenStaking
         label="Nonce"
         inputId="nonceInput_GoldenStaking"
         placeholder="Enter nonce"
+        showRandomBtn={priority === "low"}
       />
 
       {/* Create signature button */}

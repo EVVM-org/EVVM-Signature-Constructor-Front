@@ -183,8 +183,9 @@ export const RenewUsernameComponent = ({ evvmID, nameServiceAddress }: RenewUser
         label="EVVM Nonce"
         inputId="nonceEVVMInput_renewUsername"
         placeholder="Enter nonce"
+        showRandomBtn={priority === "low"}
       />
-      
+
       <button
         onClick={makeSig}
         style={{

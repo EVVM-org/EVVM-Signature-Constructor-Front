@@ -132,7 +132,7 @@ export const FlushCustomMetadataComponent = ({ evvmID, nameServiceAddress }: Flu
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Flush Custom Metadata of Identity"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/flushCustomMetadataStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/MNS/flushCustomMetadataStructure"
       />
 
       <br />
@@ -162,14 +162,16 @@ export const FlushCustomMetadataComponent = ({ evvmID, nameServiceAddress }: Flu
         placeholder="Enter priority fee"
       />
 
+      
+
+      {/* Priority configuration */}
+      <PrioritySelector onPriorityChange={setPriority} />
+
       <NumberInputWithGenerator
         label="EVVM Nonce"
         inputId="nonceEVVMInput_flushCustomMetadata"
         placeholder="Enter nonce"
       />
-
-      {/* Priority configuration */}
-      <PrioritySelector onPriorityChange={setPriority} />
 
       {/* Create signature button */}
       <button
@@ -179,7 +181,7 @@ export const FlushCustomMetadataComponent = ({ evvmID, nameServiceAddress }: Flu
           marginTop: "1rem",
         }}
       >
-        Make signature
+        Create signature
       </button>
 
       <DataDisplayWithClear

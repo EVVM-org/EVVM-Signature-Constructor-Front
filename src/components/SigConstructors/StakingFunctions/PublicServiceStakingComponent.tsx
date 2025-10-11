@@ -28,7 +28,10 @@ interface PublicServiceStakingComponentProps {
   stakingAddress: string;
 }
 
-export const PublicServiceStakingComponent = ({ evvmID, stakingAddress }: PublicServiceStakingComponentProps) => {
+export const PublicServiceStakingComponent = ({
+  evvmID,
+  stakingAddress,
+}: PublicServiceStakingComponentProps) => {
   const { signPublicServiceStaking } = useStakingSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
@@ -126,12 +129,9 @@ export const PublicServiceStakingComponent = ({ evvmID, stakingAddress }: Public
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Service Staking"
-        link="https://www.evvm.org/docs/SignatureStructures/SMate/StakingUnstakingStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/SMate/StakingUnstakingStructure"
       />
       <br />
-
-      {/* EVVM ID is now passed as a prop */}
-
 
       {/* stakingAddress is now passed as a prop */}
 
@@ -145,12 +145,6 @@ export const PublicServiceStakingComponent = ({ evvmID, stakingAddress }: Public
       />
 
       {/* Nonce Generators */}
-
-      <NumberInputWithGenerator
-        label="EVVM Nonce"
-        inputId="nonceEVVMInput_PublicServiceStaking"
-        placeholder="Enter nonce"
-      />
 
       <NumberInputWithGenerator
         label="staking Nonce"
@@ -173,6 +167,12 @@ export const PublicServiceStakingComponent = ({ evvmID, stakingAddress }: Public
 
       {/* Priority Selection */}
       <PrioritySelector onPriorityChange={setPriority} />
+
+      <NumberInputWithGenerator
+        label="EVVM Nonce"
+        inputId="nonceEVVMInput_PublicServiceStaking"
+        placeholder="Enter nonce"
+      />
 
       {/* Action Button */}
       <button

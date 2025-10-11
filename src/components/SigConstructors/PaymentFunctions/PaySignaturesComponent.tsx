@@ -103,7 +103,7 @@ export const PaySignaturesComponent = ({ evvmID, evvmAddress }: PaySignaturesCom
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Single payment"
-        link="https://www.evvm.org/docs/SignatureStructures/EVVM/SinglePaymentSignatureStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/EVVM/SinglePaymentSignatureStructure"
       />
       <br />
 
@@ -122,8 +122,9 @@ export const PaySignaturesComponent = ({ evvmID, evvmAddress }: PaySignaturesCom
             }}
             onChange={(e) => setIsUsingUsernames(e.target.value === "true")}
           >
-            <option value="true">Username</option>
             <option value="false">Address</option>
+            <option value="true">Username</option>
+            
           </select>
           <input
             type="text"
@@ -140,14 +141,7 @@ export const PaySignaturesComponent = ({ evvmID, evvmAddress }: PaySignaturesCom
         </p>
       </div>
 
-      {/* Nonce section with automatic generator */}
-
-      <NumberInputWithGenerator
-        label="Nonce"
-        inputId="nonceInput_Pay"
-        placeholder="Enter nonce"
-      />
-
+    
       <AddressInputField
         label="Token address"
         inputId="tokenAddress_Pay"
@@ -180,7 +174,7 @@ export const PaySignaturesComponent = ({ evvmID, evvmAddress }: PaySignaturesCom
 
       <ExecutorSelector
         inputId="executorInput_Pay"
-        placeholder="Enter executor"
+        placeholder="Enter executor address"
         onExecutorToggle={setIsUsingExecutor}
         isUsingExecutor={isUsingExecutor}
       />
@@ -188,6 +182,14 @@ export const PaySignaturesComponent = ({ evvmID, evvmAddress }: PaySignaturesCom
       {/* Priority configuration */}
 
       <PrioritySelector onPriorityChange={setPriority} />
+
+        {/* Nonce section with automatic generator */}
+
+      <NumberInputWithGenerator
+        label="Nonce"
+        inputId="nonceInput_Pay"
+        placeholder="Enter nonce"
+      />
 
       {/* Create signature button */}
       <button
@@ -197,7 +199,7 @@ export const PaySignaturesComponent = ({ evvmID, evvmAddress }: PaySignaturesCom
           marginTop: "1rem",
         }}
       >
-        Make signature
+        Create signature
       </button>
 
       {/* Results section */}

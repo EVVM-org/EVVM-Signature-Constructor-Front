@@ -160,7 +160,7 @@ export const AddCustomMetadataComponent = ({ evvmID, nameServiceAddress }: AddCu
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Add custom metadata of identity"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/addCustomMetadataStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/MNS/addCustomMetadataStructure"
       />
 
       <br />
@@ -206,14 +206,16 @@ export const AddCustomMetadataComponent = ({ evvmID, nameServiceAddress }: AddCu
         placeholder="Enter priority fee"
       />
 
+      
+
+      {/* Priority configuration */}
+      <PrioritySelector onPriorityChange={setPriority} />
+
       <NumberInputWithGenerator
         label="EVVM Nonce"
         inputId="nonceEVVMInput_addCustomMetadata"
         placeholder="Enter nonce"
       />
-
-      {/* Priority configuration */}
-      <PrioritySelector onPriorityChange={setPriority} />
 
       {/* Create signature button */}
       <button
@@ -223,7 +225,7 @@ export const AddCustomMetadataComponent = ({ evvmID, nameServiceAddress }: AddCu
           marginTop: "1rem",
         }}
       >
-        Make signature
+        Create signature
       </button>
 
       <DataDisplayWithClear

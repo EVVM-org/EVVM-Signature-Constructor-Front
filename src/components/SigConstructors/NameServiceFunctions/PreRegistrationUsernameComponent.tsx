@@ -22,13 +22,15 @@ type InfoData = {
   PreRegistrationUsernameInputData: PreRegistrationUsernameInputData;
 };
 
-
 interface PreRegistrationUsernameComponentProps {
   evvmID: string;
   nameServiceAddress: string;
 }
 
-export const PreRegistrationUsernameComponent = ({ evvmID, nameServiceAddress }: PreRegistrationUsernameComponentProps) => {
+export const PreRegistrationUsernameComponent = ({
+  evvmID,
+  nameServiceAddress,
+}: PreRegistrationUsernameComponentProps) => {
   const { signPreRegistrationUsername } = useNameServiceSignatureBuilder();
   let account = getAccount(config);
 
@@ -41,7 +43,6 @@ export const PreRegistrationUsernameComponent = ({ evvmID, nameServiceAddress }:
 
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
-
 
     const formData = {
       evvmId: evvmID,
@@ -125,24 +126,14 @@ export const PreRegistrationUsernameComponent = ({ evvmID, nameServiceAddress }:
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Pre-registration of username"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/preRegistrationUsernameStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/MNS/preRegistrationUsernameStructure"
       />
 
       <br />
 
       {/* Address Input */}
 
-
-
-
-
       {/* Nonce section with automatic generator */}
-
-      <NumberInputWithGenerator
-        label="NameService Nonce"
-        inputId="nonceNameServiceInput_preRegistration"
-        placeholder="Enter nonce"
-      />
 
       <NumberInputWithGenerator
         label="Clow Number"
@@ -173,6 +164,12 @@ export const PreRegistrationUsernameComponent = ({ evvmID, nameServiceAddress }:
       {/* Priority configuration */}
       <PrioritySelector onPriorityChange={setPriority} />
 
+      <NumberInputWithGenerator
+        label="NameService Nonce"
+        inputId="nonceNameServiceInput_preRegistration"
+        placeholder="Enter nonce"
+      />
+
       {/* Create signature button */}
       <button
         onClick={makeSig}
@@ -181,7 +178,7 @@ export const PreRegistrationUsernameComponent = ({ evvmID, nameServiceAddress }:
           marginTop: "1rem",
         }}
       >
-        Make signature
+        Create signature
       </button>
 
       <DataDisplayWithClear

@@ -122,7 +122,7 @@ export const PublicStakingComponent = ({ evvmID, stakingAddress }: PublicStaking
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Public Staking"
-        link="https://www.evvm.org/docs/SignatureStructures/SMate/StakingUnstakingStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/SMate/StakingUnstakingStructure"
       />
       <br />
 
@@ -135,11 +135,7 @@ export const PublicStakingComponent = ({ evvmID, stakingAddress }: PublicStaking
       <StakingActionSelector onChange={setIsStaking} />
 
       {/* Nonce Generators */}
-      <NumberInputWithGenerator
-        label="EVVM Nonce"
-        inputId="nonceEVVMInput_PublicStaking"
-        placeholder="Enter nonce"
-      />
+      
 
       <NumberInputWithGenerator
         label="staking Nonce"
@@ -162,6 +158,12 @@ export const PublicStakingComponent = ({ evvmID, stakingAddress }: PublicStaking
 
       {/* Priority Selection */}
       <PrioritySelector onPriorityChange={setPriority} />
+
+      <NumberInputWithGenerator
+        label="EVVM Nonce"
+        inputId="nonceEVVMInput_PublicStaking"
+        placeholder="Enter nonce"
+      />
 
       {/* Action Button */}
       <button

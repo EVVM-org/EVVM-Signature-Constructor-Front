@@ -119,7 +119,7 @@ export const PresaleStakingComponent = ({ evvmID, stakingAddress }: PresaleStaki
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Presale Staking"
-        link="https://www.evvm.org/docs/SignatureStructures/SMate/StakingUnstakingStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/SMate/StakingUnstakingStructure"
       />
       <br />
 
@@ -133,11 +133,7 @@ export const PresaleStakingComponent = ({ evvmID, stakingAddress }: PresaleStaki
 
       {/* Nonce Generators */}
 
-      <NumberInputWithGenerator
-        label="EVVM Nonce"
-        inputId="nonceEVVMInput_presaleStaking"
-        placeholder="Enter nonce"
-      />
+      
 
       <NumberInputWithGenerator
         label="staking Nonce"
@@ -153,6 +149,12 @@ export const PresaleStakingComponent = ({ evvmID, stakingAddress }: PresaleStaki
 
       {/* Priority Selection */}
       <PrioritySelector onPriorityChange={setPriority} />
+
+      <NumberInputWithGenerator
+        label="EVVM Nonce"
+        inputId="nonceEVVMInput_presaleStaking"
+        placeholder="Enter nonce"
+      />
 
       {/* Action Button */}
       <button

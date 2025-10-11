@@ -4,17 +4,20 @@ import { readContract } from "@wagmi/core";
 import { config } from "@/config/index";
 import Evvm from "@/constants/abi/Evvm.json";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
-
+import { TokenAddressInfo } from "./TokenAddressInfo";
 
 interface FaucetBalanceCheckerProps {
   evvmAddress: string;
 }
 
-export const FaucetBalanceChecker: React.FC<FaucetBalanceCheckerProps> = ({ evvmAddress }) => {
+export const FaucetBalanceChecker: React.FC<FaucetBalanceCheckerProps> = ({
+  evvmAddress,
+}) => {
   const [balance, setBalance] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const getValue = (id: string) => (document.getElementById(id) as HTMLInputElement)?.value || "";
+  const getValue = (id: string) =>
+    (document.getElementById(id) as HTMLInputElement)?.value || "";
 
   const checkBalance = async () => {
     setLoading(true);
@@ -38,7 +41,9 @@ export const FaucetBalanceChecker: React.FC<FaucetBalanceCheckerProps> = ({ evvm
 
   return (
     <div className="flex flex-col items-center mt-4">
-      <h2>Check Balance</h2>
+      <h2>Balance</h2>
+      <p>Check the balance of a user for a specific token.</p>
+      <br />
       <AddressInputField
         label="User address"
         inputId="faucetBalance_user"
@@ -49,10 +54,19 @@ export const FaucetBalanceChecker: React.FC<FaucetBalanceCheckerProps> = ({ evvm
         inputId="faucetBalance_token"
         placeholder="Enter token address"
       />
+
+      
+
       <button
         onClick={checkBalance}
         disabled={loading}
-        style={{ padding: "0.5rem 1rem", borderRadius: 6, border: "1px solid #ccc", background: loading ? "#eee" : "#fff", margin: "0.5rem" }}
+        style={{
+          padding: "0.5rem 1rem",
+          borderRadius: 6,
+          border: "1px solid #ccc",
+          background: loading ? "#eee" : "#fff",
+          margin: "0.5rem",
+        }}
       >
         {loading ? "Checking..." : "Check Balance"}
       </button>

@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
+import { switchChain } from "@wagmi/core";
 import { readContracts } from "@wagmi/core";
-import { config } from "@/config/index";
+import { config, networks } from "@/config/index";
 import Evvm from "@/constants/abi/Evvm.json";
 import { FaucetFunctionsComponent } from "./FaucetFunctions/FaucetFunctionsComponent";
 import { PaySignaturesComponent } from "./PaymentFunctions/PaySignaturesComponent";
@@ -21,6 +22,7 @@ import { RemoveCustomMetadataComponent } from "./NameServiceFunctions/RemoveCust
 import { FlushCustomMetadataComponent } from "./NameServiceFunctions/FlushCustomMetadataComponent";
 import { FlushUsernameComponent } from "./NameServiceFunctions/FlushUsernameComponent";
 import { FaucetBalanceChecker } from "./FaucetFunctions/FaucetBalanceChecker";
+import { TokenAddressInfo } from "./FaucetFunctions/TokenAddressInfo";
 
 const boxStyle = {
   display: "flex",
@@ -50,11 +52,54 @@ export const SigMenu = () => {
   const [nameserviceAddress, setNameserviceAddress] = useState("");
   const [stakingAddress, setStakingAddress] = useState("");
   const [loadingIDs, setLoadingIDs] = useState(false);
+  // Map selector value to network object
+  const networkOptions = [
+    { value: "sepolia", label: "Sepolia" },
+    { value: "arbitrumSepolia", label: "Arbitrum Sepolia" },
+    { value: "hederaTestnet", label: "Hedera Testnet" },
+  ];
+  const [network, setNetwork] = useState("sepolia");
+
+  const handleNetworkChange = async (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const value = e.target.value;
+    setNetwork(value);
+    // Find the chainId for the selected network
+    let chainId: number | undefined;
+    if (value === "sepolia") {
+      const id = networks.find(
+        (n) =>
+          n.name?.toLowerCase().includes("sepolia") &&
+          !n.name?.toLowerCase().includes("arbitrum")
+      )?.id;
+      chainId = typeof id === "string" ? parseInt(id) : id;
+    } else if (value === "arbitrumSepolia") {
+      const id = networks.find((n) =>
+        n.name?.toLowerCase().includes("arbitrum")
+      )?.id;
+      chainId = typeof id === "string" ? parseInt(id) : id;
+    } else if (value === "hederaTestnet") {
+      const id = networks.find((n) =>
+        n.name?.toLowerCase().includes("hedera")
+      )?.id;
+      chainId = typeof id === "string" ? parseInt(id) : id;
+    }
+    if (typeof chainId === "number" && !isNaN(chainId)) {
+      try {
+        await switchChain(config, { chainId });
+      } catch (err) {
+        // Optionally show error to user
+        // eslint-disable-next-line no-console
+        console.error("Failed to switch chain:", err);
+      }
+    }
+  };
 
   // Fetch summary info for EVVM contract: evvmID, stakingAddress, and NameService address
   const fetchEvvmSummary = async () => {
     if (!evvmAddress) {
-  alert("Please enter a valid EVVM address");
+      alert("Please enter a valid EVVM address");
       return;
     }
     setLoadingIDs(true);
@@ -231,6 +276,7 @@ export const SigMenu = () => {
         <h2 style={{ fontWeight: 700, fontSize: 22, margin: 0, color: "#222" }}>
           EVVM Signature Toolkit
         </h2>
+        <h3>Select an EVVM contract to connect and get started:</h3>
         {evvmID && stakingAddress && nameserviceAddress ? (
           <div
             style={{
@@ -245,21 +291,36 @@ export const SigMenu = () => {
               boxShadow: "0 2px 8px 0 rgba(0,0,0,0.04)",
             }}
           >
-            <div style={{ fontSize: 15, color: "#444", fontFamily: "monospace" }}>
+            <div
+              style={{ fontSize: 15, color: "#444", fontFamily: "monospace" }}
+            >
               <strong>evvmID:</strong> {String(evvmID)}
             </div>
-            <div style={{ fontSize: 15, color: "#444", fontFamily: "monospace" }}>
+            <div
+              style={{ fontSize: 15, color: "#444", fontFamily: "monospace" }}
+            >
               <strong>evvm:</strong> {evvmAddress}
             </div>
-            <div style={{ fontSize: 15, color: "#444", fontFamily: "monospace" }}>
+            <div
+              style={{ fontSize: 15, color: "#444", fontFamily: "monospace" }}
+            >
               <strong>staking:</strong> {stakingAddress}
             </div>
-            <div style={{ fontSize: 15, color: "#444", fontFamily: "monospace" }}>
+            <div
+              style={{ fontSize: 15, color: "#444", fontFamily: "monospace" }}
+            >
               <strong>nameService:</strong> {nameserviceAddress}
             </div>
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "row", gap: "1rem", alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              gap: "1rem",
+              alignItems: "center",
+            }}
+          >
             <input
               type="text"
               placeholder="EVVM Address"
@@ -279,6 +340,31 @@ export const SigMenu = () => {
                 transition: "border 0.2s",
               }}
             />
+            <select
+              style={{
+                padding: "0.7rem 1.2rem",
+                borderRadius: 8,
+                border: "1.5px solid #d1d5db",
+                background: "#f9fafb",
+                color: "#222",
+                fontWeight: 500,
+                fontSize: 15,
+                minWidth: 180,
+                marginRight: 8,
+                boxShadow: "0 1px 4px 0 rgba(0,0,0,0.03)",
+                outline: "none",
+                transition: "border 0.2s",
+                cursor: "pointer",
+              }}
+              value={network}
+              onChange={handleNetworkChange}
+            >
+              {networkOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
             <button
               onClick={fetchEvvmSummary}
               style={{
@@ -295,7 +381,7 @@ export const SigMenu = () => {
               }}
               disabled={loadingIDs}
             >
-              {loadingIDs ? "Loading..." : "Connect EVVM"}
+              {loadingIDs ? "Loading..." : "Use this EVVM"}
             </button>
           </div>
         )}
@@ -345,13 +431,22 @@ export const SigMenu = () => {
           <option value="faucet">Faucet and Balance functions</option>
           <option value="pay">Payment signatures</option>
           <option value="staking">Staking signatures</option>
-          <option value="mns">MNS signatures</option>
+          <option value="mns">Name Service signatures</option>
         </select>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+        {menu === "faucet" && <TokenAddressInfo />}
+
         {components.map((Component, index) => (
-          <div key={index} style={{ ...boxStyle, background: "#f9fafb", boxShadow: "0 1px 4px 0 rgba(0,0,0,0.03)" }}>
+          <div
+            key={index}
+            style={{
+              ...boxStyle,
+              background: "#f9fafb",
+              boxShadow: "0 1px 4px 0 rgba(0,0,0,0.03)",
+            }}
+          >
             {Component}
           </div>
         ))}

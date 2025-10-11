@@ -23,13 +23,15 @@ type InfoData = {
   AcceptOfferInputData: AcceptOfferInputData;
 };
 
-
 interface AcceptOfferComponentProps {
   evvmID: string;
   nameServiceAddress: string;
 }
 
-export const AcceptOfferComponent = ({ evvmID, nameServiceAddress }: AcceptOfferComponentProps) => {
+export const AcceptOfferComponent = ({
+  evvmID,
+  nameServiceAddress,
+}: AcceptOfferComponentProps) => {
   const { signAcceptOffer } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
@@ -41,7 +43,6 @@ export const AcceptOfferComponent = ({ evvmID, nameServiceAddress }: AcceptOffer
 
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
-
 
     const formData = {
       evvmId: evvmID,
@@ -114,15 +115,10 @@ export const AcceptOfferComponent = ({ evvmID, nameServiceAddress }: AcceptOffer
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Accept offer of username"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/acceptOfferStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/MNS/acceptOfferStructure"
       />
 
       <br />
-
-
-
-
-
 
       <NumberInputWithGenerator
         label="MNS Nonce"
@@ -148,14 +144,16 @@ export const AcceptOfferComponent = ({ evvmID, nameServiceAddress }: AcceptOffer
         placeholder="Enter priority fee"
       />
 
-      <NumberInputWithGenerator
+    
+      {/* Priority configuration */}
+      <PrioritySelector onPriorityChange={setPriority} />
+
+        <NumberInputWithGenerator
         label="EVVM Nonce"
         inputId="nonceEVVMInput_acceptOffer"
         placeholder="Enter nonce"
       />
 
-      {/* Priority configuration */}
-      <PrioritySelector onPriorityChange={setPriority} />
 
       {/* Create signature button */}
       <button
@@ -165,7 +163,7 @@ export const AcceptOfferComponent = ({ evvmID, nameServiceAddress }: AcceptOffer
           marginTop: "1rem",
         }}
       >
-        Make signature
+        Create signature
       </button>
 
       <DataDisplayWithClear

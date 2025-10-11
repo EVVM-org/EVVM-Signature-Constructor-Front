@@ -113,14 +113,6 @@ export const GoldenStakingComponent = ({ evvmID, stakingAddress }: GoldenStaking
       {/* Configuration Section */}
       <StakingActionSelector onChange={setIsStaking} />
 
-      {/* Nonce section with automatic generator */}
-
-      <NumberInputWithGenerator
-        label="Nonce"
-        inputId="nonceInput_GoldenStaking"
-        placeholder="Enter nonce"
-      />
-
       {/* Basic input fields */}
       <NumberInputField
         label="Amount of sMATE"
@@ -131,6 +123,14 @@ export const GoldenStakingComponent = ({ evvmID, stakingAddress }: GoldenStaking
       {/* Priority configuration */}
       <PrioritySelector onPriorityChange={setPriority} />
 
+      {/* Nonce section with automatic generator */}
+
+      <NumberInputWithGenerator
+        label="Nonce"
+        inputId="nonceInput_GoldenStaking"
+        placeholder="Enter nonce"
+      />
+
       {/* Create signature button */}
       <button
         onClick={makeSig}
@@ -139,7 +139,7 @@ export const GoldenStakingComponent = ({ evvmID, stakingAddress }: GoldenStaking
           marginTop: "1rem",
         }}
       >
-        Make signature
+        Create signature
       </button>
 
       {/* Results section */}

@@ -150,7 +150,7 @@ export const RenewUsernameComponent = ({ evvmID, nameServiceAddress }: RenewUser
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Renewal of username"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/renewUsernameStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/MNS/renewUsernameStructure"
       />
       <br />
       
@@ -176,12 +176,15 @@ export const RenewUsernameComponent = ({ evvmID, nameServiceAddress }: RenewUser
         inputId="priorityFeeInput_renewUsername"
         placeholder="Enter priority fee"
       />
+      
+      <PrioritySelector onPriorityChange={setPriority} />
+
       <NumberInputWithGenerator
         label="EVVM Nonce"
         inputId="nonceEVVMInput_renewUsername"
         placeholder="Enter nonce"
       />
-      <PrioritySelector onPriorityChange={setPriority} />
+      
       <button
         onClick={makeSig}
         style={{
@@ -189,7 +192,7 @@ export const RenewUsernameComponent = ({ evvmID, nameServiceAddress }: RenewUser
           marginTop: "1rem",
         }}
       >
-        Make signature
+        Create signature
       </button>
       <DataDisplayWithClear
         dataToGet={dataToGet}

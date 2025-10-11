@@ -129,8 +129,8 @@ export const FlushUsernameComponent = ({ evvmID, nameServiceAddress }: FlushUser
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
-        title="Flush Username"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/flushUsernameStructure"
+        title="Delete Username"
+        link="https://www.evvm.info/docs/SignatureStructures/MNS/flushUsernameStructure"
       />
 
       <br />
@@ -160,14 +160,16 @@ export const FlushUsernameComponent = ({ evvmID, nameServiceAddress }: FlushUser
         placeholder="Enter priority fee"
       />
 
+      
+
+      {/* Priority configuration */}
+      <PrioritySelector onPriorityChange={setPriority} />
+
       <NumberInputWithGenerator
         label="EVVM Nonce"
         inputId="nonceEVVMInput_flushUsername"
         placeholder="Enter nonce"
       />
-
-      {/* Priority configuration */}
-      <PrioritySelector onPriorityChange={setPriority} />
 
       {/* Create signature button */}
       <button
@@ -177,7 +179,7 @@ export const FlushUsernameComponent = ({ evvmID, nameServiceAddress }: FlushUser
           marginTop: "1rem",
         }}
       >
-        Make signature
+        Create signature
       </button>
 
       <DataDisplayWithClear

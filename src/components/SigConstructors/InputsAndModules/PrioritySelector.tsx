@@ -11,7 +11,7 @@ export const PrioritySelector: React.FC<PrioritySelectorProps> = ({
 }) => {
   return (
     <div style={{ marginTop }}>
-      <p>Priority</p>
+      <p>Nonce Type</p>
       <select
         style={{
           color: "black",
@@ -21,8 +21,8 @@ export const PrioritySelector: React.FC<PrioritySelectorProps> = ({
         }}
         onChange={(e) => onPriorityChange(e.target.value)}
       >
-        <option value="low">Low (synchronous nonce)</option>
-        <option value="high">High (asynchronous nonce)</option>
+        <option value="low">synchronous nonce</option>
+        <option value="high">asynchronous nonce</option>
       </select>
     </div>
   );

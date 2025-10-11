@@ -57,7 +57,7 @@ pnpm run dev
 4. Fill in token address, amount, and priority fee
 5. Generate a random nonce or enter a custom one
 6. Select priority (Low for synchronous, High for asynchronous)
-7. Click "Make signature" and approve in your wallet
+7. Click "Create signature" and approve in your wallet
 
 #### Disperse Payment
 1. Select the number of recipients (1-5)

@@ -46,18 +46,19 @@ export const FaucetFunctionsComponent = ({evvmAddress }: FaucetFunctionsComponen
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <h1>Faucet</h1>
+      <p>This faucet allows you to get tokens to a specified address.</p>
       <br />
 
 
 
       <AddressInputField
-        label="Address to give tokens to"
+        label="Address to get tokens"
         inputId="addressGive_faucet"
         placeholder="Enter address"
       />
 
       <AddressInputField
-        label="Token address to receive"
+        label="Token address"
         inputId="tokenAddress_faucet"
         placeholder="Enter token address"
         defaultValue="0x0000000000000000000000000000000000000000"

@@ -23,13 +23,15 @@ type InfoData = {
   WithdrawOfferInputData: WithdrawOfferInputData;
 };
 
-
 interface WithdrawOfferComponentProps {
   evvmID: string;
   nameServiceAddress: string;
 }
 
-export const WithdrawOfferComponent = ({ evvmID, nameServiceAddress }: WithdrawOfferComponentProps) => {
+export const WithdrawOfferComponent = ({
+  evvmID,
+  nameServiceAddress,
+}: WithdrawOfferComponentProps) => {
   const { signWithdrawOffer } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
@@ -41,7 +43,6 @@ export const WithdrawOfferComponent = ({ evvmID, nameServiceAddress }: WithdrawO
 
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
-
 
     const formData = {
       evvmId: evvmID,
@@ -101,10 +102,7 @@ export const WithdrawOfferComponent = ({ evvmID, nameServiceAddress }: WithdrawO
     }
     const nameServiceAddress = dataToGet.PayInputData.to_address;
 
-    executeWithdrawOffer(
-      dataToGet.WithdrawOfferInputData,
-      nameServiceAddress
-    )
+    executeWithdrawOffer(dataToGet.WithdrawOfferInputData, nameServiceAddress)
       .then(() => {
         console.log("Withdraw offer executed successfully");
       })
@@ -117,12 +115,10 @@ export const WithdrawOfferComponent = ({ evvmID, nameServiceAddress }: WithdrawO
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Withdraw offer of username"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/withdrawOfferStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/MNS/withdrawOfferStructure"
       />
 
       <br />
-
-
 
       <NumberInputWithGenerator
         label="NameService Nonce"
@@ -148,17 +144,14 @@ export const WithdrawOfferComponent = ({ evvmID, nameServiceAddress }: WithdrawO
         placeholder="Enter priority fee"
       />
 
+      {/* Priority configuration */}
+      <PrioritySelector onPriorityChange={setPriority} />
+
       <NumberInputWithGenerator
         label="EVVM Nonce"
         inputId="nonceEVVMInput_withdrawOffer"
         placeholder="Enter nonce"
       />
-
-
-
-      {/* Priority configuration */}
-      <PrioritySelector onPriorityChange={setPriority} />
-
       {/* Create signature button */}
       <button
         onClick={makeSig}
@@ -167,7 +160,7 @@ export const WithdrawOfferComponent = ({ evvmID, nameServiceAddress }: WithdrawO
           marginTop: "1rem",
         }}
       >
-        Make signature
+        Create signature
       </button>
 
       <DataDisplayWithClear

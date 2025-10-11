@@ -127,17 +127,11 @@ export const DispersePayComponent = ({ evvmID, evvmAddress }: DispersePayCompone
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Disperse payment"
-        link="https://www.evvm.org/docs/SignatureStructures/EVVM/DispersePaymentSignatureStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/EVVM/DispersePaymentSignatureStructure"
       />
       <br />
 
-      {/* Nonce input */}
-
-      <NumberInputWithGenerator
-        label="Nonce"
-        inputId="nonceInputDispersePay"
-        placeholder="Enter nonce"
-      />
+      
 
       {/* Token address */}
       <AddressInputField
@@ -171,6 +165,8 @@ export const DispersePayComponent = ({ evvmID, evvmAddress }: DispersePayCompone
         isUsingExecutor={isUsingExecutorDisperse}
       />
 
+
+
       {/* Number of users */}
       <div style={{ marginBottom: "1rem" }}>
         <p>Number of accounts to split the payment</p>
@@ -191,10 +187,12 @@ export const DispersePayComponent = ({ evvmID, evvmAddress }: DispersePayCompone
         </select>
       </div>
 
+      <p>For testing purposes, the number of users is 5 but you can change it from the repo.</p>
+
       {/* User inputs */}
       {Array.from({ length: numberOfUsersToDisperse }).map((_, index) => (
         <div key={index}>
-          <h4 style={{ color: "black", marginTop: "1rem" }}>{`User ${
+          <h4 style={{ color: "black", marginTop: "1rem" }}>{`Payment ${
             index + 1
           }`}</h4>
           <p>To:</p>
@@ -213,8 +211,9 @@ export const DispersePayComponent = ({ evvmID, evvmAddress }: DispersePayCompone
               });
             }}
           >
-            <option value="true">Username</option>
             <option value="false">Address</option>
+            <option value="true">Username</option>
+            
           </select>
           <input
             type="text"
@@ -253,12 +252,20 @@ export const DispersePayComponent = ({ evvmID, evvmAddress }: DispersePayCompone
       {/* Priority selection */}
       <PrioritySelector onPriorityChange={setPriorityDisperse} />
 
-      {/* Make signature button */}
+      {/* Nonce input */}
+
+      <NumberInputWithGenerator
+        label="Nonce"
+        inputId="nonceInputDispersePay"
+        placeholder="Enter nonce"
+      />
+
+      {/* Create signature button */}
       <button
         onClick={makeSig}
         style={{ padding: "0.5rem", marginTop: "1rem" }}
       >
-        Make signature
+        Create signature
       </button>
 
       {/* Display results */}

@@ -24,13 +24,15 @@ type InfoData = {
   RemoveCustomMetadataInputData: RemoveCustomMetadataInputData;
 };
 
-
 interface RemoveCustomMetadataComponentProps {
   evvmID: string;
   nameServiceAddress: string;
 }
 
-export const RemoveCustomMetadataComponent = ({ evvmID, nameServiceAddress }: RemoveCustomMetadataComponentProps) => {
+export const RemoveCustomMetadataComponent = ({
+  evvmID,
+  nameServiceAddress,
+}: RemoveCustomMetadataComponentProps) => {
   const { signRemoveCustomMetadata } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
@@ -42,7 +44,6 @@ export const RemoveCustomMetadataComponent = ({ evvmID, nameServiceAddress }: Re
   const makeSig = async () => {
     const walletData = await getAccountWithRetry(config);
     if (!walletData) return;
-
 
     const formData = {
       evvmId: evvmID,
@@ -135,12 +136,10 @@ export const RemoveCustomMetadataComponent = ({ evvmID, nameServiceAddress }: Re
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Remove custom metadata of identity"
-        link="https://www.evvm.org/docs/SignatureStructures/MNS/removeCustomMetadataStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/MNS/removeCustomMetadataStructure"
       />
 
       <br />
-
-
 
       <br />
 
@@ -168,16 +167,14 @@ export const RemoveCustomMetadataComponent = ({ evvmID, nameServiceAddress }: Re
         placeholder="Enter priority fee"
       />
 
+      {/* Priority configuration */}
+      <PrioritySelector onPriorityChange={setPriority} />
+
       <NumberInputWithGenerator
         label="EVVM Nonce"
         inputId="nonceEVVMInput_removeCustomMetadata"
         placeholder="Enter nonce"
       />
-
-
-
-      {/* Priority configuration */}
-      <PrioritySelector onPriorityChange={setPriority} />
 
       {/* Create signature button */}
       <button
@@ -187,7 +184,7 @@ export const RemoveCustomMetadataComponent = ({ evvmID, nameServiceAddress }: Re
           marginTop: "1rem",
         }}
       >
-        Make signature
+        Create signature
       </button>
 
       <DataDisplayWithClear

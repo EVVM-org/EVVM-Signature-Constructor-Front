@@ -7,12 +7,15 @@ import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import Evvm from "@/constants/abi/Evvm.json";
 
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
+import { TokenAddressInfo } from "./TokenAddressInfo";
 
 interface FaucetFunctionsComponentProps {
   evvmAddress: string;
 }
 
-export const FaucetFunctionsComponent = ({evvmAddress }: FaucetFunctionsComponentProps) => {
+export const FaucetFunctionsComponent = ({
+  evvmAddress,
+}: FaucetFunctionsComponentProps) => {
   const account = getAccount(config);
 
   const executeFaucet = async () => {
@@ -49,8 +52,6 @@ export const FaucetFunctionsComponent = ({evvmAddress }: FaucetFunctionsComponen
       <p>This faucet allows you to get tokens to a specified address.</p>
       <br />
 
-
-
       <AddressInputField
         label="Address to get tokens"
         inputId="addressGive_faucet"
@@ -62,6 +63,10 @@ export const FaucetFunctionsComponent = ({evvmAddress }: FaucetFunctionsComponen
         inputId="tokenAddress_faucet"
         placeholder="Enter token address"
       />
+
+      <div>
+        <TokenAddressInfo />
+      </div>
 
       <NumberInputField
         label="Amount"

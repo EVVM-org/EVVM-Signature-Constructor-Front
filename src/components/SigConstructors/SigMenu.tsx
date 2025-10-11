@@ -21,7 +21,6 @@ import { RemoveCustomMetadataComponent } from "./NameServiceFunctions/RemoveCust
 import { FlushCustomMetadataComponent } from "./NameServiceFunctions/FlushCustomMetadataComponent";
 import { FlushUsernameComponent } from "./NameServiceFunctions/FlushUsernameComponent";
 import { FaucetBalanceChecker } from "./FaucetFunctions/FaucetBalanceChecker";
-import { TokenAddressInfo } from "./FaucetFunctions/TokenAddressInfo";
 import { PublicServiceStakingComponent } from "./StakingFunctions/PublicServiceStakingComponent";
 
 const boxStyle = {
@@ -436,7 +435,6 @@ export const SigMenu = () => {
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-        {menu === "faucet" && <TokenAddressInfo />}
 
         {components.map((Component, index) => (
           <div

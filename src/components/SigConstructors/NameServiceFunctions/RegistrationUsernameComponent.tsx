@@ -186,6 +186,14 @@ export const RegistrationUsernameComponent = ({
 
       <br />
 
+      <p>
+        This functionality is not considering username offers to calculate
+        registration fees. We acknowledge that this functionality is needed to
+        avoid reentrancy renewal attacks to avoid paying the demand based
+        renewal fee.
+      </p>
+      <br />
+
       <NumberInputWithGenerator
         label="NameService Nonce"
         inputId="nonceNameServiceInput_registrationUsername"

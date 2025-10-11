@@ -122,6 +122,8 @@ export const PresaleStakingComponent = ({
         link="https://www.evvm.info/docs/SignatureStructures/SMate/StakingUnstakingStructure"
       />
       <br />
+      <p>A presale staker can stake/unstake one sMATE per transaction.</p>
+      <br />
 
       {/* EVVM ID is now passed as a prop */}
 
@@ -137,14 +139,6 @@ export const PresaleStakingComponent = ({
         inputId="nonceStakingInput_presaleStaking"
         placeholder="Enter nonce"
       />
-
-      <HelperInfo label="About presale staking">
-        <div>
-          <strong>
-            A presale staker can stake/unstake one sMATE per transaction.
-          </strong>
-        </div>
-      </HelperInfo>
 
       <NumberInputField
         label="Priority fee"

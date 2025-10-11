@@ -129,9 +129,12 @@ export const PreRegistrationUsernameComponent = ({
         title="Pre-registration of username"
         link="https://www.evvm.info/docs/SignatureStructures/NameService/preRegistrationUsernameStructure"
       />
-
       <br />
-
+      <p>
+        If this name was registered before is possible that you need to flush
+        the custom metadata
+      </p>
+      <br />
       {/* Address Input */}
 
       {/* Nonce section with automatic generator */}

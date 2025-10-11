@@ -134,7 +134,8 @@ export const FlushUsernameComponent = ({
         title="Delete Username"
         link="https://www.evvm.info/docs/SignatureStructures/NameService/flushUsernameStructure"
       />
-
+      <br />
+      <p>This function deletes all metadata associated with a username but does not remove the offers made on that username.</p>
       <br />
 
       {/* Nonce section with automatic generator */}

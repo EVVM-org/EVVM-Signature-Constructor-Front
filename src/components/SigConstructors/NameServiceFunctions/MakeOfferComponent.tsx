@@ -137,7 +137,7 @@ export const MakeOfferComponent = ({
       />
 
       <NumberInputField
-        label="Amount to offer"
+        label="Amount to offer (in MATE)"
         inputId="amountInput_makeOffer"
         placeholder="Enter amount to offer"
       />

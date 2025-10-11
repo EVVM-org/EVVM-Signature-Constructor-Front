@@ -67,7 +67,7 @@ export const PublicServiceStakingComponent = ({
       BigInt(formData.evvmID),
       formData.stakingAddress as `0x${string}`,
       formData.serviceAddress,
-      isStaking,
+      true,
       BigInt(formData.amountOfStaking),
       BigInt(formData.nonceStaking),
       BigInt(formData.priorityFee),
@@ -76,7 +76,7 @@ export const PublicServiceStakingComponent = ({
       (paySignature: string, stakingSignature: string) => {
         setDataToGet({
           PublicServiceStakingInputData: {
-            isStaking: isStaking,
+            isStaking: true,
             user: walletData.address as `0x${string}`,
             service: formData.serviceAddress as `0x${string}`,
             nonce: BigInt(formData.nonceStaking),
@@ -133,10 +133,11 @@ export const PublicServiceStakingComponent = ({
       />
       <br />
 
+      <p>This implementation is temporary until a direct integration with services is completed.</p>
+      <br />
       {/* stakingAddress is now passed as a prop */}
 
       {/* Configuration Section */}
-      <StakingActionSelector onChange={setIsStaking} />
 
       <AddressInputField
         label="Service Address"
@@ -155,7 +156,7 @@ export const PublicServiceStakingComponent = ({
       {/* Amount Inputs */}
       <NumberInputField
         label={
-          isStaking ? "Amount of MATE to stake" : "Amount of MATE to unstake"
+          isStaking ? "Amount of MATE to stake" : "Amount of MATE to unstake (sMATE)"
         }
         inputId="amountOfStakingInput_PublicServiceStaking"
         placeholder="Enter amount"

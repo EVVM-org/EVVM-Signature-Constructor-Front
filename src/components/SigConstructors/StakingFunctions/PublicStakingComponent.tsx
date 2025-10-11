@@ -148,7 +148,7 @@ export const PublicStakingComponent = ({
       {/* Amount Inputs */}
       <NumberInputField
         label={
-          isStaking ? "Amount of MATE to stake" : "Amount of MATE to unstake"
+          isStaking ? "Amount of MATE to stake" : "Amount of MATE to unstake (sMATE)"
         }
         inputId="amountOfStakingInput_PublicStaking"
         placeholder="Enter amount"

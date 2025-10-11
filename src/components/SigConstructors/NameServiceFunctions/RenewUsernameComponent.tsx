@@ -169,7 +169,7 @@ export const RenewUsernameComponent = ({
         onChange={handleUsernameChange}
       />
       <NumberInputField
-        label="Amount to Renew"
+        label="Cost to Renew (in MATE)"
         inputId="amountToRenew_renewUsername"
         placeholder="Enter amount to renew"
         defaultValue={amountToRenew !== null ? amountToRenew.toString() : ""}

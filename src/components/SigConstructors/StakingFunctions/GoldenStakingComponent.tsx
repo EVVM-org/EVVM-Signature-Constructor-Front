@@ -118,7 +118,7 @@ export const GoldenStakingComponent = ({
       {/* Basic input fields */}
       <NumberInputField
         label={
-          isStaking ? "Amount of MATE to stake" : "Amount of MATE to unstake"
+          isStaking ? "Amount of MATE to stake" : "Amount of MATE to unstake (sMATE)"
         }
         inputId="amountOfStakingInput_GoldenStaking"
         placeholder="Enter amount"

@@ -11,7 +11,7 @@ export const PrioritySelector: React.FC<PrioritySelectorProps> = ({
 }) => {
   return (
     <div style={{ marginTop }}>
-      <p>Nonce Type</p>
+      <p>EVVM Nonce Type</p>
       <select
         style={{
           color: "black",

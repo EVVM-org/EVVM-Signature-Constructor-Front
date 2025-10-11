@@ -145,7 +145,7 @@ export const DispersePayComponent = ({
       {/* Amount */}
 
       <NumberInputField
-        label="Amount"
+        label="Total Amount (sum of all payments)"
         inputId="amountTokenInputSplit"
         placeholder="Enter amount"
       />

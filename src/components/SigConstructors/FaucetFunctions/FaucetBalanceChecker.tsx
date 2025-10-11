@@ -55,7 +55,6 @@ export const FaucetBalanceChecker: React.FC<FaucetBalanceCheckerProps> = ({
         placeholder="Enter token address"
       />
 
-      <div>
         <HelperInfo label="Most common token addresses">
           <div>
             <strong>ETH</strong> address:<br />
@@ -66,7 +65,6 @@ export const FaucetBalanceChecker: React.FC<FaucetBalanceCheckerProps> = ({
             0x0000000000000000000000000000000000000001
           </div>
         </HelperInfo>
-      </div>
 
       <button
         onClick={checkBalance}

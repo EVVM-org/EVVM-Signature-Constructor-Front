@@ -18,26 +18,27 @@ import {
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import { tokenAddress } from "@/constants/address";
 import { executeRenewUsername } from "@/utils/TransactionExecuter";
+import { HelperInfo } from "../InputsAndModules/HelperInfo";
 
 type InfoData = {
   PayInputData: PayInputData;
   RenewUsernameInputData: RenewUsernameInputData;
 };
 
-
 interface RenewUsernameComponentProps {
   evvmID: string;
   nameServiceAddress: string;
 }
 
-export const RenewUsernameComponent = ({ evvmID, nameServiceAddress }: RenewUsernameComponentProps) => {
+export const RenewUsernameComponent = ({
+  evvmID,
+  nameServiceAddress,
+}: RenewUsernameComponentProps) => {
   const { signRenewUsername } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
   const [amountToRenew, setAmountToRenew] = React.useState<bigint | null>(null);
-
-
 
   const makeSig = async () => {
     const walletData = await getAccountWithRetry(config);
@@ -47,7 +48,9 @@ export const RenewUsernameComponent = ({ evvmID, nameServiceAddress }: RenewUser
     const getValue = (id: string) => {
       const el = document.getElementById(id) as HTMLInputElement | null;
       if (!el) {
-        throw new Error(`Input element with id '${id}' not found. Ensure the input is rendered and the id is correct.`);
+        throw new Error(
+          `Input element with id '${id}' not found. Ensure the input is rendered and the id is correct.`
+        );
       }
       return el.value;
     };
@@ -102,8 +105,8 @@ export const RenewUsernameComponent = ({ evvmID, nameServiceAddress }: RenewUser
   };
 
   const readAmountToRenew = async () => {
-
-    const getValue = (id: string) => (document.getElementById(id) as HTMLInputElement).value;
+    const getValue = (id: string) =>
+      (document.getElementById(id) as HTMLInputElement).value;
 
     if (!nameServiceAddress) {
       setAmountToRenew(null);
@@ -153,7 +156,7 @@ export const RenewUsernameComponent = ({ evvmID, nameServiceAddress }: RenewUser
         link="https://www.evvm.info/docs/SignatureStructures/NameService/renewUsernameStructure"
       />
       <br />
-      
+
       <NumberInputWithGenerator
         label="NameService Nonce"
         inputId="nonceNameServiceInput_renewUsername"
@@ -176,7 +179,7 @@ export const RenewUsernameComponent = ({ evvmID, nameServiceAddress }: RenewUser
         inputId="priorityFeeInput_renewUsername"
         placeholder="Enter priority fee"
       />
-      
+
       <PrioritySelector onPriorityChange={setPriority} />
 
       <NumberInputWithGenerator
@@ -185,6 +188,17 @@ export const RenewUsernameComponent = ({ evvmID, nameServiceAddress }: RenewUser
         placeholder="Enter nonce"
         showRandomBtn={priority !== "low"}
       />
+
+      <div>
+        {priority === "low" && (
+          <HelperInfo label="How to find my sync nonce?">
+            <div>
+              You can retrieve your next sync nonce from the EVVM contract using
+              the <code>getNextCurrentSyncNonce</code> function.
+            </div>
+          </HelperInfo>
+        )}
+      </div>
 
       <button
         onClick={makeSig}
@@ -202,5 +216,4 @@ export const RenewUsernameComponent = ({ evvmID, nameServiceAddress }: RenewUser
       />
     </div>
   );
-
-}
+};

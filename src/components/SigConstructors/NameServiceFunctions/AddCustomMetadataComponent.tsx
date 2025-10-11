@@ -18,19 +18,22 @@ import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import { tokenAddress } from "@/constants/address";
 import { executeAddCustomMetadata } from "@/utils/TransactionExecuter";
 import NameService from "@/constants/abi/NameService.json";
+import { HelperInfo } from "../InputsAndModules/HelperInfo";
 
 type InfoData = {
   PayInputData: PayInputData;
   AddCustomMetadataInputData: AddCustomMetadataInputData;
 };
 
-
 interface AddCustomMetadataComponentProps {
   evvmID: string;
   nameServiceAddress: string;
 }
 
-export const AddCustomMetadataComponent = ({ evvmID, nameServiceAddress }: AddCustomMetadataComponentProps) => {
+export const AddCustomMetadataComponent = ({
+  evvmID,
+  nameServiceAddress,
+}: AddCustomMetadataComponentProps) => {
   const { signAddCustomMetadata } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
@@ -41,7 +44,9 @@ export const AddCustomMetadataComponent = ({ evvmID, nameServiceAddress }: AddCu
   const getValue = (id: string) => {
     const el = document.getElementById(id) as HTMLInputElement | null;
     if (!el) {
-      throw new Error(`Input element with id '${id}' not found. Ensure the input is rendered and the id is correct.`);
+      throw new Error(
+        `Input element with id '${id}' not found. Ensure the input is rendered and the id is correct.`
+      );
     }
     return el.value;
   };
@@ -49,7 +54,6 @@ export const AddCustomMetadataComponent = ({ evvmID, nameServiceAddress }: AddCu
   const makeSig = async () => {
     const walletData = await getAccountWithRetry(config);
     if (!walletData) return;
-
 
     const formData = {
       evvmId: evvmID,
@@ -147,7 +151,10 @@ export const AddCustomMetadataComponent = ({ evvmID, nameServiceAddress }: AddCu
     }
     const nameServiceAddress = dataToGet.PayInputData.to_address;
 
-    executeAddCustomMetadata(dataToGet.AddCustomMetadataInputData, nameServiceAddress)
+    executeAddCustomMetadata(
+      dataToGet.AddCustomMetadataInputData,
+      nameServiceAddress
+    )
       .then(() => {
         console.log("Registration username executed successfully");
       })
@@ -164,11 +171,6 @@ export const AddCustomMetadataComponent = ({ evvmID, nameServiceAddress }: AddCu
       />
 
       <br />
-
-
-
-
-
 
       <NumberInputWithGenerator
         label="NameService Nonce"
@@ -206,8 +208,6 @@ export const AddCustomMetadataComponent = ({ evvmID, nameServiceAddress }: AddCu
         placeholder="Enter priority fee"
       />
 
-      
-
       {/* Priority configuration */}
       <PrioritySelector onPriorityChange={setPriority} />
 
@@ -217,6 +217,17 @@ export const AddCustomMetadataComponent = ({ evvmID, nameServiceAddress }: AddCu
         placeholder="Enter nonce"
         showRandomBtn={priority !== "low"}
       />
+
+      <div>
+        {priority === "low" && (
+          <HelperInfo label="How to find my sync nonce?">
+            <div>
+              You can retrieve your next sync nonce from the EVVM contract using
+              the <code>getNextCurrentSyncNonce</code> function.
+            </div>
+          </HelperInfo>
+        )}
+      </div>
 
       {/* Create signature button */}
       <button

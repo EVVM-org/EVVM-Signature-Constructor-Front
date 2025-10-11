@@ -16,6 +16,7 @@ import { PreRegistrationUsernameInputData } from "@/utils/TypeInputStructures/na
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import { tokenAddress } from "@/constants/address";
 import { executePreRegistrationUsername } from "@/utils/TransactionExecuter/useNameServiceTransactionExecuter";
+import { HelperInfo } from "../InputsAndModules/HelperInfo";
 
 type InfoData = {
   PayInputData: PayInputData;
@@ -170,6 +171,17 @@ export const PreRegistrationUsernameComponent = ({
         placeholder="Enter nonce"
         showRandomBtn={priority !== "low"}
       />
+
+      <div>
+        {priority === "low" && (
+          <HelperInfo label="How to find my sync nonce?">
+            <div>
+              You can retrieve your next sync nonce from the EVVM contract using
+              the <code>getNextCurrentSyncNonce</code> function.
+            </div>
+          </HelperInfo>
+        )}
+      </div>
 
       {/* Create signature button */}
       <button

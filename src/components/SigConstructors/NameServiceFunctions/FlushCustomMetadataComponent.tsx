@@ -18,19 +18,22 @@ import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import NameService from "@/constants/abi/NameService.json";
 import { tokenAddress } from "@/constants/address";
 import { executeFlushCustomMetadata } from "@/utils/TransactionExecuter";
+import { HelperInfo } from "../InputsAndModules/HelperInfo";
 
 type InfoData = {
   PayInputData: PayInputData;
   FlushCustomMetadataInputData: FlushCustomMetadataInputData;
 };
 
-
 interface FlushCustomMetadataComponentProps {
   evvmID: string;
   nameServiceAddress: string;
 }
 
-export const FlushCustomMetadataComponent = ({ evvmID, nameServiceAddress }: FlushCustomMetadataComponentProps) => {
+export const FlushCustomMetadataComponent = ({
+  evvmID,
+  nameServiceAddress,
+}: FlushCustomMetadataComponentProps) => {
   const { signFlushCustomMetadata } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
@@ -42,7 +45,6 @@ export const FlushCustomMetadataComponent = ({ evvmID, nameServiceAddress }: Flu
   const makeSig = async () => {
     const walletData = await getAccountWithRetry(config);
     if (!walletData) return;
-
 
     const formData = {
       evvmId: evvmID,
@@ -137,11 +139,6 @@ export const FlushCustomMetadataComponent = ({ evvmID, nameServiceAddress }: Flu
 
       <br />
 
-
-
-
-
-
       {/* Nonce section with automatic generator */}
 
       <NumberInputWithGenerator
@@ -162,8 +159,6 @@ export const FlushCustomMetadataComponent = ({ evvmID, nameServiceAddress }: Flu
         placeholder="Enter priority fee"
       />
 
-      
-
       {/* Priority configuration */}
       <PrioritySelector onPriorityChange={setPriority} />
 
@@ -173,6 +168,17 @@ export const FlushCustomMetadataComponent = ({ evvmID, nameServiceAddress }: Flu
         placeholder="Enter nonce"
         showRandomBtn={priority !== "low"}
       />
+
+      <div>
+        {priority === "low" && (
+          <HelperInfo label="How to find my sync nonce?">
+            <div>
+              You can retrieve your next sync nonce from the EVVM contract using
+              the <code>getNextCurrentSyncNonce</code> function.
+            </div>
+          </HelperInfo>
+        )}
+      </div>
 
       {/* Create signature button */}
       <button

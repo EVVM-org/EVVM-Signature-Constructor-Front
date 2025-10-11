@@ -16,6 +16,7 @@ import {
   PayInputData,
   PublicServiceStakingInputData,
 } from "@/utils/TypeInputStructures";
+import { HelperInfo } from "../InputsAndModules/HelperInfo";
 
 type InputData = {
   PublicServiceStakingInputData: PublicServiceStakingInputData;
@@ -153,7 +154,9 @@ export const PublicServiceStakingComponent = ({
 
       {/* Amount Inputs */}
       <NumberInputField
-          label={isStaking ? "Amount of MATE to stake" : "Amount of MATE to unstake"}
+        label={
+          isStaking ? "Amount of MATE to stake" : "Amount of MATE to unstake"
+        }
         inputId="amountOfStakingInput_PublicServiceStaking"
         placeholder="Enter amount"
       />
@@ -173,6 +176,17 @@ export const PublicServiceStakingComponent = ({
         placeholder="Enter nonce"
         showRandomBtn={priority !== "low"}
       />
+
+      <div>
+        {priority === "low" && (
+          <HelperInfo label="How to find my sync nonce?">
+            <div>
+              You can retrieve your next sync nonce from the EVVM contract using
+              the <code>getNextCurrentSyncNonce</code> function.
+            </div>
+          </HelperInfo>
+        )}
+      </div>
 
       {/* Action Button */}
       <button

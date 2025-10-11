@@ -17,6 +17,7 @@ import {
   PayInputData,
   PublicStakingInputData,
 } from "@/utils/TypeInputStructures";
+import { HelperInfo } from "../InputsAndModules/HelperInfo";
 
 type InputData = {
   PublicStakingInputData: PublicStakingInputData;
@@ -28,7 +29,10 @@ interface PublicStakingComponentProps {
   stakingAddress: string;
 }
 
-export const PublicStakingComponent = ({ evvmID, stakingAddress }: PublicStakingComponentProps) => {
+export const PublicStakingComponent = ({
+  evvmID,
+  stakingAddress,
+}: PublicStakingComponentProps) => {
   const { signPublicStaking } = useStakingSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
@@ -43,7 +47,7 @@ export const PublicStakingComponent = ({ evvmID, stakingAddress }: PublicStaking
 
     const formData = {
       evvmID: evvmID,
-  stakingAddress: stakingAddress,
+      stakingAddress: stakingAddress,
       nonceEVVM: getValue("nonceEVVMInput_PublicStaking"),
       nonceStaking: getValue("nonceStakingInput_PublicStaking"),
       amountOfStaking: Number(getValue("amountOfStakingInput_PublicStaking")),
@@ -128,14 +132,12 @@ export const PublicStakingComponent = ({ evvmID, stakingAddress }: PublicStaking
 
       {/* EVVM ID is now passed as a prop */}
 
-
       {/* stakingAddress is now passed as a prop */}
 
       {/* Configuration Section */}
       <StakingActionSelector onChange={setIsStaking} />
 
       {/* Nonce Generators */}
-      
 
       <NumberInputWithGenerator
         label="staking Nonce"
@@ -145,7 +147,9 @@ export const PublicStakingComponent = ({ evvmID, stakingAddress }: PublicStaking
 
       {/* Amount Inputs */}
       <NumberInputField
-          label={isStaking ? "Amount of MATE to stake" : "Amount of MATE to unstake"}
+        label={
+          isStaking ? "Amount of MATE to stake" : "Amount of MATE to unstake"
+        }
         inputId="amountOfStakingInput_PublicStaking"
         placeholder="Enter amount"
       />
@@ -165,6 +169,17 @@ export const PublicStakingComponent = ({ evvmID, stakingAddress }: PublicStaking
         placeholder="Enter nonce"
         showRandomBtn={priority !== "low"}
       />
+
+      <div>
+        {priority === "low" && (
+          <HelperInfo label="How to find my sync nonce?">
+            <div>
+              You can retrieve your next sync nonce from the EVVM contract using
+              the <code>getNextCurrentSyncNonce</code> function.
+            </div>
+          </HelperInfo>
+        )}
+      </div>
 
       {/* Action Button */}
       <button

@@ -15,6 +15,7 @@ import { PayInputData } from "@/utils/TypeInputStructures";
 import { executePay } from "@/utils/TransactionExecuter/useEVVMTransactionExecuter";
 
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
+import { HelperInfo } from "../InputsAndModules/HelperInfo";
 
 interface PaySignaturesComponentProps {
   evvmID: string;
@@ -190,6 +191,17 @@ export const PaySignaturesComponent = ({
         placeholder="Enter nonce"
         showRandomBtn={priority !== "low"}
       />
+
+      <div>
+        {priority === "low" && (
+          <HelperInfo label="How to find my sync nonce?">
+            <div>
+              You can retrieve your next sync nonce from the EVVM contract using
+              the <code>getNextCurrentSyncNonce</code> function.
+            </div>
+          </HelperInfo>
+        )}
+      </div>
 
       {/* Create signature button */}
       <button

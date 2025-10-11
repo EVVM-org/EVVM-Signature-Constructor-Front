@@ -18,19 +18,22 @@ import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import NameService from "@/constants/abi/NameService.json";
 import { tokenAddress } from "@/constants/address";
 import { executeFlushUsername } from "@/utils/TransactionExecuter";
+import { HelperInfo } from "../InputsAndModules/HelperInfo";
 
 type InfoData = {
   PayInputData: PayInputData;
   FlushUsernameInputData: FlushUsernameInputData;
 };
 
-
 interface FlushUsernameComponentProps {
   evvmID: string;
   nameServiceAddress: string;
 }
 
-export const FlushUsernameComponent = ({ evvmID, nameServiceAddress }: FlushUsernameComponentProps) => {
+export const FlushUsernameComponent = ({
+  evvmID,
+  nameServiceAddress,
+}: FlushUsernameComponentProps) => {
   const { signFlushUsername } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
@@ -42,7 +45,6 @@ export const FlushUsernameComponent = ({ evvmID, nameServiceAddress }: FlushUser
   const makeSig = async () => {
     const walletData = await getAccountWithRetry(config);
     if (!walletData) return;
-
 
     const formData = {
       evvmId: evvmID,
@@ -135,11 +137,6 @@ export const FlushUsernameComponent = ({ evvmID, nameServiceAddress }: FlushUser
 
       <br />
 
-
-
-
-
-
       {/* Nonce section with automatic generator */}
 
       <NumberInputWithGenerator
@@ -160,8 +157,6 @@ export const FlushUsernameComponent = ({ evvmID, nameServiceAddress }: FlushUser
         placeholder="Enter priority fee"
       />
 
-      
-
       {/* Priority configuration */}
       <PrioritySelector onPriorityChange={setPriority} />
 
@@ -171,6 +166,17 @@ export const FlushUsernameComponent = ({ evvmID, nameServiceAddress }: FlushUser
         placeholder="Enter nonce"
         showRandomBtn={priority !== "low"}
       />
+
+      <div>
+        {priority === "low" && (
+          <HelperInfo label="How to find my sync nonce?">
+            <div>
+              You can retrieve your next sync nonce from the EVVM contract using
+              the <code>getNextCurrentSyncNonce</code> function.
+            </div>
+          </HelperInfo>
+        )}
+      </div>
 
       {/* Create signature button */}
       <button

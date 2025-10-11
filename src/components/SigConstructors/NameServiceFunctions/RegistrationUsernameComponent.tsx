@@ -17,6 +17,7 @@ import { tokenAddress } from "@/constants/address";
 import NameService from "@/constants/abi/NameService.json";
 import Evvm from "@/constants/abi/Evvm.json";
 import { executeRegistrationUsername } from "@/utils/TransactionExecuter/useNameServiceTransactionExecuter";
+import { HelperInfo } from "../InputsAndModules/HelperInfo";
 
 type InfoData = {
   PayInputData: PayInputData;
@@ -41,7 +42,9 @@ export const RegistrationUsernameComponent = ({
   const getValue = (id: string) => {
     const el = document.getElementById(id) as HTMLInputElement | null;
     if (!el) {
-      throw new Error(`Input element with id '${id}' not found. Ensure the input is rendered and the id is correct.`);
+      throw new Error(
+        `Input element with id '${id}' not found. Ensure the input is rendered and the id is correct.`
+      );
     }
     return el.value;
   };
@@ -53,10 +56,14 @@ export const RegistrationUsernameComponent = ({
     const formData = {
       evvmId: BigInt(evvmID),
       addressNameService: nameServiceAddress,
-      nonceNameService: BigInt(getValue("nonceNameServiceInput_registrationUsername")),
+      nonceNameService: BigInt(
+        getValue("nonceNameServiceInput_registrationUsername")
+      ),
       username: getValue("usernameInput_registrationUsername"),
       clowNumber: BigInt(getValue("clowNumberInput_registrationUsername")),
-      priorityFee_EVVM: BigInt(getValue("priorityFeeInput_registrationUsername")),
+      priorityFee_EVVM: BigInt(
+        getValue("priorityFeeInput_registrationUsername")
+      ),
       nonceEVVM: BigInt(getValue("nonceEVVMInput_registrationUsername")),
       priorityFlag: priority === "high",
     };
@@ -84,7 +91,7 @@ export const RegistrationUsernameComponent = ({
                 to_address: formData.addressNameService as `0x${string}`,
                 to_identity: "",
                 token: tokenAddress.mate as `0x${string}`,
-                amount: (rewardAmount ? rewardAmount * BigInt(100) : BigInt(0)),
+                amount: rewardAmount ? rewardAmount * BigInt(100) : BigInt(0),
                 priorityFee: formData.priorityFee_EVVM,
                 nonce: formData.nonceEVVM,
                 priority: priority === "high",
@@ -203,8 +210,6 @@ export const RegistrationUsernameComponent = ({
         placeholder="Enter priority fee"
       />
 
-      
-
       {/* Priority configuration */}
       <PrioritySelector onPriorityChange={setPriority} />
 
@@ -214,6 +219,17 @@ export const RegistrationUsernameComponent = ({
         placeholder="Enter nonce"
         showRandomBtn={priority !== "low"}
       />
+
+      <div>
+        {priority === "low" && (
+          <HelperInfo label="How to find my sync nonce?">
+            <div>
+              You can retrieve your next sync nonce from the EVVM contract using
+              the <code>getNextCurrentSyncNonce</code> function.
+            </div>
+          </HelperInfo>
+        )}
+      </div>
 
       {/* Create signature button */}
       <button

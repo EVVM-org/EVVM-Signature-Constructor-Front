@@ -17,6 +17,7 @@ import {
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import { tokenAddress } from "@/constants/address";
 import { executeWithdrawOffer } from "@/utils/TransactionExecuter";
+import { HelperInfo } from "../InputsAndModules/HelperInfo";
 
 type InfoData = {
   PayInputData: PayInputData;
@@ -153,6 +154,18 @@ export const WithdrawOfferComponent = ({
         placeholder="Enter nonce"
         showRandomBtn={priority !== "low"}
       />
+
+      <div>
+        {priority === "low" && (
+          <HelperInfo label="How to find my sync nonce?">
+            <div>
+              You can retrieve your next sync nonce from the EVVM contract using
+              the <code>getNextCurrentSyncNonce</code> function.
+            </div>
+          </HelperInfo>
+        )}
+      </div>
+
       {/* Create signature button */}
       <button
         onClick={makeSig}

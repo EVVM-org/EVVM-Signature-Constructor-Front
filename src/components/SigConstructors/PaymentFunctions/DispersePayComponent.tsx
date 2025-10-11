@@ -17,6 +17,7 @@ import {
 import { executeDispersePay } from "@/utils/TransactionExecuter/useEVVMTransactionExecuter";
 
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
+import { HelperInfo } from "../InputsAndModules/HelperInfo";
 
 interface DispersePayComponentProps {
   evvmID: string;
@@ -260,6 +261,17 @@ export const DispersePayComponent = ({
         placeholder="Enter nonce"
         showRandomBtn={priorityDisperse !== "low"}
       />
+
+      <div>
+        {priorityDisperse === "low" && (
+          <HelperInfo label="How to find my sync nonce?">
+            <div>
+              You can retrieve your next sync nonce from the EVVM contract using
+              the <code>getNextCurrentSyncNonce</code> function.
+            </div>
+          </HelperInfo>
+        )}
+      </div>
 
       {/* Create signature button */}
       <button

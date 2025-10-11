@@ -16,19 +16,22 @@ import { tokenAddress } from "@/constants/address";
 import { useNameServiceSignatureBuilder } from "@/utils/SignatureBuilder/useNameServiceSignatureBuilder";
 import { MakeOfferInputData, PayInputData } from "@/utils/TypeInputStructures";
 import { executeMakeOffer } from "@/utils/TransactionExecuter";
+import { HelperInfo } from "../InputsAndModules/HelperInfo";
 
 type InfoData = {
   PayInputData: PayInputData;
   MakeOfferInputData: MakeOfferInputData;
 };
 
-
 interface MakeOfferComponentProps {
   evvmID: string;
   nameServiceAddress: string;
 }
 
-export const MakeOfferComponent = ({ evvmID, nameServiceAddress }: MakeOfferComponentProps) => {
+export const MakeOfferComponent = ({
+  evvmID,
+  nameServiceAddress,
+}: MakeOfferComponentProps) => {
   const { signMakeOffer } = useNameServiceSignatureBuilder();
   const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
@@ -40,7 +43,6 @@ export const MakeOfferComponent = ({ evvmID, nameServiceAddress }: MakeOfferComp
 
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
-
 
     const formData = {
       evvmId: evvmID,
@@ -122,9 +124,6 @@ export const MakeOfferComponent = ({ evvmID, nameServiceAddress }: MakeOfferComp
 
       <br />
 
-
-
-
       <NumberInputWithGenerator
         label="NameService Nonce"
         inputId="nonceNameServiceInput_makeOffer"
@@ -155,8 +154,6 @@ export const MakeOfferComponent = ({ evvmID, nameServiceAddress }: MakeOfferComp
         placeholder="Enter priority fee"
       />
 
-      
-
       {/* Priority configuration */}
       <PrioritySelector onPriorityChange={setPriority} />
 
@@ -166,6 +163,17 @@ export const MakeOfferComponent = ({ evvmID, nameServiceAddress }: MakeOfferComp
         placeholder="Enter nonce"
         showRandomBtn={priority !== "low"}
       />
+
+      <div>
+        {priority === "low" && (
+          <HelperInfo label="How to find my sync nonce?">
+            <div>
+              You can retrieve your next sync nonce from the EVVM contract using
+              the <code>getNextCurrentSyncNonce</code> function.
+            </div>
+          </HelperInfo>
+        )}
+      </div>
 
       {/* Create signature button */}
       <button

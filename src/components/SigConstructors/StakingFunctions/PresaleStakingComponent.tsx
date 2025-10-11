@@ -162,6 +162,17 @@ export const PresaleStakingComponent = ({
         showRandomBtn={priority !== "low"}
       />
 
+      <div>
+        {priority === "low" && (
+          <HelperInfo label="How to find my sync nonce?">
+            <div>
+              You can retrieve your next sync nonce from the EVVM contract using
+              the <code>getNextCurrentSyncNonce</code> function.
+            </div>
+          </HelperInfo>
+        )}
+      </div>
+
       {/* Action Button */}
       <button
         onClick={makeSig}

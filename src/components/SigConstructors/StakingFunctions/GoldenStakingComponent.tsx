@@ -16,6 +16,7 @@ import {
   GoldenStakingInputData,
   PayInputData,
 } from "@/utils/TypeInputStructures";
+import { HelperInfo } from "../InputsAndModules/HelperInfo";
 
 type InfoData = {
   PayInputData: PayInputData;
@@ -27,7 +28,10 @@ interface GoldenStakingComponentProps {
   stakingAddress: string;
 }
 
-export const GoldenStakingComponent = ({ evvmID, stakingAddress }: GoldenStakingComponentProps) => {
+export const GoldenStakingComponent = ({
+  evvmID,
+  stakingAddress,
+}: GoldenStakingComponentProps) => {
   let account = getAccount(config);
   const { signGoldenStaking } = useStakingSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
@@ -40,7 +44,6 @@ export const GoldenStakingComponent = ({ evvmID, stakingAddress }: GoldenStaking
 
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
-
 
     const formData = {
       evvmID: evvmID,
@@ -107,7 +110,6 @@ export const GoldenStakingComponent = ({ evvmID, stakingAddress }: GoldenStaking
 
       {/* EVVM ID is now passed as a prop */}
 
-
       {/* stakingAddress is now passed as a prop */}
 
       {/* Configuration Section */}
@@ -115,7 +117,9 @@ export const GoldenStakingComponent = ({ evvmID, stakingAddress }: GoldenStaking
 
       {/* Basic input fields */}
       <NumberInputField
-        label={isStaking ? "Amount of MATE to stake" : "Amount of MATE to unstake"}
+        label={
+          isStaking ? "Amount of MATE to stake" : "Amount of MATE to unstake"
+        }
         inputId="amountOfStakingInput_GoldenStaking"
         placeholder="Enter amount"
       />
@@ -131,6 +135,17 @@ export const GoldenStakingComponent = ({ evvmID, stakingAddress }: GoldenStaking
         placeholder="Enter nonce"
         showRandomBtn={priority !== "low"}
       />
+
+      <div>
+        {priority === "low" && (
+          <HelperInfo label="How to find my sync nonce?">
+            <div>
+              You can retrieve your next sync nonce from the EVVM contract using
+              the <code>getNextCurrentSyncNonce</code> function.
+            </div>
+          </HelperInfo>
+        )}
+      </div>
 
       {/* Create signature button */}
       <button

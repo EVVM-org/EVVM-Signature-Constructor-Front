@@ -22,6 +22,7 @@ import { FlushCustomMetadataComponent } from "./NameServiceFunctions/FlushCustom
 import { FlushUsernameComponent } from "./NameServiceFunctions/FlushUsernameComponent";
 import { FaucetBalanceChecker } from "./FaucetFunctions/FaucetBalanceChecker";
 import { TokenAddressInfo } from "./FaucetFunctions/TokenAddressInfo";
+import { PublicServiceStakingComponent } from "./StakingFunctions/PublicServiceStakingComponent";
 
 const boxStyle = {
   display: "flex",
@@ -182,6 +183,11 @@ export const SigMenu = () => {
     />,
     <PublicStakingComponent
       key="public"
+      evvmID={evvmID}
+      stakingAddress={stakingAddress}
+    />,
+    <PublicServiceStakingComponent
+      key="service"
       evvmID={evvmID}
       stakingAddress={stakingAddress}
     />,

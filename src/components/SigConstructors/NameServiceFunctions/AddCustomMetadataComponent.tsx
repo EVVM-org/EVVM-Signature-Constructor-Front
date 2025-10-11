@@ -215,7 +215,7 @@ export const AddCustomMetadataComponent = ({ evvmID, nameServiceAddress }: AddCu
         label="EVVM Nonce"
         inputId="nonceEVVMInput_addCustomMetadata"
         placeholder="Enter nonce"
-        showRandomBtn={priority === "low"}
+        showRandomBtn={priority !== "low"}
       />
 
       {/* Create signature button */}

@@ -189,7 +189,7 @@ export const PaySignaturesComponent = ({ evvmID, evvmAddress }: PaySignaturesCom
         label="Nonce"
         inputId="nonceInput_Pay"
         placeholder="Enter nonce"
-        showRandomBtn={priority === "low"}
+        showRandomBtn={priority !== "low"}
       />
 
       {/* Create signature button */}

@@ -174,7 +174,7 @@ export const RemoveCustomMetadataComponent = ({
         label="EVVM Nonce"
         inputId="nonceEVVMInput_removeCustomMetadata"
         placeholder="Enter nonce"
-        showRandomBtn={priority === "low"}
+        showRandomBtn={priority !== "low"}
       />
 
       {/* Create signature button */}

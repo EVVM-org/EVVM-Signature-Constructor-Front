@@ -171,7 +171,7 @@ export const FlushCustomMetadataComponent = ({ evvmID, nameServiceAddress }: Flu
         label="EVVM Nonce"
         inputId="nonceEVVMInput_flushCustomMetadata"
         placeholder="Enter nonce"
-        showRandomBtn={priority === "low"}
+        showRandomBtn={priority !== "low"}
       />
 
       {/* Create signature button */}

@@ -258,7 +258,7 @@ export const DispersePayComponent = ({ evvmID, evvmAddress }: DispersePayCompone
         label="Nonce"
         inputId="nonceInputDispersePay"
         placeholder="Enter nonce"
-        showRandomBtn={priorityDisperse === "low"}
+        showRandomBtn={priorityDisperse !== "low"}
       />
 
       {/* Create signature button */}

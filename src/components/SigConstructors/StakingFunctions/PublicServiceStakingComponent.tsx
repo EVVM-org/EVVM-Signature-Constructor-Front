@@ -1,40 +1,40 @@
 "use client";
 import React from "react";
+import { config } from "@/config/index";
 import { useStakingSignatureBuilder } from "@/utils/SignatureBuilder/useStakingSignatureBuilder";
 import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
 import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
+import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector";
+import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
-import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector";
 import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
-import { getAccount } from "@wagmi/core";
-import { config } from "@/config/index";
-import { executePresaleStaking } from "@/utils/TransactionExecuter/useStakingTransactionExecuter";
 import { tokenAddress } from "@/constants/address";
+import { executePublicServiceStaking } from "@/utils/TransactionExecuter/useStakingTransactionExecuter";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import {
   PayInputData,
-  PresaleStakingInputData,
+  PublicServiceStakingInputData,
 } from "@/utils/TypeInputStructures";
 
 type InputData = {
-  PresaleStakingInputData: PresaleStakingInputData;
+  PublicServiceStakingInputData: PublicServiceStakingInputData;
   PayInputData: PayInputData;
 };
 
-interface PresaleStakingComponentProps {
+interface PublicServiceStakingComponentProps {
   evvmID: string;
   stakingAddress: string;
 }
 
-export const PresaleStakingComponent = ({ evvmID, stakingAddress }: PresaleStakingComponentProps) => {
-  const { signPresaleStaking } = useStakingSignatureBuilder();
-
+export const PublicServiceStakingComponent = ({
+  evvmID,
+  stakingAddress,
+}: PublicServiceStakingComponentProps) => {
+  const { signPublicServiceStaking } = useStakingSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
-
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null);
-
 
   const makeSig = async () => {
     const walletData = await getAccountWithRetry(config);
@@ -46,38 +46,44 @@ export const PresaleStakingComponent = ({ evvmID, stakingAddress }: PresaleStaki
     const formData = {
       evvmID: evvmID,
       stakingAddress: stakingAddress,
-      priorityFee_EVVM: getValue("priorityFeeInput_presaleStaking"),
-      nonce_EVVM: getValue("nonceEVVMInput_presaleStaking"),
-      nonce: getValue("nonceStakingInput_presaleStaking"),
-      priorityFlag_EVVM: priority === "high",
+      serviceAddress: getValue("serviceAddressInput_PublicServiceStaking"),
+      amountOfStaking: Number(
+        getValue("amountOfStakingInput_PublicServiceStaking")
+      ),
+      priorityFee: getValue("priorityFeeInput_PublicServiceStaking"),
+      nonceEVVM: getValue("nonceEVVMInput_PublicServiceStaking"),
+      nonceStaking: getValue("nonceStakingInput_PublicServiceStaking"),
     };
 
-    const amountOfToken = (1 * 10 ** 18).toLocaleString(
+    const amountOfToken = (formData.amountOfStaking * 10 ** 18).toLocaleString(
       "fullwide",
       {
         useGrouping: false,
       }
     );
 
-    signPresaleStaking(
+    signPublicServiceStaking(
       BigInt(formData.evvmID),
       formData.stakingAddress as `0x${string}`,
+      formData.serviceAddress,
       isStaking,
-      BigInt(formData.nonce),
-      BigInt(formData.priorityFee_EVVM),
-      BigInt(amountOfToken),
-      BigInt(formData.nonce_EVVM),
-      formData.priorityFlag_EVVM,
+      BigInt(formData.amountOfStaking),
+      BigInt(formData.nonceStaking),
+      BigInt(formData.priorityFee),
+      BigInt(formData.nonceEVVM),
+      priority === "high",
       (paySignature: string, stakingSignature: string) => {
         setDataToGet({
-          PresaleStakingInputData: {
+          PublicServiceStakingInputData: {
             isStaking: isStaking,
             user: walletData.address as `0x${string}`,
-            nonce: BigInt(formData.nonce),
+            service: formData.serviceAddress as `0x${string}`,
+            nonce: BigInt(formData.nonceStaking),
+            amountOfStaking: BigInt(formData.amountOfStaking),
             signature: stakingSignature,
-            priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
+            priorityFee_EVVM: BigInt(formData.priorityFee),
             priorityFlag_EVVM: priority === "high",
-            nonce_EVVM: BigInt(formData.nonce_EVVM),
+            nonce_EVVM: BigInt(formData.nonceEVVM),
             signature_EVVM: paySignature,
           },
           PayInputData: {
@@ -86,15 +92,15 @@ export const PresaleStakingComponent = ({ evvmID, stakingAddress }: PresaleStaki
             to_identity: "",
             token: tokenAddress.mate as `0x${string}`,
             amount: BigInt(amountOfToken),
-            priorityFee: BigInt(formData.priorityFee_EVVM),
-            nonce: BigInt(formData.nonce_EVVM),
+            priorityFee: BigInt(formData.priorityFee),
+            nonce: BigInt(formData.nonceEVVM),
             priority: priority === "high",
             executor: formData.stakingAddress as `0x${string}`,
             signature: paySignature,
           },
         });
       },
-      (error: Error) => console.error("Error signing presale staking:", error)
+      (error) => console.error("Error signing presale staking:", error)
     );
   };
 
@@ -106,44 +112,55 @@ export const PresaleStakingComponent = ({ evvmID, stakingAddress }: PresaleStaki
 
     const stakingAddress = dataToGet.PayInputData.to_address;
 
-    executePresaleStaking(dataToGet.PresaleStakingInputData, stakingAddress)
+    executePublicServiceStaking(
+      dataToGet.PublicServiceStakingInputData,
+      stakingAddress
+    )
       .then(() => {
-        console.log("Presale staking executed successfully");
+        console.log("Public staking executed successfully");
       })
       .catch((error) => {
-        console.error("Error executing presale staking:", error);
+        console.error("Error executing public staking:", error);
       });
   };
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
-        title="Presale Staking"
+        title="Service Staking"
         link="https://www.evvm.info/docs/SignatureStructures/SMate/StakingUnstakingStructure"
       />
       <br />
-
-      {/* EVVM ID is now passed as a prop */}
-
 
       {/* stakingAddress is now passed as a prop */}
 
       {/* Configuration Section */}
       <StakingActionSelector onChange={setIsStaking} />
 
-      {/* Nonce Generators */}
+      <AddressInputField
+        label="Service Address"
+        inputId="serviceAddressInput_PublicServiceStaking"
+        placeholder="Enter service address"
+      />
 
-      
+      {/* Nonce Generators */}
 
       <NumberInputWithGenerator
         label="staking Nonce"
-        inputId="nonceStakingInput_presaleStaking"
+        inputId="nonceStakingInput_PublicServiceStaking"
         placeholder="Enter nonce"
+      />
+
+      {/* Amount Inputs */}
+      <NumberInputField
+        label="Amount of staking"
+        inputId="amountOfStakingInput_PublicServiceStaking"
+        placeholder="Enter amount of staking"
       />
 
       <NumberInputField
         label="Priority fee"
-        inputId="priorityFeeInput_presaleStaking"
+        inputId="priorityFeeInput_PublicServiceStaking"
         placeholder="Enter priority fee"
       />
 
@@ -152,7 +169,7 @@ export const PresaleStakingComponent = ({ evvmID, stakingAddress }: PresaleStaki
 
       <NumberInputWithGenerator
         label="EVVM Nonce"
-        inputId="nonceEVVMInput_presaleStaking"
+        inputId="nonceEVVMInput_PublicServiceStaking"
         placeholder="Enter nonce"
         showRandomBtn={priority !== "low"}
       />

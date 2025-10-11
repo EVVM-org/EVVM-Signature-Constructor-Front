@@ -151,7 +151,7 @@ export const AcceptOfferComponent = ({
         label="EVVM Nonce"
         inputId="nonceEVVMInput_acceptOffer"
         placeholder="Enter nonce"
-        showRandomBtn={priority === "low"}
+        showRandomBtn={priority !== "low"}
       />
 
       {/* Create signature button */}

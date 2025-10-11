@@ -7,7 +7,7 @@ import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import Evvm from "@/constants/abi/Evvm.json";
 
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import { TokenAddressInfo } from "./TokenAddressInfo";
+import { HelperInfo } from "../InputsAndModules/HelperInfo";
 
 interface FaucetFunctionsComponentProps {
   evvmAddress: string;
@@ -65,8 +65,17 @@ export const FaucetFunctionsComponent = ({
       />
 
       <div>
-        <TokenAddressInfo />
-      </div>
+              <HelperInfo label="Most common token addresses">
+                <div>
+                  <strong>ETH</strong> address:<br />
+                  0x0000000000000000000000000000000000000000
+                </div>
+                <div style={{ marginTop: 8 }}>
+                  <strong>MATE</strong> address:<br />
+                  0x0000000000000000000000000000000000000001
+                </div>
+              </HelperInfo>
+            </div>
 
       <NumberInputField
         label="Amount"

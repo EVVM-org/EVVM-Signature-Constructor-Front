@@ -132,7 +132,7 @@ export const FlushCustomMetadataComponent = ({ evvmID, nameServiceAddress }: Flu
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Flush Custom Metadata of Identity"
-        link="https://www.evvm.info/docs/SignatureStructures/MNS/flushCustomMetadataStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/NameService/flushCustomMetadataStructure"
       />
 
       <br />

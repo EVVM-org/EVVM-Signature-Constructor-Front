@@ -117,7 +117,7 @@ export const MakeOfferComponent = ({ evvmID, nameServiceAddress }: MakeOfferComp
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Make offer of username"
-        link="https://www.evvm.info/docs/SignatureStructures/MNS/makeOfferStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/NameService/makeOfferStructure"
       />
 
       <br />

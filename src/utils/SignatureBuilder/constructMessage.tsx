@@ -201,13 +201,13 @@ function buildMessageSignedForPublicServiceStake(
 function buildMessageSignedForPreRegistrationUsername(
   evvmID: bigint,
   hashUsername: string,
-  nonceMNS: bigint
+  nonceNameService: bigint
 ): string {
   const inputs: string =
     `${
       hashUsername.toLowerCase().slice(0, 2) +
       hashUsername.toUpperCase().slice(2)
-    },` + `${nonceMNS.toString()}`;
+    },` + `${nonceNameService.toString()}`;
 
   return basicMessageBuilder(
     evvmID.toString(),
@@ -220,10 +220,10 @@ function buildMessageSignedForRegistrationUsername(
   evvmID: bigint,
   username: string,
   clowNumber: bigint,
-  nonceMNS: bigint
+  nonceNameService: bigint
 ): string {
   const inputs: string =
-    `${username},` + `${clowNumber.toString()},` + `${nonceMNS.toString()}`;
+    `${username},` + `${clowNumber.toString()},` + `${nonceNameService.toString()}`;
 
   return basicMessageBuilder(evvmID.toString(), "registrationUsername", inputs);
 }
@@ -233,13 +233,13 @@ function buildMessageSignedForMakeOffer(
   username: string,
   dateExpire: bigint,
   amount: bigint,
-  nonceMNS: bigint
+  nonceNameService: bigint
 ): string {
   const inputs: string =
     `${username},` +
     `${dateExpire.toString()},` +
     `${amount.toString()},` +
-    `${nonceMNS.toString()}`;
+    `${nonceNameService.toString()}`;
 
   return basicMessageBuilder(evvmID.toString(), "makeOffer", inputs);
 }
@@ -298,10 +298,10 @@ function buildMessageSignedForRemoveCustomMetadata(
   evvmID: bigint,
   identity: string,
   key: bigint,
-  nonceMNS: bigint
+  nonceNameService: bigint
 ): string {
   const inputs: string =
-    `${identity},` + `${key.toString()},` + `${nonceMNS.toString()}`;
+    `${identity},` + `${key.toString()},` + `${nonceNameService.toString()}`;
 
   return basicMessageBuilder(evvmID.toString(), "removeCustomMetadata", inputs);
 }
@@ -309,9 +309,9 @@ function buildMessageSignedForRemoveCustomMetadata(
 function buildMessageSignedForFlushCustomMetadata(
   evvmID: bigint,
   identity: string,
-  nonceMNS: bigint
+  nonceNameService: bigint
 ): string {
-  const inputs: string = `${identity},` + `${nonceMNS.toString()}`;
+  const inputs: string = `${identity},` + `${nonceNameService.toString()}`;
 
   return basicMessageBuilder(evvmID.toString(), "flushCustomMetadata", inputs);
 }
@@ -319,9 +319,9 @@ function buildMessageSignedForFlushCustomMetadata(
 function buildMessageSignedForFlushUsername(
   evvmID: bigint,
   username: string,
-  nonceMNS: bigint
+  nonceNameService: bigint
 ): string {
-  const inputs: string = `${username},` + `${nonceMNS.toString()}`;
+  const inputs: string = `${username},` + `${nonceNameService.toString()}`;
 
   return basicMessageBuilder(evvmID.toString(), "flushUsername", inputs);
 }

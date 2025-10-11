@@ -174,7 +174,7 @@ export const RegistrationUsernameComponent = ({
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Registration of username"
-        link="https://www.evvm.info/docs/SignatureStructures/MNS/registrationUsernameStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/NameService/registrationUsernameStructure"
       />
 
       <br />

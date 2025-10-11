@@ -1,5 +1,5 @@
 /**
- * useMNSTransactionVerify
+ * useNameServiceTransactionVerify
  *
  * Functions to simulate/verify NameService transactions (registration, offers, metadata, etc).
  * Each function simulates a contract call for a specific NameService action using wagmi's simulateContract.

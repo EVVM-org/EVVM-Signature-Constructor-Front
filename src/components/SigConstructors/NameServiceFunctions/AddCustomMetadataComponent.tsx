@@ -160,7 +160,7 @@ export const AddCustomMetadataComponent = ({ evvmID, nameServiceAddress }: AddCu
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Add custom metadata of identity"
-        link="https://www.evvm.info/docs/SignatureStructures/MNS/addCustomMetadataStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/NameService/addCustomMetadataStructure"
       />
 
       <br />

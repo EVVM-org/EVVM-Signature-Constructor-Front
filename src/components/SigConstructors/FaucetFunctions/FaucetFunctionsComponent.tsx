@@ -61,7 +61,6 @@ export const FaucetFunctionsComponent = ({evvmAddress }: FaucetFunctionsComponen
         label="Token address"
         inputId="tokenAddress_faucet"
         placeholder="Enter token address"
-        defaultValue="0x0000000000000000000000000000000000000000"
       />
 
       <NumberInputField
@@ -77,7 +76,7 @@ export const FaucetFunctionsComponent = ({evvmAddress }: FaucetFunctionsComponen
           marginTop: "1rem",
         }}
       >
-        Give Tokens
+        Get Tokens
       </button>
     </div>
   );

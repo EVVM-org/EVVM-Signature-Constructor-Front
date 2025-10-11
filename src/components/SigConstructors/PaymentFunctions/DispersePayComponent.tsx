@@ -23,13 +23,16 @@ interface DispersePayComponentProps {
   evvmAddress: string;
 }
 
-export const DispersePayComponent = ({ evvmID, evvmAddress }: DispersePayComponentProps) => {
+export const DispersePayComponent = ({
+  evvmID,
+  evvmAddress,
+}: DispersePayComponentProps) => {
   let account = getAccount(config);
   const [isUsingExecutorDisperse, setIsUsingExecutorDisperse] =
     React.useState(false);
   const [priorityDisperse, setPriorityDisperse] = React.useState("low");
   const [isUsingUsernameOnDisperse, setIsUsingUsernameOnDisperse] =
-    React.useState<Array<boolean>>([true, true, true, true, true]);
+    React.useState<Array<boolean>>([false, false, false, false, false]);
   const [numberOfUsersToDisperse, setNumberOfUsersToDisperse] =
     React.useState(1);
 
@@ -114,7 +117,7 @@ export const DispersePayComponent = ({ evvmID, evvmAddress }: DispersePayCompone
       return;
     }
 
-  executeDispersePay(dataToGet, evvmAddress as `0x${string}`)
+    executeDispersePay(dataToGet, evvmAddress as `0x${string}`)
       .then(() => {
         console.log("Disperse payment executed successfully");
       })
@@ -131,14 +134,11 @@ export const DispersePayComponent = ({ evvmID, evvmAddress }: DispersePayCompone
       />
       <br />
 
-      
-
       {/* Token address */}
       <AddressInputField
         label="Token address"
         inputId="tokenAddressDispersePay"
         placeholder="Enter token address"
-        defaultValue="0x0000000000000000000000000000000000000000"
       />
 
       {/* Amount */}
@@ -165,8 +165,6 @@ export const DispersePayComponent = ({ evvmID, evvmAddress }: DispersePayCompone
         isUsingExecutor={isUsingExecutorDisperse}
       />
 
-
-
       {/* Number of users */}
       <div style={{ marginBottom: "1rem" }}>
         <p>Number of accounts to split the payment</p>
@@ -187,7 +185,10 @@ export const DispersePayComponent = ({ evvmID, evvmAddress }: DispersePayCompone
         </select>
       </div>
 
-      <p>For testing purposes, the number of users is 5 but you can change it from the repo.</p>
+      <p>
+        For testing purposes, the number of users is 5 but you can change it
+        from the repo.
+      </p>
 
       {/* User inputs */}
       {Array.from({ length: numberOfUsersToDisperse }).map((_, index) => (
@@ -213,7 +214,6 @@ export const DispersePayComponent = ({ evvmID, evvmAddress }: DispersePayCompone
           >
             <option value="false">Address</option>
             <option value="true">Username</option>
-            
           </select>
           <input
             type="text"

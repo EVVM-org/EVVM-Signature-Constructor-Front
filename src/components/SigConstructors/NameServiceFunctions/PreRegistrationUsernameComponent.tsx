@@ -126,7 +126,7 @@ export const PreRegistrationUsernameComponent = ({
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Pre-registration of username"
-        link="https://www.evvm.info/docs/SignatureStructures/MNS/preRegistrationUsernameStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/NameService/preRegistrationUsernameStructure"
       />
 
       <br />
@@ -156,17 +156,18 @@ export const PreRegistrationUsernameComponent = ({
       />
 
       <NumberInputWithGenerator
-        label="EVVM Nonce"
-        inputId="nonceEVVMInput_preRegistration"
+        label="NameService Nonce"
+        inputId="nonceNameServiceInput_preRegistration"
         placeholder="Enter nonce"
+        showRandomBtn={priority !== "low"}
       />
 
       {/* Priority configuration */}
       <PrioritySelector onPriorityChange={setPriority} />
 
       <NumberInputWithGenerator
-        label="NameService Nonce"
-        inputId="nonceNameServiceInput_preRegistration"
+        label="EVVM Nonce"
+        inputId="nonceEVVMInput_preRegistration"
         placeholder="Enter nonce"
         showRandomBtn={priority !== "low"}
       />

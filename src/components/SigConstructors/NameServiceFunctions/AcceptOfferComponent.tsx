@@ -115,13 +115,13 @@ export const AcceptOfferComponent = ({
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Accept offer of username"
-        link="https://www.evvm.info/docs/SignatureStructures/MNS/acceptOfferStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/NameService/acceptOfferStructure"
       />
 
       <br />
 
       <NumberInputWithGenerator
-        label="MNS Nonce"
+        label="NameService Nonce"
         inputId="nonceInput_acceptOffer"
         placeholder="Enter nonce"
       />

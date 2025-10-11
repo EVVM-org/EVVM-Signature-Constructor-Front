@@ -21,15 +21,17 @@ interface PaySignaturesComponentProps {
   evvmAddress: string;
 }
 
-export const PaySignaturesComponent = ({ evvmID, evvmAddress }: PaySignaturesComponentProps) => {
+export const PaySignaturesComponent = ({
+  evvmID,
+  evvmAddress,
+}: PaySignaturesComponentProps) => {
   const { signPay } = useSignatureBuilder();
   let account = getAccount(config);
 
-  const [isUsingUsernames, setIsUsingUsernames] = React.useState(true);
+  const [isUsingUsernames, setIsUsingUsernames] = React.useState(false);
   const [isUsingExecutor, setIsUsingExecutor] = React.useState(false);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<PayInputData | null>(null);
-
 
   const makeSig = async () => {
     const walletData = await getAccountWithRetry(config);
@@ -124,7 +126,6 @@ export const PaySignaturesComponent = ({ evvmID, evvmAddress }: PaySignaturesCom
           >
             <option value="false">Address</option>
             <option value="true">Username</option>
-            
           </select>
           <input
             type="text"
@@ -141,12 +142,10 @@ export const PaySignaturesComponent = ({ evvmID, evvmAddress }: PaySignaturesCom
         </p>
       </div>
 
-    
       <AddressInputField
         label="Token address"
         inputId="tokenAddress_Pay"
         placeholder="Enter token address"
-        defaultValue="0x0000000000000000000000000000000000000000"
       />
 
       {/* Basic input fields */}
@@ -183,7 +182,7 @@ export const PaySignaturesComponent = ({ evvmID, evvmAddress }: PaySignaturesCom
 
       <PrioritySelector onPriorityChange={setPriority} />
 
-        {/* Nonce section with automatic generator */}
+      {/* Nonce section with automatic generator */}
 
       <NumberInputWithGenerator
         label="Nonce"

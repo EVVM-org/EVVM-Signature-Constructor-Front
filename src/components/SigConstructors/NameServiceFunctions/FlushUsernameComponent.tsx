@@ -130,7 +130,7 @@ export const FlushUsernameComponent = ({ evvmID, nameServiceAddress }: FlushUser
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Delete Username"
-        link="https://www.evvm.info/docs/SignatureStructures/MNS/flushUsernameStructure"
+        link="https://www.evvm.info/docs/SignatureStructures/NameService/flushUsernameStructure"
       />
 
       <br />

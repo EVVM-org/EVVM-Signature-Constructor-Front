@@ -192,13 +192,6 @@ export const PublicServiceStakingComponent = ({
       {/* Action Button */}
       <button
         onClick={makeSig}
-        style={{
-          padding: "0.5rem 1rem",
-          marginTop: "1rem",
-          backgroundColor: "#50aad4",
-          color: "white",
-          border: "none",
-        }}
       >
         Create Signature
       </button>

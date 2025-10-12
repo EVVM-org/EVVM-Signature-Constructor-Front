@@ -70,19 +70,10 @@ export const FaucetBalanceChecker: React.FC<FaucetBalanceCheckerProps> = ({
         </HelperInfo>
       </div>
 
-      <button
-        onClick={checkBalance}
-        disabled={loading}
-        style={{
-          padding: "0.5rem 1rem",
-          borderRadius: 6,
-          border: "1px solid #ccc",
-          background: loading ? "#eee" : "#fff",
-          margin: "0.5rem",
-        }}
-      >
+      <button onClick={checkBalance} disabled={loading}>
         {loading ? "Checking..." : "Check Balance"}
       </button>
+
       {balance !== null && (
         <div style={{ marginTop: "0.5rem" }}>
           <strong>Balance:</strong> {balance}

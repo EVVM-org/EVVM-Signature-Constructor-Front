@@ -260,7 +260,7 @@ export const SigMenu = () => {
     <div
       style={{
         maxWidth: 900,
-        margin: "2rem auto",
+        margin: "0rem auto",
         padding: "2rem 1.5rem",
         background: "#fff",
         borderRadius: 16,
@@ -272,9 +272,9 @@ export const SigMenu = () => {
       }}
     >
       <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-        <h2 style={{ fontWeight: 700, fontSize: 22, margin: 0, color: "#222" }}>
-          EVVM Signature Toolkit
-        </h2>
+        <h1 >
+          EVVM Signature Constructor Toolkit For Devs
+        </h1>
         <h3>Select an EVVM contract to connect and get started:</h3>
         {evvmID && stakingAddress && nameserviceAddress ? (
           <div

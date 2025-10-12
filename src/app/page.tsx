@@ -105,7 +105,7 @@ export default function Home() {
           </div>
         </div>
       </header>
-      <h1>EVVM Signature Constructor Toolkit For Devs</h1>
+      
       <br />
       <SigMenu />
     </div>

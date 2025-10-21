@@ -1,22 +1,26 @@
 "use client";
 import React from "react";
-import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useStakingSignatureBuilder } from "@/utils/SignatureBuilder/useStakingSignatureBuilder";
-import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
-import { AddressInputField } from "../InputsAndModules/AddressInputField";
-import { NumberInputField } from "../InputsAndModules/NumberInputField";
-import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
-import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
-import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector";
-import { tokenAddress } from "@/constants/address";
-import { executeGoldenStaking } from "@/utils/TransactionExecuter/useStakingTransactionExecuter";
-import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
+import { getWalletClient } from "@wagmi/core";
+
 import {
+  NumberInputWithGenerator,
+  PrioritySelector,
+  DataDisplayWithClear,
+  HelperInfo,
+  NumberInputField,
+  StakingActionSelector,
+} from "@/components/SigConstructors/InputsAndModules";
+
+import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
+
+import {
+  StakingSignatureBuilder,
   GoldenStakingInputData,
   PayInputData,
-} from "@/utils/TypeInputStructures";
-import { HelperInfo } from "../InputsAndModules/HelperInfo";
+} from "@evvm/viem-signature-library";
+
+import { executeGoldenStaking } from "@/utils/TransactionExecuter";
 
 type InfoData = {
   PayInputData: PayInputData;
@@ -32,8 +36,6 @@ export const GoldenStakingComponent = ({
   evvmID,
   stakingAddress,
 }: GoldenStakingComponentProps) => {
-  let account = getAccount(config);
-  const { signGoldenStaking } = useStakingSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
@@ -57,34 +59,43 @@ export const GoldenStakingComponent = ({
       (BigInt(5083) * BigInt(10) ** BigInt(18));
 
     // Sign and set data
-    signGoldenStaking(
-      BigInt(formData.evvmID),
-      formData.stakingAddress as `0x${string}`,
-      amountOfToken,
-      BigInt(formData.nonce),
-      priority === "high",
-      (signaturePay: string) => {
-        setDataToGet({
-          PayInputData: {
-            from: walletData.address as `0x${string}`,
-            to_address: formData.stakingAddress as `0x${string}`,
-            to_identity: "",
-            token: tokenAddress.mate as `0x${string}`,
-            amount: amountOfToken,
-            priorityFee: BigInt(0),
-            nonce: BigInt(formData.nonce),
-            priority: priority === "high",
-            executor: formData.stakingAddress as `0x${string}`,
-            signature: signaturePay,
-          },
-          GoldenStakingInputData: {
-            isStaking: isStaking,
-            amountOfStaking: BigInt(formData.amountOfStaking),
-            signature_EVVM: signaturePay,
-          },
-        } as InfoData);
-      }
-    );
+
+    try {
+      const walletClient = await getWalletClient(config);
+      const signatureBuilder = new (StakingSignatureBuilder as any)(
+        walletClient,
+        walletData
+      );
+
+      const signaturePay = await signatureBuilder.signGoldenStaking(
+        BigInt(formData.evvmID),
+        formData.stakingAddress as `0x${string}`,
+        amountOfToken,
+        BigInt(formData.nonce),
+        priority === "high"
+      );
+      setDataToGet({
+        PayInputData: {
+          from: walletData.address as `0x${string}`,
+          to_address: formData.stakingAddress as `0x${string}`,
+          to_identity: "",
+          token: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+          amount: amountOfToken,
+          priorityFee: BigInt(0),
+          nonce: BigInt(formData.nonce),
+          priority: priority === "high",
+          executor: formData.stakingAddress as `0x${string}`,
+          signature: signaturePay,
+        },
+        GoldenStakingInputData: {
+          isStaking: isStaking,
+          amountOfStaking: BigInt(formData.amountOfStaking),
+          signature_EVVM: signaturePay,
+        },
+      } as InfoData);
+    } catch (error) {
+      console.error("Error creating signature:", error);
+    }
   };
 
   const execute = async () => {
@@ -118,7 +129,9 @@ export const GoldenStakingComponent = ({
       {/* Basic input fields */}
       <NumberInputField
         label={
-          isStaking ? "Amount of MATE to stake" : "Amount of MATE to unstake (sMATE)"
+          isStaking
+            ? "Amount of MATE to stake"
+            : "Amount of MATE to unstake (sMATE)"
         }
         inputId="amountOfStakingInput_GoldenStaking"
         placeholder="Enter amount"

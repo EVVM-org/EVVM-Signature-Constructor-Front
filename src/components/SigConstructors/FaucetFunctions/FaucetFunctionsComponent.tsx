@@ -4,7 +4,7 @@ import { getAccount, writeContract } from "@wagmi/core";
 import { config } from "@/config/index";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
-import Evvm from "@/constants/abi/Evvm.json";
+import { EvvmABI } from "@evvm/viem-signature-library";
 
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import { HelperInfo } from "../InputsAndModules/HelperInfo";
@@ -33,7 +33,7 @@ export const FaucetFunctionsComponent = ({
     };
 
     writeContract(config, {
-      abi: Evvm.abi,
+      abi: EvvmABI,
       address: formData.evvmAddress as `0x${string}`,
       functionName: "addBalance",
       args: [formData.user, formData.token, formData.quantity],

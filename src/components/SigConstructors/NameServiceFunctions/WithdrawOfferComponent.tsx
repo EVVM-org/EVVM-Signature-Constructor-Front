@@ -1,23 +1,23 @@
 "use client";
 import React from "react";
-import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useNameServiceSignatureBuilder } from "@/utils/SignatureBuilder/useNameServiceSignatureBuilder";
-import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
-import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
-import { AddressInputField } from "../InputsAndModules/AddressInputField";
-import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
-import { NumberInputField } from "../InputsAndModules/NumberInputField";
-import { TextInputField } from "../InputsAndModules/TextInputField";
-import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
+import { getWalletClient, readContract } from "@wagmi/core";
+import {
+  TitleAndLink,
+  NumberInputWithGenerator,
+  PrioritySelector,
+  DataDisplayWithClear,
+  HelperInfo,
+  NumberInputField,
+  TextInputField,
+} from "@/components/SigConstructors/InputsAndModules";
+import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
+import { executeWithdrawOffer } from "@/utils/TransactionExecuter";
 import {
   PayInputData,
   WithdrawOfferInputData,
-} from "@/utils/TypeInputStructures";
-import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import { tokenAddress } from "@/constants/address";
-import { executeWithdrawOffer } from "@/utils/TransactionExecuter";
-import { HelperInfo } from "../InputsAndModules/HelperInfo";
+  NameServiceSignatureBuilder,
+} from "@evvm/viem-signature-library";
 
 type InfoData = {
   PayInputData: PayInputData;
@@ -33,8 +33,6 @@ export const WithdrawOfferComponent = ({
   evvmID,
   nameServiceAddress,
 }: WithdrawOfferComponentProps) => {
-  const { signWithdrawOffer } = useNameServiceSignatureBuilder();
-  const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
 
@@ -56,44 +54,52 @@ export const WithdrawOfferComponent = ({
       priorityFlag_EVVM: priority === "high",
     };
 
-    signWithdrawOffer(
-      BigInt(formData.evvmId),
-      formData.addressNameService as `0x${string}`,
-      formData.username,
-      BigInt(formData.offerId),
-      BigInt(formData.nonceNameService),
-      BigInt(formData.priorityFee_EVVM),
-      BigInt(formData.nonce_EVVM),
-      formData.priorityFlag_EVVM,
-      (paySignature: string, withdrawOfferSignature: string) => {
-        setDataToGet({
-          PayInputData: {
-            from: walletData.address as `0x${string}`,
-            to_address: formData.addressNameService as `0x${string}`,
-            to_identity: "",
-            token: tokenAddress.mate as `0x${string}`,
-            amount: BigInt(0),
-            priorityFee: BigInt(formData.priorityFee_EVVM),
-            nonce: BigInt(formData.nonce_EVVM),
-            priority: priority === "high",
-            executor: formData.addressNameService as `0x${string}`,
-            signature: paySignature,
-          },
-          WithdrawOfferInputData: {
-            user: walletData.address as `0x${string}`,
-            nonce: BigInt(formData.nonceNameService),
-            username: formData.username,
-            offerID: BigInt(formData.offerId),
-            priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
-            signature: withdrawOfferSignature,
-            nonce_EVVM: BigInt(formData.nonce_EVVM),
-            priorityFlag_EVVM: formData.priorityFlag_EVVM,
-            signature_EVVM: paySignature,
-          },
-        });
-      },
-      (error) => console.error("Error signing payment:", error)
-    );
+    try {
+      const walletClient = await getWalletClient(config);
+      const signatureBuilder = new (NameServiceSignatureBuilder as any)(
+        walletClient,
+        walletData
+      );
+
+      const { paySignature, actionSignature } =
+        await signatureBuilder.signWithdrawOffer(
+          BigInt(formData.evvmId),
+          formData.addressNameService as `0x${string}`,
+          formData.username,
+          BigInt(formData.offerId),
+          BigInt(formData.nonceNameService),
+          BigInt(formData.priorityFee_EVVM),
+          BigInt(formData.nonce_EVVM),
+          formData.priorityFlag_EVVM
+        );
+      setDataToGet({
+        PayInputData: {
+          from: walletData.address as `0x${string}`,
+          to_address: formData.addressNameService as `0x${string}`,
+          to_identity: "",
+          token: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+          amount: BigInt(0),
+          priorityFee: BigInt(formData.priorityFee_EVVM),
+          nonce: BigInt(formData.nonce_EVVM),
+          priority: priority === "high",
+          executor: formData.addressNameService as `0x${string}`,
+          signature: paySignature,
+        },
+        WithdrawOfferInputData: {
+          user: walletData.address as `0x${string}`,
+          nonce: BigInt(formData.nonceNameService),
+          username: formData.username,
+          offerID: BigInt(formData.offerId),
+          priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
+          signature: actionSignature,
+          nonce_EVVM: BigInt(formData.nonce_EVVM),
+          priorityFlag_EVVM: formData.priorityFlag_EVVM,
+          signature_EVVM: paySignature,
+        },
+      });
+    } catch (error) {
+      console.error("Error signing withdraw offer:", error);
+    }
   };
 
   const execute = async () => {
@@ -101,9 +107,8 @@ export const WithdrawOfferComponent = ({
       console.error("No data to execute payment");
       return;
     }
-    const nameServiceAddress = dataToGet.PayInputData.to_address;
 
-    executeWithdrawOffer(dataToGet.WithdrawOfferInputData, nameServiceAddress)
+    executeWithdrawOffer(dataToGet.WithdrawOfferInputData, nameServiceAddress as `0x${string}`)
       .then(() => {
         console.log("Withdraw offer executed successfully");
       })

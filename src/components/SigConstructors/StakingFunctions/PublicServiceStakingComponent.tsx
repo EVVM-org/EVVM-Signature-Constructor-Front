@@ -1,22 +1,23 @@
 "use client";
 import React from "react";
 import { config } from "@/config/index";
-import { useStakingSignatureBuilder } from "@/utils/SignatureBuilder/useStakingSignatureBuilder";
-import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
-import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
-import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector";
-import { AddressInputField } from "../InputsAndModules/AddressInputField";
-import { NumberInputField } from "../InputsAndModules/NumberInputField";
-import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
-import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
-import { tokenAddress } from "@/constants/address";
+import { getWalletClient } from "@wagmi/core";
+import {
+  TitleAndLink,
+  NumberInputWithGenerator,
+  PrioritySelector,
+  DataDisplayWithClear,
+  HelperInfo,
+  NumberInputField,
+  AddressInputField,
+} from "@/components/SigConstructors/InputsAndModules";
 import { executePublicServiceStaking } from "@/utils/TransactionExecuter/useStakingTransactionExecuter";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import {
   PayInputData,
   PublicServiceStakingInputData,
-} from "@/utils/TypeInputStructures";
-import { HelperInfo } from "../InputsAndModules/HelperInfo";
+  StakingSignatureBuilder,
+} from "@evvm/viem-signature-library";
 
 type InputData = {
   PublicServiceStakingInputData: PublicServiceStakingInputData;
@@ -32,8 +33,6 @@ export const PublicServiceStakingComponent = ({
   evvmID,
   stakingAddress,
 }: PublicServiceStakingComponentProps) => {
-  const { signPublicServiceStaking } = useStakingSignatureBuilder();
-  const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null);
 
@@ -63,46 +62,54 @@ export const PublicServiceStakingComponent = ({
       }
     );
 
-    signPublicServiceStaking(
-      BigInt(formData.evvmID),
-      formData.stakingAddress as `0x${string}`,
-      formData.serviceAddress,
-      true,
-      BigInt(formData.amountOfStaking),
-      BigInt(formData.nonceStaking),
-      BigInt(formData.priorityFee),
-      BigInt(formData.nonceEVVM),
-      priority === "high",
-      (paySignature: string, stakingSignature: string) => {
-        setDataToGet({
-          PublicServiceStakingInputData: {
-            isStaking: true,
-            user: walletData.address as `0x${string}`,
-            service: formData.serviceAddress as `0x${string}`,
-            nonce: BigInt(formData.nonceStaking),
-            amountOfStaking: BigInt(formData.amountOfStaking),
-            signature: stakingSignature,
-            priorityFee_EVVM: BigInt(formData.priorityFee),
-            priorityFlag_EVVM: priority === "high",
-            nonce_EVVM: BigInt(formData.nonceEVVM),
-            signature_EVVM: paySignature,
-          },
-          PayInputData: {
-            from: walletData.address as `0x${string}`,
-            to_address: formData.stakingAddress as `0x${string}`,
-            to_identity: "",
-            token: tokenAddress.mate as `0x${string}`,
-            amount: BigInt(amountOfToken),
-            priorityFee: BigInt(formData.priorityFee),
-            nonce: BigInt(formData.nonceEVVM),
-            priority: priority === "high",
-            executor: formData.stakingAddress as `0x${string}`,
-            signature: paySignature,
-          },
-        });
-      },
-      (error) => console.error("Error signing presale staking:", error)
-    );
+    try {
+      const walletClient = await getWalletClient(config);
+      const signatureBuilder = new (StakingSignatureBuilder as any)(
+        walletClient,
+        walletData
+      );
+
+      const { paySignature, actionSignature } =
+        await signatureBuilder.signPublicServiceStaking(
+          BigInt(formData.evvmID),
+          formData.stakingAddress as `0x${string}`,
+          formData.serviceAddress,
+          true,
+          BigInt(formData.amountOfStaking),
+          BigInt(formData.nonceStaking),
+          BigInt(formData.priorityFee),
+          BigInt(formData.nonceEVVM),
+          priority === "high"
+        );
+      setDataToGet({
+        PublicServiceStakingInputData: {
+          isStaking: true,
+          user: walletData.address as `0x${string}`,
+          service: formData.serviceAddress as `0x${string}`,
+          nonce: BigInt(formData.nonceStaking),
+          amountOfStaking: BigInt(formData.amountOfStaking),
+          signature: actionSignature,
+          priorityFee_EVVM: BigInt(formData.priorityFee),
+          priorityFlag_EVVM: priority === "high",
+          nonce_EVVM: BigInt(formData.nonceEVVM),
+          signature_EVVM: paySignature,
+        },
+        PayInputData: {
+          from: walletData.address as `0x${string}`,
+          to_address: formData.stakingAddress as `0x${string}`,
+          to_identity: "",
+          token: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+          amount: BigInt(amountOfToken),
+          priorityFee: BigInt(formData.priorityFee),
+          nonce: BigInt(formData.nonceEVVM),
+          priority: priority === "high",
+          executor: formData.stakingAddress as `0x${string}`,
+          signature: paySignature,
+        },
+      });
+    } catch (error) {
+      console.error("Error creating signature:", error);
+    }
   };
 
   const execute = async () => {
@@ -133,7 +140,10 @@ export const PublicServiceStakingComponent = ({
       />
       <br />
 
-      <p>This implementation is temporary until a direct integration with services is completed.</p>
+      <p>
+        This implementation is temporary until a direct integration with
+        services is completed.
+      </p>
       <br />
       {/* stakingAddress is now passed as a prop */}
 
@@ -155,9 +165,7 @@ export const PublicServiceStakingComponent = ({
 
       {/* Amount Inputs */}
       <NumberInputField
-        label={
-          isStaking ? "Amount of MATE to stake" : "Amount of MATE to unstake (sMATE)"
-        }
+        label={"Amount of MATE to stake"}
         inputId="amountOfStakingInput_PublicServiceStaking"
         placeholder="Enter amount"
       />
@@ -190,11 +198,7 @@ export const PublicServiceStakingComponent = ({
       </div>
 
       {/* Action Button */}
-      <button
-        onClick={makeSig}
-      >
-        Create Signature
-      </button>
+      <button onClick={makeSig}>Create Signature</button>
 
       {/* Results Section */}
       <DataDisplayWithClear

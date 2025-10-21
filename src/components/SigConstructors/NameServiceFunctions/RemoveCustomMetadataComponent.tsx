@@ -1,24 +1,24 @@
 "use client";
 import React from "react";
-import { getAccount, readContract } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useNameServiceSignatureBuilder } from "@/utils/SignatureBuilder/useNameServiceSignatureBuilder";
-import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
-import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
-import { AddressInputField } from "../InputsAndModules/AddressInputField";
-import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
-import { NumberInputField } from "../InputsAndModules/NumberInputField";
-import { TextInputField } from "../InputsAndModules/TextInputField";
-import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
+import { getWalletClient, readContract } from "@wagmi/core";
 import {
-  RemoveCustomMetadataInputData,
-  PayInputData,
-} from "@/utils/TypeInputStructures";
-import NameService from "@/constants/abi/NameService.json";
+  TitleAndLink,
+  NumberInputWithGenerator,
+  PrioritySelector,
+  DataDisplayWithClear,
+  HelperInfo,
+  NumberInputField,
+  TextInputField,
+} from "@/components/SigConstructors/InputsAndModules";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import { executeRemoveCustomMetadata } from "@/utils/TransactionExecuter";
-import { tokenAddress } from "@/constants/address";
-import { HelperInfo } from "../InputsAndModules/HelperInfo";
+import {
+  NameServiceABI,
+  PayInputData,
+  RemoveCustomMetadataInputData,
+  NameServiceSignatureBuilder,
+} from "@evvm/viem-signature-library";
 
 type InfoData = {
   PayInputData: PayInputData;
@@ -34,8 +34,6 @@ export const RemoveCustomMetadataComponent = ({
   evvmID,
   nameServiceAddress,
 }: RemoveCustomMetadataComponentProps) => {
-  const { signRemoveCustomMetadata } = useNameServiceSignatureBuilder();
-  const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
 
@@ -57,18 +55,25 @@ export const RemoveCustomMetadataComponent = ({
       priorityFlag: priority === "high",
     };
 
-    readContract(config, {
-      abi: NameService.abi,
-      address: formData.addressNameService as `0x${string}`,
-      functionName: "getPriceToRemoveCustomMetadata",
-      args: [],
-    })
-      .then((price) => {
-        if (!price) {
-          console.error("Price to remove custom metadata is not available");
-          return;
-        }
-        signRemoveCustomMetadata(
+    try {
+      const walletClient = await getWalletClient(config);
+      const signatureBuilder = new (NameServiceSignatureBuilder as any)(
+        walletClient,
+        walletData
+      );
+      const price = await readContract(config, {
+        abi: NameServiceABI,
+        address: formData.addressNameService as `0x${string}`,
+        functionName: "getPriceToRemoveCustomMetadata",
+        args: [],
+      });
+      if (!price) {
+        console.error("Price to remove custom metadata is not available");
+        return;
+      }
+
+      const { paySignature, actionSignature } =
+        await signatureBuilder.signRemoveCustomMetadata(
           BigInt(formData.evvmId),
           formData.addressNameService as `0x${string}`,
           formData.identity,
@@ -77,41 +82,36 @@ export const RemoveCustomMetadataComponent = ({
           price as bigint,
           BigInt(formData.priorityFee_EVVM),
           BigInt(formData.nonceEVVM),
-          formData.priorityFlag,
-          (paySignature: string, removeCustomMetadataSignature: string) => {
-            setDataToGet({
-              PayInputData: {
-                from: walletData.address as `0x${string}`,
-                to_address: formData.addressNameService as `0x${string}`,
-                to_identity: "",
-                token: tokenAddress.mate as `0x${string}`,
-                amount: price as bigint,
-                priorityFee: BigInt(formData.priorityFee_EVVM),
-                nonce: BigInt(formData.nonceEVVM),
-                priority: priority === "high",
-                executor: formData.addressNameService as `0x${string}`,
-                signature: paySignature,
-              },
-              RemoveCustomMetadataInputData: {
-                user: walletData.address as `0x${string}`,
-                nonce: BigInt(formData.nonceNameService),
-                identity: formData.identity,
-                key: BigInt(formData.key),
-                priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
-                signature: removeCustomMetadataSignature,
-                nonce_EVVM: BigInt(formData.nonceEVVM),
-                priorityFlag_EVVM: formData.priorityFlag,
-                signature_EVVM: paySignature,
-              },
-            });
-          },
-          (error) => console.error("Error signing payment:", error)
+          formData.priorityFlag
         );
-      })
-      .catch((error) => {
-        console.error("Error reading mate reward amount:", error);
-        return;
+      setDataToGet({
+        PayInputData: {
+          from: walletData.address as `0x${string}`,
+          to_address: formData.addressNameService as `0x${string}`,
+          to_identity: "",
+          token: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+          amount: price as bigint,
+          priorityFee: BigInt(formData.priorityFee_EVVM),
+          nonce: BigInt(formData.nonceEVVM),
+          priority: priority === "high",
+          executor: formData.addressNameService as `0x${string}`,
+          signature: paySignature,
+        },
+        RemoveCustomMetadataInputData: {
+          user: walletData.address as `0x${string}`,
+          nonce: BigInt(formData.nonceNameService),
+          identity: formData.identity,
+          key: BigInt(formData.key),
+          priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
+          signature: actionSignature,
+          nonce_EVVM: BigInt(formData.nonceEVVM),
+          priorityFlag_EVVM: formData.priorityFlag,
+          signature_EVVM: paySignature,
+        },
       });
+    } catch (error) {
+      console.error("Error signing accept offer:", error);
+    }
   };
 
   const execute = async () => {
@@ -119,11 +119,10 @@ export const RemoveCustomMetadataComponent = ({
       console.error("No data to execute payment");
       return;
     }
-    const nameServiceAddress = dataToGet.PayInputData.to_address;
 
     executeRemoveCustomMetadata(
       dataToGet.RemoveCustomMetadataInputData,
-      nameServiceAddress
+      nameServiceAddress as `0x${string}`
     )
       .then(() => {
         console.log("Registration username executed successfully");

@@ -1,23 +1,26 @@
 "use client";
 import React from "react";
-import { getAccount, readContract } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useNameServiceSignatureBuilder } from "@/utils/SignatureBuilder/useNameServiceSignatureBuilder";
-import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
-import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
-import { AddressInputField } from "../InputsAndModules/AddressInputField";
-import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
-import { NumberInputField } from "../InputsAndModules/NumberInputField";
-import { TextInputField } from "../InputsAndModules/TextInputField";
-import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
-import { PayInputData } from "@/utils/TypeInputStructures/evvmTypeInputStructure";
-import { RegistrationUsernameInputData } from "@/utils/TypeInputStructures/nameServiceTypeInputStructure";
+import { getWalletClient, readContract } from "@wagmi/core";
+import {
+  TitleAndLink,
+  NumberInputWithGenerator,
+  PrioritySelector,
+  DataDisplayWithClear,
+  HelperInfo,
+  NumberInputField,
+  TextInputField,
+} from "@/components/SigConstructors/InputsAndModules";
+
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import { tokenAddress } from "@/constants/address";
-import NameService from "@/constants/abi/NameService.json";
-import Evvm from "@/constants/abi/Evvm.json";
+import { NameServiceABI } from "@evvm/viem-signature-library";
 import { executeRegistrationUsername } from "@/utils/TransactionExecuter/useNameServiceTransactionExecuter";
-import { HelperInfo } from "../InputsAndModules/HelperInfo";
+import {
+  EvvmABI,
+  PayInputData,
+  RegistrationUsernameInputData,
+  NameServiceSignatureBuilder,
+} from "@evvm/viem-signature-library";
 
 type InfoData = {
   PayInputData: PayInputData;
@@ -33,8 +36,6 @@ export const RegistrationUsernameComponent = ({
   evvmID,
   nameServiceAddress,
 }: RegistrationUsernameComponentProps) => {
-  const { signRegistrationUsername } = useNameServiceSignatureBuilder();
-  const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
   const [rewardAmount, setRewardAmount] = React.useState<bigint | null>(null);
@@ -68,56 +69,56 @@ export const RegistrationUsernameComponent = ({
       priorityFlag: priority === "high",
     };
 
-    await readRewardAmount();
+    try {
+      const walletClient = await getWalletClient(config);
+      const signatureBuilder = new (NameServiceSignatureBuilder as any)(
+        walletClient,
+        walletData
+      );
 
-    readRewardAmount()
-      .then(() => {
-        signRegistrationUsername(
-          {
-            evvmId: formData.evvmId,
-            addressNameService: formData.addressNameService as `0x${string}`,
-            username: formData.username,
-            clowNumber: formData.clowNumber,
-            nonce: formData.nonceNameService,
-            mateReward: rewardAmount as bigint,
-            priorityFee_EVVM: formData.priorityFee_EVVM,
-            nonce_EVVM: formData.nonceEVVM,
-            priorityFlag_EVVM: formData.priorityFlag,
-          },
-          (paySignature: string, registrationUsernameSignature: string) => {
-            setDataToGet({
-              PayInputData: {
-                from: walletData.address as `0x${string}`,
-                to_address: formData.addressNameService as `0x${string}`,
-                to_identity: "",
-                token: tokenAddress.mate as `0x${string}`,
-                amount: rewardAmount ? rewardAmount * BigInt(100) : BigInt(0),
-                priorityFee: formData.priorityFee_EVVM,
-                nonce: formData.nonceEVVM,
-                priority: priority === "high",
-                executor: formData.addressNameService as `0x${string}`,
-                signature: paySignature,
-              },
-              RegistrationUsernameInputData: {
-                user: walletData.address as `0x${string}`,
-                nonce: formData.nonceNameService,
-                username: formData.username,
-                clowNumber: BigInt(formData.clowNumber),
-                signature: registrationUsernameSignature,
-                priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
-                nonce_EVVM: BigInt(formData.nonceEVVM),
-                priorityFlag_EVVM: formData.priorityFlag,
-                signature_EVVM: paySignature,
-              },
-            });
-          },
-          (error) => console.error("Error signing payment:", error)
-        );
-      })
-      .catch((error) => {
-        console.error("Error reading mate reward amount:", error);
-        return;
+      await readRewardAmount();
+
+      const { paySignature, actionSignature } =
+        await signatureBuilder.signRegistrationUsername({
+          evvmId: formData.evvmId,
+          addressNameService: formData.addressNameService as `0x${string}`,
+          username: formData.username,
+          clowNumber: formData.clowNumber,
+          nonce: formData.nonceNameService,
+          mateReward: rewardAmount as bigint,
+          priorityFee_EVVM: formData.priorityFee_EVVM,
+          nonce_EVVM: formData.nonceEVVM,
+          priorityFlag_EVVM: formData.priorityFlag,
+        });
+
+      setDataToGet({
+        PayInputData: {
+          from: walletData.address as `0x${string}`,
+          to_address: formData.addressNameService as `0x${string}`,
+          to_identity: "",
+          token: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+          amount: rewardAmount ? rewardAmount * BigInt(100) : BigInt(0),
+          priorityFee: formData.priorityFee_EVVM,
+          nonce: formData.nonceEVVM,
+          priority: priority === "high",
+          executor: formData.addressNameService as `0x${string}`,
+          signature: paySignature,
+        },
+        RegistrationUsernameInputData: {
+          user: walletData.address as `0x${string}`,
+          nonce: formData.nonceNameService,
+          username: formData.username,
+          clowNumber: BigInt(formData.clowNumber),
+          signature: actionSignature,
+          priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
+          nonce_EVVM: BigInt(formData.nonceEVVM),
+          priorityFlag_EVVM: formData.priorityFlag,
+          signature_EVVM: paySignature,
+        },
       });
+    } catch (error) {
+      console.error("Error creating signatures:", error);
+    }
   };
 
   const readRewardAmount = async () => {
@@ -126,7 +127,7 @@ export const RegistrationUsernameComponent = ({
       setRewardAmount(null);
     } else {
       await readContract(config, {
-        abi: NameService.abi,
+        abi: NameServiceABI,
         address: nameServiceAddress as `0x${string}`,
         functionName: "getEvvmAddress",
         args: [],
@@ -137,7 +138,7 @@ export const RegistrationUsernameComponent = ({
           }
 
           readContract(config, {
-            abi: Evvm.abi,
+            abi: EvvmABI,
             address: evvmAddress as `0x${string}`,
             functionName: "getRewardAmount",
             args: [],
@@ -163,11 +164,12 @@ export const RegistrationUsernameComponent = ({
       console.error("No data to execute payment");
       return;
     }
-    const nameServiceAddress = dataToGet.PayInputData.to_address;
+
+    console.log("Executing registration username...");
 
     executeRegistrationUsername(
       dataToGet.RegistrationUsernameInputData,
-      nameServiceAddress
+      nameServiceAddress as `0x${string}`
     )
       .then(() => {
         console.log("Registration username executed successfully");

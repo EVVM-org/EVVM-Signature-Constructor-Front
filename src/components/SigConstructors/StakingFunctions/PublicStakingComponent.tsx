@@ -1,23 +1,23 @@
 "use client";
 import React from "react";
-import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useStakingSignatureBuilder } from "@/utils/SignatureBuilder/useStakingSignatureBuilder";
-import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
-import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
-import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector";
-// ...existing code...
-import { NumberInputField } from "../InputsAndModules/NumberInputField";
-import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
-import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
-import { tokenAddress } from "@/constants/address";
+import { getWalletClient } from "@wagmi/core";
+import {
+  TitleAndLink,
+  NumberInputWithGenerator,
+  PrioritySelector,
+  DataDisplayWithClear,
+  HelperInfo,
+  NumberInputField,
+  StakingActionSelector,
+} from "@/components/SigConstructors/InputsAndModules";
 import { executePublicStaking } from "@/utils/TransactionExecuter/useStakingTransactionExecuter";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import {
   PayInputData,
   PublicStakingInputData,
-} from "@/utils/TypeInputStructures";
-import { HelperInfo } from "../InputsAndModules/HelperInfo";
+  StakingSignatureBuilder,
+} from "@evvm/viem-signature-library";
 
 type InputData = {
   PublicStakingInputData: PublicStakingInputData;
@@ -33,7 +33,6 @@ export const PublicStakingComponent = ({
   evvmID,
   stakingAddress,
 }: PublicStakingComponentProps) => {
-  const { signPublicStaking } = useStakingSignatureBuilder();
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null);
@@ -63,46 +62,53 @@ export const PublicStakingComponent = ({
       BigInt(formData.amountOfStaking) *
       (BigInt(5083) * BigInt(10) ** BigInt(18));
 
-    // Sign message
-    signPublicStaking(
-      BigInt(formData.evvmID),
-      formData.stakingAddress as `0x${string}`,
-      isStaking,
-      BigInt(formData.amountOfStaking),
-      BigInt(formData.nonceStaking),
-      amountOfToken,
-      BigInt(formData.priorityFee),
-      BigInt(formData.nonceEVVM),
-      priority === "high",
-      (paySignature: string, stakingSignature: string) => {
-        setDataToGet({
-          PublicStakingInputData: {
-            isStaking: isStaking,
-            user: walletData.address as `0x${string}`,
-            nonce: BigInt(formData.nonceStaking),
-            amountOfStaking: BigInt(formData.amountOfStaking),
-            signature: stakingSignature,
-            priorityFee_EVVM: BigInt(formData.priorityFee),
-            priorityFlag_EVVM: priority === "high",
-            nonce_EVVM: BigInt(formData.nonceEVVM),
-            signature_EVVM: paySignature,
-          },
-          PayInputData: {
-            from: walletData.address as `0x${string}`,
-            to_address: formData.stakingAddress as `0x${string}`,
-            to_identity: "",
-            token: tokenAddress.mate as `0x${string}`,
-            amount: BigInt(amountOfToken),
-            priorityFee: BigInt(formData.priorityFee),
-            nonce: BigInt(formData.nonceEVVM),
-            priority: priority === "high",
-            executor: formData.stakingAddress as `0x${string}`,
-            signature: paySignature,
-          },
-        });
-      },
-      (error: Error) => console.error("Error signing presale staking:", error)
-    );
+    try {
+      const walletClient = await getWalletClient(config);
+      const signatureBuilder = new (StakingSignatureBuilder as any)(
+        walletClient,
+        walletData
+      );
+
+      const { paySignature, actionSignature } =
+        await signatureBuilder.signPublicStaking(
+          BigInt(formData.evvmID),
+          formData.stakingAddress as `0x${string}`,
+          isStaking,
+          BigInt(formData.amountOfStaking),
+          BigInt(formData.nonceStaking),
+          amountOfToken,
+          BigInt(formData.priorityFee),
+          BigInt(formData.nonceEVVM),
+          priority === "high"
+        );
+      setDataToGet({
+        PublicStakingInputData: {
+          isStaking: isStaking,
+          user: walletData.address as `0x${string}`,
+          nonce: BigInt(formData.nonceStaking),
+          amountOfStaking: BigInt(formData.amountOfStaking),
+          signature: actionSignature,
+          priorityFee_EVVM: BigInt(formData.priorityFee),
+          priorityFlag_EVVM: priority === "high",
+          nonce_EVVM: BigInt(formData.nonceEVVM),
+          signature_EVVM: paySignature,
+        },
+        PayInputData: {
+          from: walletData.address as `0x${string}`,
+          to_address: formData.stakingAddress as `0x${string}`,
+          to_identity: "",
+          token: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+          amount: BigInt(amountOfToken),
+          priorityFee: BigInt(formData.priorityFee),
+          nonce: BigInt(formData.nonceEVVM),
+          priority: priority === "high",
+          executor: formData.stakingAddress as `0x${string}`,
+          signature: paySignature,
+        },
+      });
+    } catch (error) {
+      console.error("Error creating signature:", error);
+    }
   };
 
   const execute = async () => {
@@ -148,7 +154,9 @@ export const PublicStakingComponent = ({
       {/* Amount Inputs */}
       <NumberInputField
         label={
-          isStaking ? "Amount of MATE to stake" : "Amount of MATE to unstake (sMATE)"
+          isStaking
+            ? "Amount of MATE to stake"
+            : "Amount of MATE to unstake (sMATE)"
         }
         inputId="amountOfStakingInput_PublicStaking"
         placeholder="Enter amount"
@@ -182,11 +190,7 @@ export const PublicStakingComponent = ({
       </div>
 
       {/* Action Button */}
-      <button
-        onClick={makeSig}
-      >
-        Create Signature
-      </button>
+      <button onClick={makeSig}>Create Signature</button>
 
       {/* Results Section */}
       <DataDisplayWithClear

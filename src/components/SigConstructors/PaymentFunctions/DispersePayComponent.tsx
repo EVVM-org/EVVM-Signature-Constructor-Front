@@ -1,23 +1,27 @@
 "use client";
 import React from "react";
-import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useSignatureBuilder } from "@/utils/SignatureBuilder/useEVVMSignatureBuilder";
-import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
-import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
-import { AddressInputField } from "../InputsAndModules/AddressInputField";
-import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
-import { NumberInputField } from "../InputsAndModules/NumberInputField";
-import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
-import { ExecutorSelector } from "../InputsAndModules/ExecutorSelector";
+import { getAccount, getWalletClient } from "@wagmi/core";
 import {
+  TitleAndLink,
+  NumberInputWithGenerator,
+  AddressInputField,
+  PrioritySelector,
+  ExecutorSelector,
+  DataDisplayWithClear,
+  HelperInfo,
+  NumberInputField,
+} from "@/components/SigConstructors/InputsAndModules";
+
+import {
+  EVVMSignatureBuilder,
   DispersePayInputData,
   DispersePayMetadata,
-} from "@/utils/TypeInputStructures";
+} from "@evvm/viem-signature-library";
+
 import { executeDispersePay } from "@/utils/TransactionExecuter/useEVVMTransactionExecuter";
 
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import { HelperInfo } from "../InputsAndModules/HelperInfo";
 
 interface DispersePayComponentProps {
   evvmID: string;
@@ -40,8 +44,6 @@ export const DispersePayComponent = ({
   const [dataToGet, setDataToGet] = React.useState<DispersePayInputData | null>(
     null
   );
-
-  const { signDispersePay } = useSignatureBuilder();
 
   const makeSig = async () => {
     const walletData = await getAccountWithRetry(config);
@@ -79,32 +81,38 @@ export const DispersePayComponent = ({
       });
     }
 
-    signDispersePay(
-      BigInt(formData.evvmID),
-      toData,
-      formData.tokenAddress as `0x${string}`,
-      BigInt(formData.amount),
-      BigInt(formData.priorityFee),
-      BigInt(formData.nonce),
-      priorityDisperse === "high",
-      formData.executor as `0x${string}`,
-      (dispersePaySignature: string) => {
-        setDataToGet({
-          from: walletData.address as `0x${string}`,
-          toData,
-          token: formData.tokenAddress as `0x${string}`,
-          amount: BigInt(formData.amount),
-          priorityFee: BigInt(formData.priorityFee),
-          priority: priorityDisperse === "high",
-          nonce: BigInt(formData.nonce),
-          executor: formData.executor,
-          signature: dispersePaySignature,
-        });
-      },
-      (error: Error) => {
-        console.error("Error signing disperse payment:", error);
-      }
-    );
+    try {
+      const walletClient = await getWalletClient(config);
+      const signatureBuilder = new (EVVMSignatureBuilder as any)(
+        walletClient,
+        walletData
+      );
+
+      const dispersePaySignature = await signatureBuilder.signDispersePay(
+        BigInt(formData.evvmID),
+        toData,
+        formData.tokenAddress as `0x${string}`,
+        BigInt(formData.amount),
+        BigInt(formData.priorityFee),
+        BigInt(formData.nonce),
+        priorityDisperse === "high",
+        formData.executor as `0x${string}`
+      );
+
+      setDataToGet({
+        from: walletData.address as `0x${string}`,
+        toData,
+        token: formData.tokenAddress as `0x${string}`,
+        amount: BigInt(formData.amount),
+        priorityFee: BigInt(formData.priorityFee),
+        priority: priorityDisperse === "high",
+        nonce: BigInt(formData.nonce),
+        executor: formData.executor,
+        signature: dispersePaySignature,
+      });
+    } catch (error) {
+      console.error("Error creating signature:", error);
+    }
   };
 
   const executeDispersePayment = async () => {

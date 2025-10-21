@@ -1,22 +1,23 @@
 "use client";
 import React from "react";
-import { useStakingSignatureBuilder } from "@/utils/SignatureBuilder/useStakingSignatureBuilder";
-import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
-import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
-import { NumberInputField } from "../InputsAndModules/NumberInputField";
-import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
-import { StakingActionSelector } from "../InputsAndModules/StakingActionSelector";
-import { DataDisplayWithClear } from "../InputsAndModules/DataDisplayWithClear";
-import { getAccount } from "@wagmi/core";
 import { config } from "@/config/index";
+import { getWalletClient } from "@wagmi/core";
+import {
+  TitleAndLink,
+  NumberInputWithGenerator,
+  PrioritySelector,
+  DataDisplayWithClear,
+  HelperInfo,
+  NumberInputField,
+  StakingActionSelector,
+} from "@/components/SigConstructors/InputsAndModules";
 import { executePresaleStaking } from "@/utils/TransactionExecuter/useStakingTransactionExecuter";
-import { tokenAddress } from "@/constants/address";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import {
   PayInputData,
   PresaleStakingInputData,
-} from "@/utils/TypeInputStructures";
-import { HelperInfo } from "../InputsAndModules/HelperInfo";
+  StakingSignatureBuilder,
+} from "@evvm/viem-signature-library";
 
 type InputData = {
   PresaleStakingInputData: PresaleStakingInputData;
@@ -32,8 +33,6 @@ export const PresaleStakingComponent = ({
   evvmID,
   stakingAddress,
 }: PresaleStakingComponentProps) => {
-  const { signPresaleStaking } = useStakingSignatureBuilder();
-
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState("low");
 
@@ -59,43 +58,52 @@ export const PresaleStakingComponent = ({
       useGrouping: false,
     });
 
-    signPresaleStaking(
-      BigInt(formData.evvmID),
-      formData.stakingAddress as `0x${string}`,
-      isStaking,
-      BigInt(formData.nonce),
-      BigInt(formData.priorityFee_EVVM),
-      BigInt(amountOfToken),
-      BigInt(formData.nonce_EVVM),
-      formData.priorityFlag_EVVM,
-      (paySignature: string, stakingSignature: string) => {
-        setDataToGet({
-          PresaleStakingInputData: {
-            isStaking: isStaking,
-            user: walletData.address as `0x${string}`,
-            nonce: BigInt(formData.nonce),
-            signature: stakingSignature,
-            priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
-            priorityFlag_EVVM: priority === "high",
-            nonce_EVVM: BigInt(formData.nonce_EVVM),
-            signature_EVVM: paySignature,
-          },
-          PayInputData: {
-            from: walletData.address as `0x${string}`,
-            to_address: formData.stakingAddress as `0x${string}`,
-            to_identity: "",
-            token: tokenAddress.mate as `0x${string}`,
-            amount: BigInt(amountOfToken),
-            priorityFee: BigInt(formData.priorityFee_EVVM),
-            nonce: BigInt(formData.nonce_EVVM),
-            priority: priority === "high",
-            executor: formData.stakingAddress as `0x${string}`,
-            signature: paySignature,
-          },
-        });
-      },
-      (error: Error) => console.error("Error signing presale staking:", error)
-    );
+    try {
+      const walletClient = await getWalletClient(config);
+      const signatureBuilder = new (StakingSignatureBuilder as any)(
+        walletClient,
+        walletData
+      );
+
+      const { paySignature, actionSignature } =
+        await signatureBuilder.signPresaleStaking(
+          BigInt(formData.evvmID),
+          formData.stakingAddress as `0x${string}`,
+          isStaking,
+          BigInt(formData.nonce),
+          BigInt(formData.priorityFee_EVVM),
+          BigInt(amountOfToken),
+          BigInt(formData.nonce_EVVM),
+          formData.priorityFlag_EVVM
+        );
+
+      setDataToGet({
+        PresaleStakingInputData: {
+          isStaking: isStaking,
+          user: walletData.address as `0x${string}`,
+          nonce: BigInt(formData.nonce),
+          signature: actionSignature,
+          priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
+          priorityFlag_EVVM: priority === "high",
+          nonce_EVVM: BigInt(formData.nonce_EVVM),
+          signature_EVVM: paySignature,
+        },
+        PayInputData: {
+          from: walletData.address as `0x${string}`,
+          to_address: formData.stakingAddress as `0x${string}`,
+          to_identity: "",
+          token: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+          amount: BigInt(amountOfToken),
+          priorityFee: BigInt(formData.priorityFee_EVVM),
+          nonce: BigInt(formData.nonce_EVVM),
+          priority: priority === "high",
+          executor: formData.stakingAddress as `0x${string}`,
+          signature: paySignature,
+        },
+      });
+    } catch (error) {
+      console.error("Error creating signature:", error);
+    }
   };
 
   const execute = async () => {

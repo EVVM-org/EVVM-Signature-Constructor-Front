@@ -69,7 +69,7 @@
  */
 import { writeContract } from "@wagmi/core";
 import { config } from "@/config";
-import NameService from "@/constants/abi/NameService.json";
+import {NameServiceABI } from "@evvm/viem-signature-library";
 import {
   PreRegistrationUsernameInputData,
   RegistrationUsernameInputData,
@@ -81,7 +81,7 @@ import {
   RemoveCustomMetadataInputData,
   FlushCustomMetadataInputData,
   FlushUsernameInputData,
-} from "../TypeInputStructures/";
+} from "@evvm/viem-signature-library";
 
 const executePreRegistrationUsername = async (
   InputData: PreRegistrationUsernameInputData,
@@ -92,7 +92,7 @@ const executePreRegistrationUsername = async (
   }
 
   writeContract(config, {
-    abi: NameService.abi,
+    abi: NameServiceABI,
     address: nameServiceAddress,
     functionName: "preRegistrationUsername",
     args: [
@@ -123,7 +123,7 @@ const executeRegistrationUsername = async (
   }
 
   writeContract(config, {
-    abi: NameService.abi,
+    abi: NameServiceABI,
     address: nameServiceAddress,
     functionName: "registrationUsername",
     args: [
@@ -155,7 +155,7 @@ const executeMakeOffer = async (
   }
 
   writeContract(config, {
-    abi: NameService.abi,
+    abi: NameServiceABI,
     address: nameServiceAddress,
     functionName: "makeOffer",
     args: [
@@ -188,7 +188,7 @@ const executeWithdrawOffer = async (
   }
 
   writeContract(config, {
-    abi: NameService.abi,
+    abi: NameServiceABI,
     address: nameServiceAddress,
     functionName: "withdrawOffer",
     args: [
@@ -220,7 +220,7 @@ const executeAcceptOffer = async (
   }
 
   writeContract(config, {
-    abi: NameService.abi,
+    abi: NameServiceABI,
     address: nameServiceAddress,
     functionName: "acceptOffer",
     args: [
@@ -252,7 +252,7 @@ const executeRenewUsername = async (
   }
 
   writeContract(config, {
-    abi: NameService.abi,
+    abi: NameServiceABI,
     address: nameServiceAddress,
     functionName: "renewUsername",
     args: [
@@ -282,8 +282,10 @@ const executeAddCustomMetadata = async (
     return Promise.reject("No input to execute");
   }
 
+  console.log("Executing addCustomMetadata with InputData:", InputData);
+
   writeContract(config, {
-    abi: NameService.abi,
+    abi: NameServiceABI,
     address: nameServiceAddress,
     functionName: "addCustomMetadata",
     args: [
@@ -315,7 +317,7 @@ const executeRemoveCustomMetadata = async (
   }
 
   writeContract(config, {
-    abi: NameService.abi,
+    abi: NameServiceABI,
     address: nameServiceAddress,
     functionName: "removeCustomMetadata",
     args: [
@@ -347,7 +349,7 @@ const executeFlushCustomMetadata = async (
   }
 
   writeContract(config, {
-    abi: NameService.abi,
+    abi: NameServiceABI,
     address: nameServiceAddress,
     functionName: "flushCustomMetadata",
     args: [
@@ -378,7 +380,7 @@ const executeFlushUsername = async (
   }
 
   writeContract(config, {
-    abi: NameService.abi,
+    abi: NameServiceABI,
     address: nameServiceAddress,
     functionName: "flushUsername",
     args: [

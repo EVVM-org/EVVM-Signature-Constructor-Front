@@ -2,7 +2,8 @@
 import React, { useState } from "react";
 import { readContract } from "@wagmi/core";
 import { config } from "@/config/index";
-import Evvm from "@/constants/abi/Evvm.json";
+import { EvvmABI } from "@evvm/viem-signature-library";
+
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { HelperInfo } from "../InputsAndModules/HelperInfo";
 
@@ -26,7 +27,7 @@ export const FaucetBalanceChecker: React.FC<FaucetBalanceCheckerProps> = ({
     const token = getValue("faucetBalance_token");
     try {
       const result = await readContract(config, {
-        abi: Evvm.abi,
+        abi: EvvmABI,
         address: evvmAddress as `0x${string}`,
         functionName: "getBalance",
         args: [user, token],

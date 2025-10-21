@@ -10,9 +10,9 @@ import { writeContract } from "@wagmi/core";
 import {
   DispersePayInputData,
   PayInputData,
-} from "../TypeInputStructures/evvmTypeInputStructure";
+} from "@evvm/viem-signature-library";
 import { config } from "@/config";
-import Evvm from "@/constants/abi/Evvm.json";
+import { EvvmABI } from "@evvm/viem-signature-library";
 
 const executePay = async (
   InputData: PayInputData,
@@ -23,7 +23,7 @@ const executePay = async (
   }
 
   return writeContract(config, {
-    abi: Evvm.abi,
+    abi: EvvmABI,
     address: evvmAddress,
     functionName: "pay",
     args: [
@@ -56,7 +56,7 @@ const executeDispersePay = async (
   }
 
   writeContract(config, {
-    abi: Evvm.abi,
+    abi: EvvmABI,
     address: evvmAddress,
     functionName: "dispersePay",
     args: [
@@ -87,7 +87,7 @@ const executePayMultiple = async (
     return Promise.reject("No data to execute multiple payments");
   }
   writeContract(config, {
-    abi: Evvm.abi,
+    abi: EvvmABI,
     address: evvmAddress,
     functionName: "payMultiple",
     args: InputData.map((data) => [

@@ -1,24 +1,24 @@
 "use client";
 import React from "react";
-import { getAccount, readContract } from "@wagmi/core";
 import { config } from "@/config/index";
-import { useNameServiceSignatureBuilder } from "@/utils/SignatureBuilder/useNameServiceSignatureBuilder";
-import { TitleAndLink } from "@/components/SigConstructors/InputsAndModules/TitleAndLink";
-import { NumberInputWithGenerator } from "@/components/SigConstructors/InputsAndModules/NumberInputWithGenerator";
-import { AddressInputField } from "../InputsAndModules/AddressInputField";
-import { PrioritySelector } from "../InputsAndModules/PrioritySelector";
-import { NumberInputField } from "../InputsAndModules/NumberInputField";
-import { TextInputField } from "../InputsAndModules/TextInputField";
-import { DataDisplayWithClear } from "@/components/SigConstructors/InputsAndModules/DataDisplayWithClear";
+import { getWalletClient, readContract } from "@wagmi/core";
 import {
+  TitleAndLink,
+  NumberInputWithGenerator,
+  PrioritySelector,
+  DataDisplayWithClear,
+  HelperInfo,
+  NumberInputField,
+  TextInputField,
+} from "@/components/SigConstructors/InputsAndModules";
+import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
+import { executeAddCustomMetadata } from "@/utils/TransactionExecuter";
+import {
+  NameServiceABI,
   AddCustomMetadataInputData,
   PayInputData,
-} from "@/utils/TypeInputStructures";
-import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import { tokenAddress } from "@/constants/address";
-import { executeAddCustomMetadata } from "@/utils/TransactionExecuter";
-import NameService from "@/constants/abi/NameService.json";
-import { HelperInfo } from "../InputsAndModules/HelperInfo";
+  NameServiceSignatureBuilder,
+} from "@evvm/viem-signature-library";
 
 type InfoData = {
   PayInputData: PayInputData;
@@ -34,8 +34,6 @@ export const AddCustomMetadataComponent = ({
   evvmID,
   nameServiceAddress,
 }: AddCustomMetadataComponentProps) => {
-  const { signAddCustomMetadata } = useNameServiceSignatureBuilder();
-  const account = getAccount(config);
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
   const [amountToAddCustomMetadata, setAmountToAddCustomMetadata] =
@@ -70,9 +68,17 @@ export const AddCustomMetadataComponent = ({
 
     let valueCustomMetadata = `${formData.schema}:${formData.subschema}>${formData.value}`;
 
-    getPriceToAddCustomMetadata()
-      .then(() => {
-        signAddCustomMetadata(
+    try {
+      const walletClient = await getWalletClient(config);
+      const signatureBuilder = new (NameServiceSignatureBuilder as any)(
+        walletClient,
+        walletData
+      );
+
+      await getPriceToAddCustomMetadata();
+
+      const { paySignature, actionSignature } =
+        await signatureBuilder.signAddCustomMetadata(
           BigInt(formData.evvmId),
           formData.addressNameService as `0x${string}`,
           BigInt(formData.nonceNameService),
@@ -83,43 +89,39 @@ export const AddCustomMetadataComponent = ({
             : BigInt(5000000000000000000 * 10),
           BigInt(formData.priorityFee_EVVM),
           BigInt(formData.nonceEVVM),
-          formData.priorityFlag,
-          (paySignature, addCustomMetadataSignature) => {
-            setDataToGet({
-              PayInputData: {
-                from: walletData.address as `0x${string}`,
-                to_address: formData.addressNameService as `0x${string}`,
-                to_identity: "",
-                token: tokenAddress.mate as `0x${string}`,
-                amount: amountToAddCustomMetadata
-                  ? BigInt(amountToAddCustomMetadata)
-                  : BigInt(5000000000000000000 * 10),
-                priorityFee: BigInt(formData.priorityFee_EVVM),
-                nonce: BigInt(formData.nonceEVVM),
-                priority: priority === "high",
-                executor: formData.addressNameService as `0x${string}`,
-                signature: paySignature,
-              },
-              AddCustomMetadataInputData: {
-                user: walletData.address as `0x${string}`,
-                identity: formData.identity,
-                value: valueCustomMetadata,
-                nonce: BigInt(formData.nonceNameService),
-                signature: addCustomMetadataSignature,
-                priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
-                nonce_EVVM: BigInt(formData.nonceEVVM),
-                priorityFlag_EVVM: formData.priorityFlag,
-                signature_EVVM: paySignature,
-              },
-            });
-          },
-          (error) => console.error("Error signing payment:", error)
+          formData.priorityFlag
         );
-      })
-      .catch((error) => {
-        console.error("Error reading mate reward amount:", error);
-        return;
+
+      setDataToGet({
+        PayInputData: {
+          from: walletData.address as `0x${string}`,
+          to_address: formData.addressNameService as `0x${string}`,
+          to_identity: "",
+          token: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+          amount: amountToAddCustomMetadata
+            ? BigInt(amountToAddCustomMetadata)
+            : BigInt(5000000000000000000 * 10),
+          priorityFee: BigInt(formData.priorityFee_EVVM),
+          nonce: BigInt(formData.nonceEVVM),
+          priority: priority === "high",
+          executor: formData.addressNameService as `0x${string}`,
+          signature: paySignature,
+        },
+        AddCustomMetadataInputData: {
+          user: walletData.address as `0x${string}`,
+          identity: formData.identity,
+          value: valueCustomMetadata,
+          nonce: BigInt(formData.nonceNameService),
+          signature: actionSignature,
+          priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
+          nonce_EVVM: BigInt(formData.nonceEVVM),
+          priorityFlag_EVVM: formData.priorityFlag,
+          signature_EVVM: paySignature,
+        },
       });
+    } catch (error) {
+      console.error("Error creating signature:", error);
+    }
   };
 
   const getPriceToAddCustomMetadata = async () => {
@@ -128,7 +130,7 @@ export const AddCustomMetadataComponent = ({
       setAmountToAddCustomMetadata(null);
     } else {
       await readContract(config, {
-        abi: NameService.abi,
+        abi: NameServiceABI,
         address: nameServiceAddress as `0x${string}`,
         functionName: "getPriceToAddCustomMetadata",
         args: [],
@@ -149,11 +151,10 @@ export const AddCustomMetadataComponent = ({
       console.error("No data to execute payment");
       return;
     }
-    const nameServiceAddress = dataToGet.PayInputData.to_address;
 
     executeAddCustomMetadata(
       dataToGet.AddCustomMetadataInputData,
-      nameServiceAddress
+      nameServiceAddress as `0x${string}`
     )
       .then(() => {
         console.log("Registration username executed successfully");

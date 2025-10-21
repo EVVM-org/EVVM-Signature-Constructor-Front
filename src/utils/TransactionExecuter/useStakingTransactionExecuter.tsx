@@ -8,13 +8,13 @@
  */
 import { writeContract } from "@wagmi/core";
 import { config } from "@/config";
-import Staking from "@/constants/abi/Staking.json";
+import { StakingABI } from "@evvm/viem-signature-library";
 import {
   GoldenStakingInputData,
   PresaleStakingInputData,
   PublicServiceStakingInputData,
   PublicStakingInputData,
-} from "../TypeInputStructures/stakingTypeInputStructure";
+} from "@evvm/viem-signature-library";
 
 const executeGoldenStaking = async (
   InputData: GoldenStakingInputData,
@@ -25,7 +25,7 @@ const executeGoldenStaking = async (
   }
 
   writeContract(config, {
-    abi: Staking.abi,
+    abi: StakingABI,
     address: stakingAddress,
     functionName: "goldenStaking",
     args: [
@@ -51,7 +51,7 @@ const executePresaleStaking = async (
   }
 
   writeContract(config, {
-    abi: Staking.abi,
+    abi: StakingABI,
     address: stakingAddress,
     functionName: "presaleStaking",
     args: [
@@ -82,7 +82,7 @@ const executePublicStaking = async (
   }
 
   writeContract(config, {
-    abi: Staking.abi,
+    abi: StakingABI,
     address: stakingAddress,
     functionName: "publicStaking",
     args: [
@@ -114,7 +114,7 @@ const executePublicServiceStaking = async (
   }
 
   writeContract(config, {
-    abi: Staking.abi,
+    abi: StakingABI,
     address: stakingAddress,
     functionName: "publicServiceStaking",
     args: [
@@ -127,7 +127,7 @@ const executePublicServiceStaking = async (
       InputData.priorityFee_EVVM,
       InputData.nonce_EVVM,
       InputData.priorityFlag_EVVM,
-      InputData.signature_EVVM
+      InputData.signature_EVVM,
     ],
   })
     .then(() => {

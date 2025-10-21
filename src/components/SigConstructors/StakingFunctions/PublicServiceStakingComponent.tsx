@@ -10,7 +10,7 @@ import {
   HelperInfo,
   NumberInputField,
   AddressInputField,
-} from "@/components/SigConstructors/InputsAndModules";
+} from "@/components/InputsAndModules";
 import { executePublicServiceStaking } from "@/utils/TransactionExecuter/useStakingTransactionExecuter";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import {

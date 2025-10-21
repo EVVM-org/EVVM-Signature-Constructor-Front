@@ -10,7 +10,7 @@ import {
   HelperInfo,
   NumberInputField,
   StakingActionSelector,
-} from "@/components/SigConstructors/InputsAndModules";
+} from "@/components/InputsAndModules";
 
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 

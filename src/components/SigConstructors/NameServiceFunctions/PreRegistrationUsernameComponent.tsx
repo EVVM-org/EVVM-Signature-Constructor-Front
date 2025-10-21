@@ -10,7 +10,7 @@ import {
   HelperInfo,
   NumberInputField,
   TextInputField,
-} from "@/components/SigConstructors/InputsAndModules";
+} from "@/components/InputsAndModules";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import { executePreRegistrationUsername } from "@/utils/TransactionExecuter";
 import {

@@ -11,7 +11,7 @@ import {
   DataDisplayWithClear,
   HelperInfo,
   NumberInputField,
-} from "@/components/SigConstructors/InputsAndModules";
+} from "@/components/InputsAndModules";
 
 import {
   EVVMSignatureBuilder,

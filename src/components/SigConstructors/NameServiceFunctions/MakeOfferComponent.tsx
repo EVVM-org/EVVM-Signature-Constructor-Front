@@ -11,7 +11,7 @@ import {
   NumberInputField,
   TextInputField,
   DateInputField,
-} from "@/components/InputsAndModules";
+} from "@/components/SigConstructors/InputsAndModules";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import { executeMakeOffer } from "@/utils/TransactionExecuter";
 import { dateToUnixTimestamp } from "@/utils/dateToUnixTimestamp";

@@ -1,5 +1,5 @@
 import React from "react";
-import { DetailedData } from "@/components/InputsAndModules/DetailedData";
+import { DetailedData } from "@/components/SigConstructors/InputsAndModules/DetailedData";
 import styles from "@/components/SigConstructors/SignatureConstructor.module.css";
 
 interface DataDisplayWithClearProps {

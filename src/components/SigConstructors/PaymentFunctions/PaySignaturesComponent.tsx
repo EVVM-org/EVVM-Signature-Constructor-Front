@@ -9,7 +9,7 @@ import {
   ExecutorSelector,
   DataDisplayWithClear,
   HelperInfo,
-} from "@/components/InputsAndModules";
+} from "@/components/SigConstructors/InputsAndModules";
 
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import { executePay } from "@/utils/TransactionExecuter/useEVVMTransactionExecuter";

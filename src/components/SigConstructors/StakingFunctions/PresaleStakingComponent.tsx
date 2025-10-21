@@ -10,7 +10,7 @@ import {
   HelperInfo,
   NumberInputField,
   StakingActionSelector,
-} from "@/components/InputsAndModules";
+} from "@/components/SigConstructors/InputsAndModules";
 import { executePresaleStaking } from "@/utils/TransactionExecuter/useStakingTransactionExecuter";
 import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import {

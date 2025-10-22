@@ -55,19 +55,32 @@ export const RegistrationUsernameComponent = ({
     if (!walletData) return;
 
     const formData = {
-      evvmId: BigInt(evvmID),
+      evvmId: evvmID,
       addressNameService: nameServiceAddress,
-      nonceNameService: BigInt(
-        getValue("nonceNameServiceInput_registrationUsername")
-      ),
+      nonceNameService: getValue("nonceNameServiceInput_registrationUsername"),
       username: getValue("usernameInput_registrationUsername"),
-      clowNumber: BigInt(getValue("clowNumberInput_registrationUsername")),
-      priorityFee_EVVM: BigInt(
-        getValue("priorityFeeInput_registrationUsername")
-      ),
-      nonceEVVM: BigInt(getValue("nonceEVVMInput_registrationUsername")),
+      clowNumber: getValue("clowNumberInput_registrationUsername"),
+      priorityFee_EVVM: getValue("priorityFeeInput_registrationUsername"),
+      nonceEVVM: getValue("nonceEVVMInput_registrationUsername"),
       priorityFlag: priority === "high",
     };
+
+    // Validate that required fields are not empty
+    if (!formData.username) {
+      throw new Error("Username is required");
+    }
+    if (!formData.nonceNameService) {
+      throw new Error("NameService nonce is required");
+    }
+    if (!formData.clowNumber) {
+      throw new Error("Clow number is required");
+    }
+    if (!formData.nonceEVVM) {
+      throw new Error("EVVM nonce is required");
+    }
+    if (!formData.priorityFee_EVVM) {
+      throw new Error("Priority fee is required");
+    }
 
     try {
       const walletClient = await getWalletClient(config);
@@ -80,14 +93,14 @@ export const RegistrationUsernameComponent = ({
 
       const { paySignature, actionSignature } =
         await signatureBuilder.signRegistrationUsername(
-          formData.evvmId,
+          BigInt(formData.evvmId),
           formData.addressNameService as `0x${string}`,
           formData.username,
-          formData.clowNumber,
-          formData.nonceNameService,
+          BigInt(formData.clowNumber),
+          BigInt(formData.nonceNameService),
           rewardAmount as bigint,
-          formData.priorityFee_EVVM,
-          formData.nonceEVVM,
+          BigInt(formData.priorityFee_EVVM),
+          BigInt(formData.nonceEVVM),
           formData.priorityFlag
         );
 
@@ -98,15 +111,15 @@ export const RegistrationUsernameComponent = ({
           to_identity: "",
           token: "0x0000000000000000000000000000000000000001" as `0x${string}`,
           amount: rewardAmount ? rewardAmount * BigInt(100) : BigInt(0),
-          priorityFee: formData.priorityFee_EVVM,
-          nonce: formData.nonceEVVM,
+          priorityFee: BigInt(formData.priorityFee_EVVM),
+          nonce: BigInt(formData.nonceEVVM),
           priority: priority === "high",
           executor: formData.addressNameService as `0x${string}`,
           signature: paySignature,
         },
         RegistrationUsernameInputData: {
           user: walletData.address as `0x${string}`,
-          nonce: formData.nonceNameService,
+          nonce: BigInt(formData.nonceNameService),
           username: formData.username,
           clowNumber: BigInt(formData.clowNumber),
           signature: actionSignature,

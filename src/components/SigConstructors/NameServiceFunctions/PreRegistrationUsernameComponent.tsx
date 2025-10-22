@@ -41,8 +41,15 @@ export const PreRegistrationUsernameComponent = ({
     const walletData = await getAccountWithRetry(config);
     if (!walletData) return;
 
-    const getValue = (id: string) =>
-      (document.getElementById(id) as HTMLInputElement).value;
+    const getValue = (id: string) => {
+      const el = document.getElementById(id) as HTMLInputElement | null;
+      if (!el) {
+        throw new Error(
+          `Input element with id '${id}' not found. Ensure the input is rendered and the id is correct.`
+        );
+      }
+      return el.value;
+    };
 
     const formData = {
       evvmId: evvmID,
@@ -55,6 +62,23 @@ export const PreRegistrationUsernameComponent = ({
       priorityFlag_EVVM: priority === "high",
     };
 
+    // Validate that required fields are not empty
+    if (!formData.username) {
+      throw new Error("Username is required");
+    }
+    if (!formData.nonce) {
+      throw new Error("NameService nonce is required");
+    }
+    if (!formData.clowNumber) {
+      throw new Error("Clow number is required");
+    }
+    if (!formData.nonce_EVVM) {
+      throw new Error("EVVM nonce is required");
+    }
+    if (!formData.priorityFee_EVVM) {
+      throw new Error("Priority fee is required");
+    }
+
     try {
       const walletClient = await getWalletClient(config);
       const signatureBuilder = new (NameServiceSignatureBuilder as any)(
@@ -63,16 +87,16 @@ export const PreRegistrationUsernameComponent = ({
       );
 
       const { paySignature, actionSignature } =
-        await signatureBuilder.signPreRegistrationUsername({
-          evvmId: BigInt(formData.evvmId),
-          addressNameService: formData.addressNameService as `0x${string}`,
-          username: formData.username,
-          clowNumber: BigInt(formData.clowNumber),
-          nonce: BigInt(formData.nonce),
-          priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
-          nonce_EVVM: BigInt(formData.nonce_EVVM),
-          priorityFlag_EVVM_EVVM: formData.priorityFlag_EVVM,
-        });
+        await signatureBuilder.signPreRegistrationUsername(
+          BigInt(formData.evvmId),
+          formData.addressNameService as `0x${string}`,
+          formData.username,
+          BigInt(formData.clowNumber),
+          BigInt(formData.nonce),
+          BigInt(formData.priorityFee_EVVM),
+          BigInt(formData.nonce_EVVM),
+          formData.priorityFlag_EVVM
+        );
 
       const hashUsername = hashPreRegisteredUsername(
         formData.username,

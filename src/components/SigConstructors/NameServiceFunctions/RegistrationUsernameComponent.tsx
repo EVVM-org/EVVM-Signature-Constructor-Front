@@ -79,17 +79,17 @@ export const RegistrationUsernameComponent = ({
       await readRewardAmount();
 
       const { paySignature, actionSignature } =
-        await signatureBuilder.signRegistrationUsername({
-          evvmId: formData.evvmId,
-          addressNameService: formData.addressNameService as `0x${string}`,
-          username: formData.username,
-          clowNumber: formData.clowNumber,
-          nonce: formData.nonceNameService,
-          mateReward: rewardAmount as bigint,
-          priorityFee_EVVM: formData.priorityFee_EVVM,
-          nonce_EVVM: formData.nonceEVVM,
-          priorityFlag_EVVM: formData.priorityFlag,
-        });
+        await signatureBuilder.signRegistrationUsername(
+          formData.evvmId,
+          formData.addressNameService as `0x${string}`,
+          formData.username,
+          formData.clowNumber,
+          formData.nonceNameService,
+          rewardAmount as bigint,
+          formData.priorityFee_EVVM,
+          formData.nonceEVVM,
+          formData.priorityFlag
+        );
 
       setDataToGet({
         PayInputData: {

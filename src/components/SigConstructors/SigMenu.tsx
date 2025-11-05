@@ -21,7 +21,6 @@ import { RemoveCustomMetadataComponent } from "./NameServiceFunctions/RemoveCust
 import { FlushCustomMetadataComponent } from "./NameServiceFunctions/FlushCustomMetadataComponent";
 import { FlushUsernameComponent } from "./NameServiceFunctions/FlushUsernameComponent";
 import { FaucetBalanceChecker } from "./FaucetFunctions/FaucetBalanceChecker";
-import { PublicServiceStakingComponent } from "./StakingFunctions/PublicServiceStakingComponent";
 
 const boxStyle = {
   display: "flex",
@@ -182,11 +181,6 @@ export const SigMenu = () => {
     />,
     <PublicStakingComponent
       key="public"
-      evvmID={evvmID}
-      stakingAddress={stakingAddress}
-    />,
-    <PublicServiceStakingComponent
-      key="service"
       evvmID={evvmID}
       stakingAddress={stakingAddress}
     />,

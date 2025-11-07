@@ -21,6 +21,7 @@ import { RemoveCustomMetadataComponent } from "./NameServiceFunctions/RemoveCust
 import { FlushCustomMetadataComponent } from "./NameServiceFunctions/FlushCustomMetadataComponent";
 import { FlushUsernameComponent } from "./NameServiceFunctions/FlushUsernameComponent";
 import { FaucetBalanceChecker } from "./FaucetFunctions/FaucetBalanceChecker";
+import { MakeOrderComponent } from "./P2PSwap/MakeOrderComponent";
 
 const boxStyle = {
   display: "flex",
@@ -49,6 +50,7 @@ export const SigMenu = () => {
   const [evvmAddress, setEvvmAddress] = useState("");
   const [nameserviceAddress, setNameserviceAddress] = useState("");
   const [stakingAddress, setStakingAddress] = useState("");
+  const [p2pswapAddress, setP2pswapAddress] = useState("");
   const [loadingIDs, setLoadingIDs] = useState(false);
   // Map selector value to network object
   const networkOptions = [
@@ -239,6 +241,19 @@ export const SigMenu = () => {
     />,
   ];
 
+  const p2pComponents = [ 
+	<MakeOrderComponent 
+		key="makeOrder"
+		evvmID={evvmID}
+		p2pSwapAddress={p2pswapAddress}
+	/>
+	// todo:
+	// [x] makeOrder comp
+	// cancelOrder comp
+	// dispatchOrder_fillPropotionalFee comp
+	// dispatchOrder_fillFixedFee comp
+  ]
+
   const components =
     menu === "faucet"
       ? FaucetFunctions
@@ -248,7 +263,9 @@ export const SigMenu = () => {
       ? stakingComponents
       : menu === "mns"
       ? mnsComponents
-      : [];
+      : menu === 'p2pswap' 
+	  ? p2pComponents
+	  : [];
 
   return (
     <div
@@ -290,17 +307,17 @@ export const SigMenu = () => {
               <strong>evvmID:</strong> {String(evvmID)}
             </div>
             <div
-              style={{ fontSize: 15, color: "#444", fontFamily: "monospace" }}
+              style={{ fontSize: 15, color: '#444', fontFamily: 'monospace' }}
             >
               <strong>evvm:</strong> {evvmAddress}
             </div>
             <div
-              style={{ fontSize: 15, color: "#444", fontFamily: "monospace" }}
+              style={{ fontSize: 15, color: '#444', fontFamily: 'monospace' }}
             >
               <strong>staking:</strong> {stakingAddress}
             </div>
             <div
-              style={{ fontSize: 15, color: "#444", fontFamily: "monospace" }}
+              style={{ fontSize: 15, color: '#444', fontFamily: 'monospace' }}
             >
               <strong>nameService:</strong> {nameserviceAddress}
             </div>
@@ -308,10 +325,10 @@ export const SigMenu = () => {
         ) : (
           <div
             style={{
-              display: "flex",
-              flexDirection: "row",
-              gap: "1rem",
-              alignItems: "center",
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '1rem',
+              alignItems: 'center',
             }}
           >
             <input
@@ -320,34 +337,34 @@ export const SigMenu = () => {
               value={evvmAddress}
               onChange={(e) => setEvvmAddress(e.target.value)}
               style={{
-                padding: "0.75rem 1rem",
+                padding: '0.75rem 1rem',
                 borderRadius: 8,
-                background: "#f9fafb",
-                color: "#222",
-                border: "1.5px solid #d1d5db",
+                background: '#f9fafb',
+                color: '#222',
+                border: '1.5px solid #d1d5db',
                 width: 420,
-                fontFamily: "monospace",
+                fontFamily: 'monospace',
                 fontSize: 16,
-                boxSizing: "border-box",
-                outline: "none",
-                transition: "border 0.2s",
+                boxSizing: 'border-box',
+                outline: 'none',
+                transition: 'border 0.2s',
               }}
             />
             <select
               style={{
-                padding: "0.7rem 1.2rem",
+                padding: '0.7rem 1.2rem',
                 borderRadius: 8,
-                border: "1.5px solid #d1d5db",
-                background: "#f9fafb",
-                color: "#222",
+                border: '1.5px solid #d1d5db',
+                background: '#f9fafb',
+                color: '#222',
                 fontWeight: 500,
                 fontSize: 15,
                 minWidth: 180,
                 marginRight: 8,
-                boxShadow: "0 1px 4px 0 rgba(0,0,0,0.03)",
-                outline: "none",
-                transition: "border 0.2s",
-                cursor: "pointer",
+                boxShadow: '0 1px 4px 0 rgba(0,0,0,0.03)',
+                outline: 'none',
+                transition: 'border 0.2s',
+                cursor: 'pointer',
               }}
               value={network}
               onChange={handleNetworkChange}
@@ -361,20 +378,20 @@ export const SigMenu = () => {
             <button
               onClick={fetchEvvmSummary}
               style={{
-                padding: "0.7rem 1.5rem",
+                padding: '0.7rem 1.5rem',
                 borderRadius: 8,
-                border: "1.5px solid #d1d5db",
-                background: loadingIDs ? "#e5e7eb" : "#f3f4f6",
-                color: "#222",
+                border: '1.5px solid #d1d5db',
+                background: loadingIDs ? '#e5e7eb' : '#f3f4f6',
+                color: '#222',
                 fontWeight: 600,
                 fontSize: 15,
-                cursor: loadingIDs ? "not-allowed" : "pointer",
-                transition: "background 0.2s",
+                cursor: loadingIDs ? 'not-allowed' : 'pointer',
+                transition: 'background 0.2s',
                 minWidth: 140,
               }}
               disabled={loadingIDs}
             >
-              {loadingIDs ? "Loading..." : "Use this EVVM"}
+              {loadingIDs ? 'Loading...' : 'Use this EVVM'}
             </button>
           </div>
         )}
@@ -382,11 +399,11 @@ export const SigMenu = () => {
 
       <div
         style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "1rem",
-          width: "100%",
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '1rem',
+          width: '100%',
         }}
       >
         <label
@@ -394,10 +411,10 @@ export const SigMenu = () => {
           style={{
             fontWeight: 600,
             fontSize: 16,
-            color: "#333",
+            color: '#333',
             marginBottom: 4,
-            textAlign: "center",
-            width: "100%",
+            textAlign: 'center',
+            width: '100%',
           }}
         >
           Select a function:
@@ -409,15 +426,15 @@ export const SigMenu = () => {
             ...selectStyle,
             fontSize: 16,
             fontWeight: 500,
-            border: "1.5px solid #d1d5db",
-            background: "#f9fafb",
-            color: "#222",
+            border: '1.5px solid #d1d5db',
+            background: '#f9fafb',
+            color: '#222',
             maxWidth: 400,
             minWidth: 260,
-            margin: "0 auto",
-            textAlign: "center",
-            boxShadow: "0 1px 4px 0 rgba(0,0,0,0.02)",
-            display: "block",
+            margin: '0 auto',
+            textAlign: 'center',
+            boxShadow: '0 1px 4px 0 rgba(0,0,0,0.02)',
+            display: 'block',
           }}
           value={menu}
         >
@@ -425,17 +442,18 @@ export const SigMenu = () => {
           <option value="pay">Payment signatures</option>
           <option value="staking">Staking signatures</option>
           <option value="mns">Name Service signatures</option>
+          <option value="p2pswap">P2P Swap signatures</option>
         </select>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
         {components.map((Component, index) => (
           <div
             key={index}
             style={{
               ...boxStyle,
-              background: "#f9fafb",
-              boxShadow: "0 1px 4px 0 rgba(0,0,0,0.03)",
+              background: '#f9fafb',
+              boxShadow: '0 1px 4px 0 rgba(0,0,0,0.03)',
             }}
           >
             {Component}
@@ -443,5 +461,5 @@ export const SigMenu = () => {
         ))}
       </div>
     </div>
-  );
-};
+  )
+}

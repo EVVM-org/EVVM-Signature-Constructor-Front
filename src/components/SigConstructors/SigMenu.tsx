@@ -23,6 +23,8 @@ import { FlushUsernameComponent } from "./NameServiceFunctions/FlushUsernameComp
 import { FaucetBalanceChecker } from "./FaucetFunctions/FaucetBalanceChecker";
 import { MakeOrderComponent } from "./P2PSwap/MakeOrderComponent";
 import { CancelOrderComponent } from "./P2PSwap/CancelOrderComponent";
+import { DispatchOrderFillPropotionalFeeComponent } from "./P2PSwap/DispatchOrderPropotionalComponent";
+import { DispatchOrderFillFixedFeeComponent } from "./P2PSwap/DispatchOrderFixedComponent";
 
 const boxStyle = {
   display: "flex",
@@ -252,12 +254,17 @@ export const SigMenu = () => {
 		key="cancelOrder"
 		evvmID={evvmID}
 		p2pSwapAddress={p2pswapAddress}
+	/>,
+	<DispatchOrderFillPropotionalFeeComponent 
+		key="dispatchOrder_fillPropotionalFee"
+		evvmID={evvmID}
+		p2pSwapAddress={p2pswapAddress}
+	/>,
+	<DispatchOrderFillFixedFeeComponent 
+		key="dispatchOrder_fillFixedFee"
+		evvmID={evvmID}
+		p2pSwapAddress={p2pswapAddress}
 	/>
-	// todo:
-	// [x] makeOrder comp
-	// cancelOrder comp
-	// dispatchOrder_fillPropotionalFee comp
-	// dispatchOrder_fillFixedFee comp
   ]
 
   const components =

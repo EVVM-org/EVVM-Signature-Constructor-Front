@@ -22,6 +22,7 @@ import { FlushCustomMetadataComponent } from "./NameServiceFunctions/FlushCustom
 import { FlushUsernameComponent } from "./NameServiceFunctions/FlushUsernameComponent";
 import { FaucetBalanceChecker } from "./FaucetFunctions/FaucetBalanceChecker";
 import { MakeOrderComponent } from "./P2PSwap/MakeOrderComponent";
+import { CancelOrderComponent } from "./P2PSwap/CancelOrderComponent";
 
 const boxStyle = {
   display: "flex",
@@ -244,6 +245,11 @@ export const SigMenu = () => {
   const p2pComponents = [ 
 	<MakeOrderComponent 
 		key="makeOrder"
+		evvmID={evvmID}
+		p2pSwapAddress={p2pswapAddress}
+	/>,
+	<CancelOrderComponent 
+		key="cancelOrder"
 		evvmID={evvmID}
 		p2pSwapAddress={p2pswapAddress}
 	/>

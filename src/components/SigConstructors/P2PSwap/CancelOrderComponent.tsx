@@ -15,22 +15,23 @@ import { getAccountWithRetry } from '@/utils/getAccountWithRetry'
 import { getWalletClient } from 'wagmi/actions'
 import {
   EVVMSignatureBuilder,
-  MakeOrderInputData,
+  CancelOrderInputData,
   P2PSwapSignatureBuilder,
 } from '@evvm/viem-signature-library'
-import { executeMakeOrder } from '@/utils/TransactionExecuter'
+import { executeCancelOrder } from '@/utils/TransactionExecuter'
+import { MATE_TOKEN_ADDRESS } from '@/utils/constants'
 
-interface MakeOrderComponentProps {
+interface CancelOrderComponentProps {
   evvmID: string
   p2pSwapAddress: string
 }
 
-export const MakeOrderComponent = ({
+export const CancelOrderComponent = ({
   evvmID,
   p2pSwapAddress,
-}: MakeOrderComponentProps) => {
+}: CancelOrderComponentProps) => {
   const [priority, setPriority] = React.useState('low')
-  const [dataToGet, setDataToGet] = React.useState<MakeOrderInputData | null>(
+  const [dataToGet, setDataToGet] = React.useState<CancelOrderInputData | null>(
     null
   )
 
@@ -46,13 +47,12 @@ export const MakeOrderComponent = ({
 
     // retrieve variables from inputs
     // todo: replace this approach with actual state usage
-    const nonce = BigInt(getValue('nonceInput_MakeOrder'))
-    const tokenA = getValue('tokenA_MakeOrder') as `0x${string}`
-    const tokenB = getValue('tokenB_MakeOrder') as `0x${string}`
-    const amountA = BigInt(getValue('amountA_MakeOrder'))
-    const amountB = BigInt(getValue('amountB_MakeOrder'))
-    const priorityFee = BigInt(getValue('priorityFee_MakeOrder'))
-    const nonce_EVVM = BigInt(getValue('nonce_EVVM_MakeOrder'))
+    const nonce = BigInt(getValue('nonceInput_CancelOrder'))
+    const tokenA = getValue('tokenA_CancelOrder') as `0x${string}`
+    const tokenB = getValue('tokenB_CancelOrder') as `0x${string}`
+    const orderId = BigInt(getValue('orderId_CancelOrder'))
+    const priorityFee = BigInt(getValue('priorityFee_CancelOrder'))
+    const nonce_EVVM = BigInt(getValue('nonce_EVVM_CancelOrder'))
 
     try {
       const walletClient = await getWalletClient(config)
@@ -71,23 +71,22 @@ export const MakeOrderComponent = ({
       const signatureEVVM = await evvmSignatureBuilder.pay(
         BigInt(evvmID),
         p2pSwapAddress,
-		"",
-        tokenA,
-        amountA,
+        '',
+        MATE_TOKEN_ADDRESS,
+        0,
         priorityFee,
         nonce_EVVM,
         priority === 'high',
         p2pSwapAddress
       )
 
-      // create p2pswap makeOrder() signature
-      const signatureP2P = await p2pSwapSignatureBuilder.makeOrder(
+      // create p2pswap cancelOrder() signature
+      const signatureP2P = await p2pSwapSignatureBuilder.cancelOrder(
         BigInt(evvmID),
         nonce,
         tokenA,
         tokenB,
-        amountA,
-        amountB
+        orderId
       )
 
       // prepare data to execute transaction (send it to state)
@@ -97,10 +96,9 @@ export const MakeOrderComponent = ({
           nonce,
           tokenA,
           tokenB,
-          amountA,
-          amountB,
+          orderId,
+          signature: signatureP2P,
         },
-        signature: signatureP2P,
         priorityFee,
         nonce_EVVM,
         priorityFlag_EVVM: priority === 'high',
@@ -113,7 +111,7 @@ export const MakeOrderComponent = ({
 
   const execute = async () => {
     if (!dataToGet) {
-      console.error('No data to execute makeOrder')
+      console.error('No data to execute cancelOrder')
       return
     }
 
@@ -122,39 +120,46 @@ export const MakeOrderComponent = ({
       return
     }
 
-    executeMakeOrder(dataToGet, p2pSwapAddress as `0x${string}`)
+    executeCancelOrder(dataToGet, p2pSwapAddress as `0x${string}`)
       .then(() => {
-        console.log('Order created successfully')
+        console.log('Order cancelled successfully')
       })
       .catch((error) => {
-        console.error('Error executing order:', error)
+        console.error('Error executing transaction:', error)
       })
   }
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
-        title="Make Order"
-        link="https://www.evvm.info/docs/SignatureStructures/P2PSwap/MakeOrderSignatureStructure"
+        title="Cancel Order"
+        link="https://www.evvm.info/docs/SignatureStructures/P2PSwap/CancelOrderSignatureStructure"
       />
       <br />
 
       <AddressInputField
         label="Token A address"
-        inputId="tokenA_MakeOrder"
+        inputId="tokenA_CancelOrder"
         placeholder="Enter token A address"
       />
 
       <AddressInputField
         label="Token B address"
-        inputId="tokenB_MakeOrder"
+        inputId="tokenB_CancelOrder"
         placeholder="Enter token B address"
       />
 
       {[
-        { label: 'Amount of token A', id: 'amountA_MakeOrder', type: 'number' },
-        { label: 'Amount of token B', id: 'amountB_MakeOrder', type: 'number' },
-        { label: 'Priority fee', id: 'priorityFee_MakeOrder', type: 'number' },
+        {
+          label: 'Order ID',
+          id: 'orderId_CancelOrder',
+          type: 'number',
+        },
+        {
+          label: 'Priority fee (paid in MATE TOKEN)',
+          id: 'priorityFee_CancelOrder',
+          type: 'number',
+        },
       ].map(({ label, id, type }) => (
         <div key={id} style={{ marginBottom: '1rem' }}>
           <p>{label}</p>
@@ -178,14 +183,14 @@ export const MakeOrderComponent = ({
 
       <NumberInputWithGenerator
         label="Nonce for P2PSwap"
-        inputId="nonceInput_MakeOrder"
+        inputId="nonceInput_CancelOrder"
         placeholder="Enter nonce"
         showRandomBtn={true}
       />
 
       <NumberInputWithGenerator
         label="Nonce for EVVM contract interaction"
-        inputId="nonce_EVVM_MakeOrder"
+        inputId="nonce_EVVM_CancelOrder"
         placeholder="Enter nonce"
         showRandomBtn={priority !== 'low'}
       />

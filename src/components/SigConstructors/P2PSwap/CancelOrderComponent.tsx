@@ -68,10 +68,9 @@ export const CancelOrderComponent = ({
       )
 
       // create evvm pay() signature
-      const signatureEVVM = await evvmSignatureBuilder.pay(
+      const signatureEVVM = await evvmSignatureBuilder.signPay(
         BigInt(evvmID),
         p2pSwapAddress,
-        '',
         MATE_TOKEN_ADDRESS,
         0,
         priorityFee,

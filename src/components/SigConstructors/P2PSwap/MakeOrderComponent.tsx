@@ -68,10 +68,9 @@ export const MakeOrderComponent = ({
       )
 
       // create evvm pay() signature
-      const signatureEVVM = await evvmSignatureBuilder.pay(
+      const signatureEVVM = await evvmSignatureBuilder.signPay(
         BigInt(evvmID),
         p2pSwapAddress,
-        '',
         tokenA,
         amountA,
         priorityFee,

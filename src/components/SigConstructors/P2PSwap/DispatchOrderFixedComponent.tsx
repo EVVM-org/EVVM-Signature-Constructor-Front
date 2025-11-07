@@ -94,7 +94,7 @@ export const DispatchOrderFillFixedFeeComponent = ({
         p2pSwapAddress
       )
 
-      // create p2pswap dispatchOrderFillPropotionalFee() signature
+      // create p2pswap dispatchOrderFillFixedFee() signature
       const signatureP2P = await p2pSwapSignatureBuilder.dispatchOrder(
         BigInt(evvmID),
         nonce,
@@ -129,7 +129,7 @@ export const DispatchOrderFillFixedFeeComponent = ({
 
   const execute = async () => {
     if (!dataToGet) {
-      console.error('No data to execute dispatchOrderFillPropotionalFee')
+      console.error('No data to execute dispatchOrderFillFixedFee')
       return
     }
 
@@ -150,7 +150,7 @@ export const DispatchOrderFillFixedFeeComponent = ({
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
-        title="Dispatch Order (with proportional fee)"
+        title="Dispatch Order (with fixed fee)"
         link="https://www.evvm.info/docs/SignatureStructures/P2PSwap/DispatchOrderSignatureStructure"
       />
       <br />

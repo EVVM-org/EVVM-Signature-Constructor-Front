@@ -71,7 +71,7 @@ export const MakeOrderComponent = ({
       const signatureEVVM = await evvmSignatureBuilder.pay(
         BigInt(evvmID),
         p2pSwapAddress,
-		"",
+        '',
         tokenA,
         amountA,
         priorityFee,
@@ -133,6 +133,11 @@ export const MakeOrderComponent = ({
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
+      {!p2pSwapAddress && (
+        <strong style={{ color: 'red' }}>
+          Must provide a valid P2P Swap Contract address to use these functions
+        </strong>
+      )}
       <TitleAndLink
         title="Make Order"
         link="https://www.evvm.info/docs/SignatureStructures/P2PSwap/MakeOrderSignatureStructure"

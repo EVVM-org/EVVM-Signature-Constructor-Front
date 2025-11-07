@@ -30,12 +30,12 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
   p2pSwapAddress,
 }: DispatchOrderFillPropotionalFeeComponentProps) => {
   const [priority, setPriority] = React.useState('low')
-  const [amountB, setAmountB] = React.useState(0)
+  const [amountB, setAmountB] = React.useState(0n)
   const [dataToGet, setDataToGet] =
     React.useState<DispatchOrderFillPropotionalFeeInputData | null>(null)
 
   const fee: bigint = useMemo(
-    () => (BigInt(amountB) + 500n) / 10_000n,
+    () => (amountB + 500n) / 10_000n,
     [amountB]
   )
 
@@ -210,7 +210,7 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
               height: '2rem',
               width: '25rem',
             }}
-            onInput={(e) => setAmountB(Number(e.currentTarget.value))}
+            onInput={(e) => setAmountB(BigInt(e.currentTarget.value))}
           />
         </div>
       </div>

@@ -30,15 +30,15 @@ export const DispatchOrderFillFixedFeeComponent = ({
   p2pSwapAddress,
 }: DispatchOrderFillFixedFeeComponentProps) => {
   const [priority, setPriority] = React.useState('low')
-  const [amountB, setAmountB] = React.useState(0)
-  const [amountOut, setAmountOut] = React.useState(0)
+  const [amountB, setAmountB] = React.useState(0n)
+  const [amountOut, setAmountOut] = React.useState(1000000000000000000n)
   const [dataToGet, setDataToGet] =
     React.useState<DispatchOrderFillFixedFeeInputData | null>(null)
 
   const fee: bigint = useMemo(() => {
-    const propFee = (BigInt(amountB) + 500n) / 10_000n
+    const propFee = (amountB + 500n) / 10_000n
     if (propFee > amountOut) {
-      return BigInt(amountOut)
+      return amountOut
     } else {
       return propFee
     }
@@ -208,7 +208,7 @@ export const DispatchOrderFillFixedFeeComponent = ({
               height: '2rem',
               width: '25rem',
             }}
-            onInput={(e) => setAmountB(Number(e.currentTarget.value))}
+            onInput={(e) => setAmountB(BigInt(e.currentTarget.value))}
           />
         </div>
       </div>
@@ -226,7 +226,7 @@ export const DispatchOrderFillFixedFeeComponent = ({
               height: '2rem',
               width: '25rem',
             }}
-            onInput={(e) => setAmountOut(Number(e.currentTarget.value))}
+            onInput={(e) => setAmountOut(BigInt(e.currentTarget.value))}
           />
         </div>
       </div>

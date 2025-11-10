@@ -86,7 +86,7 @@ const executeDispatchOrderFillPropotionalFee = async (
   return writeContract(config, {
     abi: P2PSwapABI,
     address: p2pSwapAddress,
-    functionName: 'dispatchOrder',
+    functionName: 'dispatchOrder_fillPropotionalFee',
     args: [
       InputData.user,
       InputData.metadata,
@@ -115,7 +115,7 @@ const executeDispatchOrderFillFixedFee = async (
   return writeContract(config, {
     abi: P2PSwapABI,
     address: p2pSwapAddress,
-    functionName: 'dispatchOrder',
+    functionName: 'dispatchOrder_fillFixedFee',
     args: [
       InputData.user,
       InputData.metadata,

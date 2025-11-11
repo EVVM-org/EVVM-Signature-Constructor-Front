@@ -54,10 +54,12 @@ const executeCancelOrder = async (
     return Promise.reject('No data to cancel order')
   }
 
+  // todo: try again with fixed gasFees 
   return writeContract(config, {
     abi: P2PSwapABI,
     address: p2pSwapAddress,
     functionName: 'cancelOrder',
+	gas: 1_500_000n,
     args: [
       InputData.user,
       InputData.metadata,
@@ -87,6 +89,7 @@ const executeDispatchOrderFillPropotionalFee = async (
     abi: P2PSwapABI,
     address: p2pSwapAddress,
     functionName: 'dispatchOrder_fillPropotionalFee',
+	gas: 1_500_000n,
     args: [
       InputData.user,
       InputData.metadata,
@@ -116,6 +119,7 @@ const executeDispatchOrderFillFixedFee = async (
     abi: P2PSwapABI,
     address: p2pSwapAddress,
     functionName: 'dispatchOrder_fillFixedFee',
+	gas: 1_500_000n,
     args: [
       InputData.user,
       InputData.metadata,

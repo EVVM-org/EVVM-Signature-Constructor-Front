@@ -36,7 +36,7 @@ export const DispatchOrderFillFixedFeeComponent = ({
     React.useState<DispatchOrderFillFixedFeeInputData | null>(null)
 
   const fee: bigint = useMemo(() => {
-    const propFee = (amountB + 500n) / 10_000n
+    const propFee = (amountB * 500n) / 10_000n
     if (propFee > amountOut) {
       return amountOut
     } else {

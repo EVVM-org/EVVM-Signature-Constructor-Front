@@ -60,6 +60,16 @@ export const SigMenu = () => {
     { value: 'sepolia', label: 'Sepolia' },
     { value: 'arbitrumSepolia', label: 'Arbitrum Sepolia' },
     { value: 'hederaTestnet', label: 'Hedera Testnet' },
+    { value: 'baseSepolia', label: 'Base Sepolia' },
+    { value: 'mantleSepoliaTestnet', label: 'Mantle Sepolia Testnet' },
+    { value: 'monadTestnet', label: 'Monad Testnet' },
+    { value: 'zksyncSepoliaTestnet', label: 'zkSync Sepolia Testnet' },
+    { value: 'celoSepolia', label: 'Celo Sepolia' },
+    { value: 'opBNBTestnet', label: 'opBNB Testnet' },
+    { value: 'scrollSepolia', label: 'Scroll Sepolia' },
+    { value: 'zircuitGarfieldTestnet', label: 'Zircuit Garfield Testnet' },
+    { value: 'optimismSepolia', label: 'Optimism Sepolia' },
+    { value: 'avalancheFuji', label: 'Avalanche Fuji' },
   ]
   const [network, setNetwork] = useState('sepolia')
 
@@ -74,7 +84,13 @@ export const SigMenu = () => {
       const id = networks.find(
         (n) =>
           n.name?.toLowerCase().includes('sepolia') &&
-          !n.name?.toLowerCase().includes('arbitrum')
+          !n.name?.toLowerCase().includes('arbitrum') &&
+          !n.name?.toLowerCase().includes('base') &&
+          !n.name?.toLowerCase().includes('mantle') &&
+          !n.name?.toLowerCase().includes('zksync') &&
+          !n.name?.toLowerCase().includes('celo') &&
+          !n.name?.toLowerCase().includes('scroll') &&
+          !n.name?.toLowerCase().includes('optimism')
       )?.id
       chainId = typeof id === 'string' ? parseInt(id) : id
     } else if (value === 'arbitrumSepolia') {
@@ -85,6 +101,57 @@ export const SigMenu = () => {
     } else if (value === 'hederaTestnet') {
       const id = networks.find((n) =>
         n.name?.toLowerCase().includes('hedera')
+      )?.id
+      chainId = typeof id === 'string' ? parseInt(id) : id
+    } else if (value === 'baseSepolia') {
+      const id = networks.find((n) =>
+        n.name?.toLowerCase().includes('base')
+      )?.id
+      chainId = typeof id === 'string' ? parseInt(id) : id
+    } else if (value === 'mantleSepoliaTestnet') {
+      const id = networks.find((n) =>
+        n.name?.toLowerCase().includes('mantle')
+      )?.id
+      chainId = typeof id === 'string' ? parseInt(id) : id
+    } else if (value === 'monadTestnet') {
+      const id = networks.find((n) =>
+        n.name?.toLowerCase().includes('monad')
+      )?.id
+      chainId = typeof id === 'string' ? parseInt(id) : id
+    } else if (value === 'zksyncSepoliaTestnet') {
+      const id = networks.find((n) =>
+        n.name?.toLowerCase().includes('zksync')
+      )?.id
+      chainId = typeof id === 'string' ? parseInt(id) : id
+    } else if (value === 'celoSepolia') {
+      const id = networks.find((n) =>
+        n.name?.toLowerCase().includes('celo')
+      )?.id
+      chainId = typeof id === 'string' ? parseInt(id) : id
+    } else if (value === 'opBNBTestnet') {
+      const id = networks.find((n) =>
+        n.name?.toLowerCase().includes('opbnb')
+      )?.id
+      chainId = typeof id === 'string' ? parseInt(id) : id
+    } else if (value === 'scrollSepolia') {
+      const id = networks.find((n) =>
+        n.name?.toLowerCase().includes('scroll')
+      )?.id
+      chainId = typeof id === 'string' ? parseInt(id) : id
+    } else if (value === 'zircuitGarfieldTestnet') {
+      const id = networks.find((n) =>
+        n.name?.toLowerCase().includes('zircuit')
+      )?.id
+      chainId = typeof id === 'string' ? parseInt(id) : id
+    } else if (value === 'optimismSepolia') {
+      const id = networks.find((n) =>
+        n.name?.toLowerCase().includes('optimism')
+      )?.id
+      chainId = typeof id === 'string' ? parseInt(id) : id
+    } else if (value === 'avalancheFuji') {
+      const id = networks.find((n) =>
+        n.name?.toLowerCase().includes('avalanche') ||
+        n.name?.toLowerCase().includes('fuji')
       )?.id
       chainId = typeof id === 'string' ? parseInt(id) : id
     }

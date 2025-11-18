@@ -26,6 +26,7 @@ import { CancelOrderComponent } from './P2PSwap/CancelOrderComponent'
 import { DispatchOrderFillPropotionalFeeComponent } from './P2PSwap/DispatchOrderPropotionalComponent'
 import { DispatchOrderFillFixedFeeComponent } from './P2PSwap/DispatchOrderFixedComponent'
 import { RegisterEvvmComponent } from './EvvmRegistery/RegisterEvvmComponent'
+import { SetEvvmIdComponent } from './EvvmRegistery/SetEvvmIdComponent'
 
 const boxStyle = {
   display: 'flex',
@@ -282,6 +283,7 @@ export const SigMenu = () => {
 
   const registryComponents = [
     <RegisterEvvmComponent key="registerEvvm" />,
+    <SetEvvmIdComponent key="setEvvmId" evvmAddress={evvmAddress} />,
   ]
 
   const components =
@@ -334,7 +336,7 @@ export const SigMenu = () => {
             <div
               style={{ fontSize: 15, color: '#444', fontFamily: 'monospace' }}
             >
-              <strong>evvmID:</strong> {String(evvmID)}
+              { evvmID !== '0' && <strong>evvmID:</strong> } {evvmID === '0' ? <span style={{ color: '#dc2626', fontWeight: 600 }}>Please register your EVVM</span> : String(evvmID)}
             </div>
             <div
               style={{ fontSize: 15, color: '#444', fontFamily: 'monospace' }}

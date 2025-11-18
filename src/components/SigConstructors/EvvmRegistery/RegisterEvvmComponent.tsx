@@ -94,10 +94,7 @@ export const RegisterEvvmComponent = () => {
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
-      <TitleAndLink
-        title="Register EVVM"
-        link="https://www.evvm.info/docs"
-      />
+      <h1>Register EVVM</h1>
       <br />
 
       {/* Chain ID */}
@@ -153,29 +150,6 @@ export const RegisterEvvmComponent = () => {
             margin: 0,
           }}>
             {resultEvvmId}
-          </p>
-        </div>
-      )}
-
-      {/* Display transaction hash */}
-      {txHash && (
-        <div style={{ 
-          marginTop: "1.5rem", 
-          padding: "1rem", 
-          backgroundColor: "#f0f9ff",
-          borderRadius: "8px",
-          width: "100%",
-        }}>
-          <p style={{ color: "#000", marginBottom: "0.5rem" }}>
-            <strong>Transaction Hash:</strong>
-          </p>
-          <p style={{ 
-            color: "#333", 
-            wordBreak: "break-all",
-            fontFamily: "monospace",
-            fontSize: "0.9rem"
-          }}>
-            {txHash}
           </p>
         </div>
       )}

@@ -85,8 +85,19 @@ pnpm run dev
 ## Configuration
 
 ### Supported Networks
-- Ethereum Mainnet
-- Arbitrum
+- Sepolia
+- Arbitrum Sepolia
+- Hedera Testnet
+- Base Sepolia
+- Mantle Sepolia Testnet
+- Monad Testnet
+- zkSync Sepolia Testnet
+- Celo Sepolia
+- opBNB Testnet
+- Scroll Sepolia
+- Zircuit Garfield Testnet
+- Optimism Sepolia
+- Avalanche Fuji
 
 ### Environment Variables
 - `NEXT_PUBLIC_PROJECT_ID`: Your Reown Cloud project ID

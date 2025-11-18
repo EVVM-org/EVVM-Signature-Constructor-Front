@@ -25,6 +25,7 @@ import { MakeOrderComponent } from './P2PSwap/MakeOrderComponent'
 import { CancelOrderComponent } from './P2PSwap/CancelOrderComponent'
 import { DispatchOrderFillPropotionalFeeComponent } from './P2PSwap/DispatchOrderPropotionalComponent'
 import { DispatchOrderFillFixedFeeComponent } from './P2PSwap/DispatchOrderFixedComponent'
+import { RegisterEvvmComponent } from './EvvmRegistery/RegisterEvvmComponent'
 
 const boxStyle = {
   display: 'flex',
@@ -78,90 +79,35 @@ export const SigMenu = () => {
   ) => {
     const value = e.target.value
     setNetwork(value)
-    // Find the chainId for the selected network
-    let chainId: number | undefined
-    if (value === 'sepolia') {
-      const id = networks.find(
-        (n) =>
-          n.name?.toLowerCase().includes('sepolia') &&
-          !n.name?.toLowerCase().includes('arbitrum') &&
-          !n.name?.toLowerCase().includes('base') &&
-          !n.name?.toLowerCase().includes('mantle') &&
-          !n.name?.toLowerCase().includes('zksync') &&
-          !n.name?.toLowerCase().includes('celo') &&
-          !n.name?.toLowerCase().includes('scroll') &&
-          !n.name?.toLowerCase().includes('optimism')
-      )?.id
-      chainId = typeof id === 'string' ? parseInt(id) : id
-    } else if (value === 'arbitrumSepolia') {
-      const id = networks.find((n) =>
-        n.name?.toLowerCase().includes('arbitrum')
-      )?.id
-      chainId = typeof id === 'string' ? parseInt(id) : id
-    } else if (value === 'hederaTestnet') {
-      const id = networks.find((n) =>
-        n.name?.toLowerCase().includes('hedera')
-      )?.id
-      chainId = typeof id === 'string' ? parseInt(id) : id
-    } else if (value === 'baseSepolia') {
-      const id = networks.find((n) =>
-        n.name?.toLowerCase().includes('base')
-      )?.id
-      chainId = typeof id === 'string' ? parseInt(id) : id
-    } else if (value === 'mantleSepoliaTestnet') {
-      const id = networks.find((n) =>
-        n.name?.toLowerCase().includes('mantle')
-      )?.id
-      chainId = typeof id === 'string' ? parseInt(id) : id
-    } else if (value === 'monadTestnet') {
-      const id = networks.find((n) =>
-        n.name?.toLowerCase().includes('monad')
-      )?.id
-      chainId = typeof id === 'string' ? parseInt(id) : id
-    } else if (value === 'zksyncSepoliaTestnet') {
-      const id = networks.find((n) =>
-        n.name?.toLowerCase().includes('zksync')
-      )?.id
-      chainId = typeof id === 'string' ? parseInt(id) : id
-    } else if (value === 'celoSepolia') {
-      const id = networks.find((n) =>
-        n.name?.toLowerCase().includes('celo')
-      )?.id
-      chainId = typeof id === 'string' ? parseInt(id) : id
-    } else if (value === 'opBNBTestnet') {
-      const id = networks.find((n) =>
-        n.name?.toLowerCase().includes('opbnb')
-      )?.id
-      chainId = typeof id === 'string' ? parseInt(id) : id
-    } else if (value === 'scrollSepolia') {
-      const id = networks.find((n) =>
-        n.name?.toLowerCase().includes('scroll')
-      )?.id
-      chainId = typeof id === 'string' ? parseInt(id) : id
-    } else if (value === 'zircuitGarfieldTestnet') {
-      const id = networks.find((n) =>
-        n.name?.toLowerCase().includes('zircuit')
-      )?.id
-      chainId = typeof id === 'string' ? parseInt(id) : id
-    } else if (value === 'optimismSepolia') {
-      const id = networks.find((n) =>
-        n.name?.toLowerCase().includes('optimism')
-      )?.id
-      chainId = typeof id === 'string' ? parseInt(id) : id
-    } else if (value === 'avalancheFuji') {
-      const id = networks.find((n) =>
-        n.name?.toLowerCase().includes('avalanche') ||
-        n.name?.toLowerCase().includes('fuji')
-      )?.id
-      chainId = typeof id === 'string' ? parseInt(id) : id
+    
+    // Map network values to their indices in the networks array
+    const networkMap: { [key: string]: number } = {
+      sepolia: 0,
+      arbitrumSepolia: 1,
+      hederaTestnet: 2,
+      baseSepolia: 3,
+      mantleSepoliaTestnet: 4,
+      monadTestnet: 5,
+      zksyncSepoliaTestnet: 6,
+      celoSepolia: 7,
+      opBNBTestnet: 8,
+      scrollSepolia: 9,
+      zircuitGarfieldTestnet: 10,
+      optimismSepolia: 11,
+      avalancheFuji: 12,
     }
-    if (typeof chainId === 'number' && !isNaN(chainId)) {
-      try {
-        await switchChain(config, { chainId })
-      } catch (err) {
-        // Optionally show error to user
-        // eslint-disable-next-line no-console
-        console.error('Failed to switch chain:', err)
+    
+    const networkIndex = networkMap[value]
+    if (networkIndex !== undefined && networks[networkIndex]) {
+      const chainId = networks[networkIndex].id
+      if (typeof chainId === 'number' && !isNaN(chainId)) {
+        try {
+          await switchChain(config, { chainId })
+        } catch (err) {
+          // Optionally show error to user
+          // eslint-disable-next-line no-console
+          console.error('Failed to switch chain:', err)
+        }
       }
     }
   }
@@ -334,6 +280,10 @@ export const SigMenu = () => {
     />,
   ]
 
+  const registryComponents = [
+    <RegisterEvvmComponent key="registerEvvm" />,
+  ]
+
   const components =
     menu === 'faucet'
       ? FaucetFunctions
@@ -345,7 +295,9 @@ export const SigMenu = () => {
             ? mnsComponents
             : menu === 'p2pswap'
               ? p2pComponents
-              : []
+              : menu === 'registry'
+                ? registryComponents
+                : []
 
   return (
     <div
@@ -551,6 +503,7 @@ export const SigMenu = () => {
           <option value="staking">Staking signatures</option>
           <option value="mns">Name Service signatures</option>
           <option value="p2pswap">P2P Swap signatures</option>
+          <option value="registry">EVVM Registry</option>
         </select>
       </div>
 

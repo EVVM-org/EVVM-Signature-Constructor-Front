@@ -72,6 +72,7 @@ export const SigMenu = () => {
     { value: 'zircuitGarfieldTestnet', label: 'Zircuit Garfield Testnet' },
     { value: 'optimismSepolia', label: 'Optimism Sepolia' },
     { value: 'avalancheFuji', label: 'Avalanche Fuji' },
+    { value: 'flareTestnet', label: 'Flare Testnet' },
   ]
   const [network, setNetwork] = useState('sepolia')
 
@@ -96,6 +97,7 @@ export const SigMenu = () => {
       zircuitGarfieldTestnet: 10,
       optimismSepolia: 11,
       avalancheFuji: 12,
+      flareTestnet: 13,
     }
     
     const networkIndex = networkMap[value]

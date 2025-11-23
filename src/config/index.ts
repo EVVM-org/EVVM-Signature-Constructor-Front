@@ -14,6 +14,7 @@ import {
   zircuitGarfieldTestnet,
   optimismSepolia,
   avalancheFuji,
+  flareTestnet
 } from '@reown/appkit/networks'
 import type { AppKitNetwork } from '@reown/appkit/networks'
 
@@ -39,6 +40,7 @@ export const networks = [
   zircuitGarfieldTestnet,
   optimismSepolia,
   avalancheFuji,
+  flareTestnet,
 ] as [AppKitNetwork, ...AppKitNetwork[]]
 
 //Set up the Wagmi Adapter (Config)

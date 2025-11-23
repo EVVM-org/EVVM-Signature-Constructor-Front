@@ -98,6 +98,7 @@ pnpm run dev
 - Zircuit Garfield Testnet
 - Optimism Sepolia
 - Avalanche Fuji
+- Flare Testnet
 
 ### Environment Variables
 - `NEXT_PUBLIC_PROJECT_ID`: Your Reown Cloud project ID

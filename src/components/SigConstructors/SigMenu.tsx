@@ -1,159 +1,180 @@
-"use client";
-import { useState } from "react";
-import { switchChain } from "@wagmi/core";
-import { readContracts } from "@wagmi/core";
-import { config, networks } from "@/config/index";
-import { EvvmABI } from "@evvm/viem-signature-library";
-import { FaucetFunctionsComponent } from "./FaucetFunctions/FaucetFunctionsComponent";
-import { PaySignaturesComponent } from "./PaymentFunctions/PaySignaturesComponent";
-import { DispersePayComponent } from "./PaymentFunctions/DispersePayComponent";
-import { GoldenStakingComponent } from "./StakingFunctions/GoldenStakingComponent";
-import { PresaleStakingComponent } from "./StakingFunctions/PresaleStakingComponent";
-import { PublicStakingComponent } from "./StakingFunctions/PublicStakingComponent";
-import { PreRegistrationUsernameComponent } from "./NameServiceFunctions/PreRegistrationUsernameComponent";
-import { RegistrationUsernameComponent } from "./NameServiceFunctions/RegistrationUsernameComponent";
-import { MakeOfferComponent } from "./NameServiceFunctions/MakeOfferComponent";
-import { WithdrawOfferComponent } from "./NameServiceFunctions/WithdrawOfferComponent";
-import { AcceptOfferComponent } from "./NameServiceFunctions/AcceptOfferComponent";
-import { RenewUsernameComponent } from "./NameServiceFunctions/RenewUsernameComponent";
-import { AddCustomMetadataComponent } from "./NameServiceFunctions/AddCustomMetadataComponent";
-import { RemoveCustomMetadataComponent } from "./NameServiceFunctions/RemoveCustomMetadataComponent";
-import { FlushCustomMetadataComponent } from "./NameServiceFunctions/FlushCustomMetadataComponent";
-import { FlushUsernameComponent } from "./NameServiceFunctions/FlushUsernameComponent";
-import { FaucetBalanceChecker } from "./FaucetFunctions/FaucetBalanceChecker";
+'use client'
+import { useState } from 'react'
+import { switchChain } from '@wagmi/core'
+import { readContracts } from '@wagmi/core'
+import { config, networks } from '@/config/index'
+import { EvvmABI } from '@evvm/viem-signature-library'
+import { FaucetFunctionsComponent } from './FaucetFunctions/FaucetFunctionsComponent'
+import { PaySignaturesComponent } from './PaymentFunctions/PaySignaturesComponent'
+import { DispersePayComponent } from './PaymentFunctions/DispersePayComponent'
+import { GoldenStakingComponent } from './StakingFunctions/GoldenStakingComponent'
+import { PresaleStakingComponent } from './StakingFunctions/PresaleStakingComponent'
+import { PublicStakingComponent } from './StakingFunctions/PublicStakingComponent'
+import { PreRegistrationUsernameComponent } from './NameServiceFunctions/PreRegistrationUsernameComponent'
+import { RegistrationUsernameComponent } from './NameServiceFunctions/RegistrationUsernameComponent'
+import { MakeOfferComponent } from './NameServiceFunctions/MakeOfferComponent'
+import { WithdrawOfferComponent } from './NameServiceFunctions/WithdrawOfferComponent'
+import { AcceptOfferComponent } from './NameServiceFunctions/AcceptOfferComponent'
+import { RenewUsernameComponent } from './NameServiceFunctions/RenewUsernameComponent'
+import { AddCustomMetadataComponent } from './NameServiceFunctions/AddCustomMetadataComponent'
+import { RemoveCustomMetadataComponent } from './NameServiceFunctions/RemoveCustomMetadataComponent'
+import { FlushCustomMetadataComponent } from './NameServiceFunctions/FlushCustomMetadataComponent'
+import { FlushUsernameComponent } from './NameServiceFunctions/FlushUsernameComponent'
+import { FaucetBalanceChecker } from './FaucetFunctions/FaucetBalanceChecker'
+import { MakeOrderComponent } from './P2PSwap/MakeOrderComponent'
+import { CancelOrderComponent } from './P2PSwap/CancelOrderComponent'
+import { DispatchOrderFillPropotionalFeeComponent } from './P2PSwap/DispatchOrderPropotionalComponent'
+import { DispatchOrderFillFixedFeeComponent } from './P2PSwap/DispatchOrderFixedComponent'
+import { RegisterEvvmComponent } from './EvvmRegistery/RegisterEvvmComponent'
+import { SetEvvmIdComponent } from './EvvmRegistery/SetEvvmIdComponent'
 
 const boxStyle = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "1rem",
-  padding: "1rem",
-  border: "1px solid #ccc",
-  borderRadius: "8px",
-  width: "100%",
-  marginBottom: "1rem",
-} as const;
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '1rem',
+  padding: '1rem',
+  border: '1px solid #ccc',
+  borderRadius: '8px',
+  width: '100%',
+  marginBottom: '1rem',
+} as const
 
 const selectStyle = {
-  padding: "1rem",
-  border: "1px solid #ccc",
-  borderRadius: "8px",
-  width: "100%",
-  backgroundColor: "#f9f9f9",
-  color: "#333",
-  marginBottom: "1rem",
-} as const;
+  padding: '1rem',
+  border: '1px solid #ccc',
+  borderRadius: '8px',
+  width: '100%',
+  backgroundColor: '#f9f9f9',
+  color: '#333',
+  marginBottom: '1rem',
+} as const
 
 export const SigMenu = () => {
-  const [menu, setMenu] = useState("faucet");
-  const [evvmID, setEvvmID] = useState("");
-  const [evvmAddress, setEvvmAddress] = useState("");
-  const [nameserviceAddress, setNameserviceAddress] = useState("");
-  const [stakingAddress, setStakingAddress] = useState("");
-  const [loadingIDs, setLoadingIDs] = useState(false);
+  const [menu, setMenu] = useState('faucet')
+  const [evvmID, setEvvmID] = useState('')
+  const [evvmAddress, setEvvmAddress] = useState('')
+  const [nameserviceAddress, setNameserviceAddress] = useState('')
+  const [stakingAddress, setStakingAddress] = useState('')
+  const [p2pswapAddress, setP2pswapAddress] = useState('')
+  const [loadingIDs, setLoadingIDs] = useState(false)
   // Map selector value to network object
   const networkOptions = [
-    { value: "sepolia", label: "Sepolia" },
-    { value: "arbitrumSepolia", label: "Arbitrum Sepolia" },
-    { value: "hederaTestnet", label: "Hedera Testnet" },
-  ];
-  const [network, setNetwork] = useState("sepolia");
+    { value: 'sepolia', label: 'Sepolia' },
+    { value: 'arbitrumSepolia', label: 'Arbitrum Sepolia' },
+    { value: 'hederaTestnet', label: 'Hedera Testnet' },
+    { value: 'baseSepolia', label: 'Base Sepolia' },
+    { value: 'mantleSepoliaTestnet', label: 'Mantle Sepolia Testnet' },
+    { value: 'monadTestnet', label: 'Monad Testnet' },
+    { value: 'zksyncSepoliaTestnet', label: 'zkSync Sepolia Testnet' },
+    { value: 'celoSepolia', label: 'Celo Sepolia' },
+    { value: 'opBNBTestnet', label: 'opBNB Testnet' },
+    { value: 'scrollSepolia', label: 'Scroll Sepolia' },
+    { value: 'zircuitGarfieldTestnet', label: 'Zircuit Garfield Testnet' },
+    { value: 'optimismSepolia', label: 'Optimism Sepolia' },
+    { value: 'avalancheFuji', label: 'Avalanche Fuji' },
+    { value: 'flareTestnet', label: 'Flare Testnet' },
+  ]
+  const [network, setNetwork] = useState('sepolia')
 
   const handleNetworkChange = async (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    const value = e.target.value;
-    setNetwork(value);
-    // Find the chainId for the selected network
-    let chainId: number | undefined;
-    if (value === "sepolia") {
-      const id = networks.find(
-        (n) =>
-          n.name?.toLowerCase().includes("sepolia") &&
-          !n.name?.toLowerCase().includes("arbitrum")
-      )?.id;
-      chainId = typeof id === "string" ? parseInt(id) : id;
-    } else if (value === "arbitrumSepolia") {
-      const id = networks.find((n) =>
-        n.name?.toLowerCase().includes("arbitrum")
-      )?.id;
-      chainId = typeof id === "string" ? parseInt(id) : id;
-    } else if (value === "hederaTestnet") {
-      const id = networks.find((n) =>
-        n.name?.toLowerCase().includes("hedera")
-      )?.id;
-      chainId = typeof id === "string" ? parseInt(id) : id;
+    const value = e.target.value
+    setNetwork(value)
+    
+    // Map network values to their indices in the networks array
+    const networkMap: { [key: string]: number } = {
+      sepolia: 0,
+      arbitrumSepolia: 1,
+      hederaTestnet: 2,
+      baseSepolia: 3,
+      mantleSepoliaTestnet: 4,
+      monadTestnet: 5,
+      zksyncSepoliaTestnet: 6,
+      celoSepolia: 7,
+      opBNBTestnet: 8,
+      scrollSepolia: 9,
+      zircuitGarfieldTestnet: 10,
+      optimismSepolia: 11,
+      avalancheFuji: 12,
+      flareTestnet: 13,
     }
-    if (typeof chainId === "number" && !isNaN(chainId)) {
-      try {
-        await switchChain(config, { chainId });
-      } catch (err) {
-        // Optionally show error to user
-        // eslint-disable-next-line no-console
-        console.error("Failed to switch chain:", err);
+    
+    const networkIndex = networkMap[value]
+    if (networkIndex !== undefined && networks[networkIndex]) {
+      const chainId = networks[networkIndex].id
+      if (typeof chainId === 'number' && !isNaN(chainId)) {
+        try {
+          await switchChain(config, { chainId })
+        } catch (err) {
+          // Optionally show error to user
+          // eslint-disable-next-line no-console
+          console.error('Failed to switch chain:', err)
+        }
       }
     }
-  };
+  }
 
   // Fetch summary info for EVVM contract: evvmID, stakingAddress, and NameService address
   const fetchEvvmSummary = async () => {
     if (!evvmAddress) {
-      alert("Please enter a valid EVVM address");
-      return;
+      alert('Please enter a valid EVVM address')
+      return
     }
-    setLoadingIDs(true);
+    setLoadingIDs(true)
     try {
       const contracts = [
         {
           abi: EvvmABI as any,
           address: evvmAddress as `0x${string}`,
-          functionName: "getEvvmID",
+          functionName: 'getEvvmID',
           args: [],
         },
         {
           abi: EvvmABI as any,
           address: evvmAddress as `0x${string}`,
-          functionName: "getStakingContractAddress",
+          functionName: 'getStakingContractAddress',
           args: [],
         },
         {
           abi: EvvmABI as any,
           address: evvmAddress as `0x${string}`,
-          functionName: "getNameServiceAddress",
+          functionName: 'getNameServiceAddress',
           args: [],
         },
-      ];
-      const results = await readContracts(config, { contracts });
-      const [evvmIDResult, stakingAddrResult, nsAddrResult] = results;
+      ]
+      const results = await readContracts(config, { contracts })
+      const [evvmIDResult, stakingAddrResult, nsAddrResult] = results
       setEvvmID(
         evvmIDResult?.result !== undefined && evvmIDResult?.result !== null
           ? String(evvmIDResult.result)
-          : ""
-      );
+          : ''
+      )
       setStakingAddress(
-        typeof stakingAddrResult?.result === "string"
+        typeof stakingAddrResult?.result === 'string'
           ? stakingAddrResult.result
-          : ""
-      );
+          : ''
+      )
       setNameserviceAddress(
-        typeof nsAddrResult?.result === "string" ? nsAddrResult.result : ""
-      );
+        typeof nsAddrResult?.result === 'string' ? nsAddrResult.result : ''
+      )
     } catch (err) {
-      setEvvmID("");
-      setStakingAddress("");
-      setNameserviceAddress("");
+      setEvvmID('')
+      setStakingAddress('')
+      setNameserviceAddress('')
       alert(
-        "Could not fetch data (evvmID, stakingAddress, NameService address)"
-      );
+        'Could not fetch data (evvmID, stakingAddress, NameService address)'
+      )
     } finally {
-      setLoadingIDs(false);
+      setLoadingIDs(false)
     }
-  };
+  }
 
   // Pass evvmID, evvmAddress, and stakingAddress as props to all components
   const FaucetFunctions = [
     <FaucetFunctionsComponent key="faucet" evvmAddress={evvmAddress} />,
     <FaucetBalanceChecker key="faucetBalance" evvmAddress={evvmAddress} />,
-  ];
+  ]
 
   const payComponents = [
     <PaySignaturesComponent
@@ -166,7 +187,7 @@ export const SigMenu = () => {
       evvmID={evvmID}
       evvmAddress={evvmAddress}
     />,
-  ];
+  ]
 
   const stakingComponents = [
     <GoldenStakingComponent
@@ -184,7 +205,7 @@ export const SigMenu = () => {
       evvmID={evvmID}
       stakingAddress={stakingAddress}
     />,
-  ];
+  ]
 
   const mnsComponents = [
     <PreRegistrationUsernameComponent
@@ -237,70 +258,100 @@ export const SigMenu = () => {
       evvmID={evvmID}
       nameServiceAddress={nameserviceAddress}
     />,
-  ];
+  ]
+
+  const p2pComponents = [
+    <MakeOrderComponent
+      key="makeOrder"
+      evvmID={evvmID}
+      p2pSwapAddress={p2pswapAddress}
+    />,
+    <CancelOrderComponent
+      key="cancelOrder"
+      evvmID={evvmID}
+      p2pSwapAddress={p2pswapAddress}
+    />,
+    <DispatchOrderFillPropotionalFeeComponent
+      key="dispatchOrder_fillPropotionalFee"
+      evvmID={evvmID}
+      p2pSwapAddress={p2pswapAddress}
+    />,
+    <DispatchOrderFillFixedFeeComponent
+      key="dispatchOrder_fillFixedFee"
+      evvmID={evvmID}
+      p2pSwapAddress={p2pswapAddress}
+    />,
+  ]
+
+  const registryComponents = [
+    <RegisterEvvmComponent key="registerEvvm" />,
+    <SetEvvmIdComponent key="setEvvmId" evvmAddress={evvmAddress} />,
+  ]
 
   const components =
-    menu === "faucet"
+    menu === 'faucet'
       ? FaucetFunctions
-      : menu === "pay"
-      ? payComponents
-      : menu === "staking"
-      ? stakingComponents
-      : menu === "mns"
-      ? mnsComponents
-      : [];
+      : menu === 'pay'
+        ? payComponents
+        : menu === 'staking'
+          ? stakingComponents
+          : menu === 'mns'
+            ? mnsComponents
+            : menu === 'p2pswap'
+              ? p2pComponents
+              : menu === 'registry'
+                ? registryComponents
+                : []
 
   return (
     <div
       style={{
         maxWidth: 900,
-        margin: "0rem auto",
-        padding: "2rem 1.5rem",
-        background: "#fff",
+        margin: '0rem auto',
+        padding: '2rem 1.5rem',
+        background: '#fff',
         borderRadius: 16,
-        boxShadow: "0 4px 24px 0 rgba(0,0,0,0.08)",
-        border: "1px solid #e5e7eb",
-        display: "flex",
-        flexDirection: "column",
-        gap: "2rem",
+        boxShadow: '0 4px 24px 0 rgba(0,0,0,0.08)',
+        border: '1px solid #e5e7eb',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '2rem',
       }}
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-        <h1 >
-          EVVM Signature Constructor Toolkit For Devs
-        </h1>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <h1>EVVM Signature Constructor Toolkit For Devs</h1>
         <h3>Select an EVVM contract to connect and get started:</h3>
         {evvmID && stakingAddress && nameserviceAddress ? (
           <div
             style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.5rem",
-              background: "#f8fafc",
-              border: "1.5px solid #d1d5db",
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.5rem',
+              background: '#f8fafc',
+              border: '1.5px solid #d1d5db',
               borderRadius: 10,
-              padding: "1rem 1.5rem",
+              padding: '1rem 1.5rem',
               minWidth: 0,
-              boxShadow: "0 2px 8px 0 rgba(0,0,0,0.04)",
+              boxShadow: '0 2px 8px 0 rgba(0,0,0,0.04)',
             }}
           >
             <div
-              style={{ fontSize: 15, color: "#444", fontFamily: "monospace" }}
+              style={{ fontSize: 15, color: '#444', fontFamily: 'monospace' }}
             >
-              <strong>evvmID:</strong> {String(evvmID)}
+              { evvmID !== '0' && <strong>evvmID:</strong> } {evvmID === '0' ? <span style={{ color: '#dc2626', fontWeight: 600 }}>Please register your EVVM</span> : String(evvmID)}
             </div>
             <div
-              style={{ fontSize: 15, color: "#444", fontFamily: "monospace" }}
+              style={{ fontSize: 15, color: '#444', fontFamily: 'monospace' }}
             >
               <strong>evvm:</strong> {evvmAddress}
             </div>
             <div
-              style={{ fontSize: 15, color: "#444", fontFamily: "monospace" }}
+              style={{ fontSize: 15, color: '#444', fontFamily: 'monospace' }}
             >
               <strong>staking:</strong> {stakingAddress}
             </div>
             <div
-              style={{ fontSize: 15, color: "#444", fontFamily: "monospace" }}
+              style={{ fontSize: 15, color: '#444', fontFamily: 'monospace' }}
             >
               <strong>nameService:</strong> {nameserviceAddress}
             </div>
@@ -308,10 +359,10 @@ export const SigMenu = () => {
         ) : (
           <div
             style={{
-              display: "flex",
-              flexDirection: "row",
-              gap: "1rem",
-              alignItems: "center",
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '1rem',
+              alignItems: 'center',
             }}
           >
             <input
@@ -320,34 +371,34 @@ export const SigMenu = () => {
               value={evvmAddress}
               onChange={(e) => setEvvmAddress(e.target.value)}
               style={{
-                padding: "0.75rem 1rem",
+                padding: '0.75rem 1rem',
                 borderRadius: 8,
-                background: "#f9fafb",
-                color: "#222",
-                border: "1.5px solid #d1d5db",
+                background: '#f9fafb',
+                color: '#222',
+                border: '1.5px solid #d1d5db',
                 width: 420,
-                fontFamily: "monospace",
+                fontFamily: 'monospace',
                 fontSize: 16,
-                boxSizing: "border-box",
-                outline: "none",
-                transition: "border 0.2s",
+                boxSizing: 'border-box',
+                outline: 'none',
+                transition: 'border 0.2s',
               }}
             />
             <select
               style={{
-                padding: "0.7rem 1.2rem",
+                padding: '0.7rem 1.2rem',
                 borderRadius: 8,
-                border: "1.5px solid #d1d5db",
-                background: "#f9fafb",
-                color: "#222",
+                border: '1.5px solid #d1d5db',
+                background: '#f9fafb',
+                color: '#222',
                 fontWeight: 500,
                 fontSize: 15,
                 minWidth: 180,
                 marginRight: 8,
-                boxShadow: "0 1px 4px 0 rgba(0,0,0,0.03)",
-                outline: "none",
-                transition: "border 0.2s",
-                cursor: "pointer",
+                boxShadow: '0 1px 4px 0 rgba(0,0,0,0.03)',
+                outline: 'none',
+                transition: 'border 0.2s',
+                cursor: 'pointer',
               }}
               value={network}
               onChange={handleNetworkChange}
@@ -361,20 +412,20 @@ export const SigMenu = () => {
             <button
               onClick={fetchEvvmSummary}
               style={{
-                padding: "0.7rem 1.5rem",
+                padding: '0.7rem 1.5rem',
                 borderRadius: 8,
-                border: "1.5px solid #d1d5db",
-                background: loadingIDs ? "#e5e7eb" : "#f3f4f6",
-                color: "#222",
+                border: '1.5px solid #d1d5db',
+                background: loadingIDs ? '#e5e7eb' : '#f3f4f6',
+                color: '#222',
                 fontWeight: 600,
                 fontSize: 15,
-                cursor: loadingIDs ? "not-allowed" : "pointer",
-                transition: "background 0.2s",
+                cursor: loadingIDs ? 'not-allowed' : 'pointer',
+                transition: 'background 0.2s',
                 minWidth: 140,
               }}
               disabled={loadingIDs}
             >
-              {loadingIDs ? "Loading..." : "Use this EVVM"}
+              {loadingIDs ? 'Loading...' : 'Use this EVVM'}
             </button>
           </div>
         )}
@@ -382,11 +433,41 @@ export const SigMenu = () => {
 
       <div
         style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "1rem",
-          width: "100%",
+          display: 'flex',
+          flexDirection: 'row',
+          gap: '1rem',
+          alignItems: 'center',
+        }}
+      >
+        <input
+          type="text"
+          placeholder="P2P Swap Address"
+          value={p2pswapAddress}
+          onChange={(e) => setP2pswapAddress(e.target.value)}
+          style={{
+            padding: '0.75rem 1rem',
+            margin: '0 auto',
+            borderRadius: 8,
+            background: '#f9fafb',
+            color: '#222',
+            border: '1.5px solid #d1d5db',
+            width: 420,
+            fontFamily: 'monospace',
+            fontSize: 16,
+            boxSizing: 'border-box',
+            outline: 'none',
+            transition: 'border 0.2s',
+          }}
+        />
+      </div>
+
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '1rem',
+          width: '100%',
         }}
       >
         <label
@@ -394,10 +475,10 @@ export const SigMenu = () => {
           style={{
             fontWeight: 600,
             fontSize: 16,
-            color: "#333",
+            color: '#333',
             marginBottom: 4,
-            textAlign: "center",
-            width: "100%",
+            textAlign: 'center',
+            width: '100%',
           }}
         >
           Select a function:
@@ -409,15 +490,15 @@ export const SigMenu = () => {
             ...selectStyle,
             fontSize: 16,
             fontWeight: 500,
-            border: "1.5px solid #d1d5db",
-            background: "#f9fafb",
-            color: "#222",
+            border: '1.5px solid #d1d5db',
+            background: '#f9fafb',
+            color: '#222',
             maxWidth: 400,
             minWidth: 260,
-            margin: "0 auto",
-            textAlign: "center",
-            boxShadow: "0 1px 4px 0 rgba(0,0,0,0.02)",
-            display: "block",
+            margin: '0 auto',
+            textAlign: 'center',
+            boxShadow: '0 1px 4px 0 rgba(0,0,0,0.02)',
+            display: 'block',
           }}
           value={menu}
         >
@@ -425,17 +506,19 @@ export const SigMenu = () => {
           <option value="pay">Payment signatures</option>
           <option value="staking">Staking signatures</option>
           <option value="mns">Name Service signatures</option>
+          <option value="p2pswap">P2P Swap signatures</option>
+          <option value="registry">EVVM Registry</option>
         </select>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
         {components.map((Component, index) => (
           <div
             key={index}
             style={{
               ...boxStyle,
-              background: "#f9fafb",
-              boxShadow: "0 1px 4px 0 rgba(0,0,0,0.03)",
+              background: '#f9fafb',
+              boxShadow: '0 1px 4px 0 rgba(0,0,0,0.03)',
             }}
           >
             {Component}
@@ -443,5 +526,5 @@ export const SigMenu = () => {
         ))}
       </div>
     </div>
-  );
-};
+  )
+}

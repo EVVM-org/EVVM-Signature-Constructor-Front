@@ -5,6 +5,9 @@ interface PrioritySelectorProps {
   marginTop?: string;
 }
 
+/**
+	* Offers two priority types of execution: sync (low) and async (high)
+*/
 export const PrioritySelector: React.FC<PrioritySelectorProps> = ({
   onPriorityChange,
   marginTop = "1rem",

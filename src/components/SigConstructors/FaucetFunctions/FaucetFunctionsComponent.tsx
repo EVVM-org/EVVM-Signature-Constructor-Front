@@ -4,9 +4,8 @@ import { getAccount, writeContract } from "@wagmi/core";
 import { config } from "@/config/index";
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { NumberInputField } from "../InputsAndModules/NumberInputField";
-import { EvvmABI } from "@evvm/viem-signature-library";
+import { EvvmABI } from "@evvm/evvm-js";
 
-import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 import { HelperInfo } from "../InputsAndModules/HelperInfo";
 
 interface FaucetFunctionsComponentProps {
@@ -19,9 +18,6 @@ export const FaucetFunctionsComponent = ({
   const account = getAccount(config);
 
   const executeFaucet = async () => {
-    const walletData = await getAccountWithRetry(config);
-    if (!walletData) return;
-
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 

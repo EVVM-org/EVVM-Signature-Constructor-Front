@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { config } from "@/config/index";
-import { getWalletClient, readContract } from "@wagmi/core";
 import {
   TitleAndLink,
   NumberInputWithGenerator,
@@ -12,41 +11,37 @@ import {
   TextInputField,
   DateInputField,
 } from "@/components/SigConstructors/InputsAndModules";
-import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import { executeMakeOffer } from "@/utils/TransactionExecuter";
+import { execute } from "@evvm/evvm-js";
+import { getEvvmSigner, getCurrentChainId } from "@/utils/evvm-signer";
 import { dateToUnixTimestamp } from "@/utils/dateToUnixTimestamp";
 import {
-  PayInputData,
-  MakeOfferInputData,
-  NameServiceSignatureBuilder,
-} from "@evvm/viem-signature-library";
+  IPayData,
+  IMakeOfferData,
+  NameService,
+  EVVM,
+  type ISerializableSignedAction,
+} from "@evvm/evvm-js";
 
 type InfoData = {
-  PayInputData: PayInputData;
-  MakeOfferInputData: MakeOfferInputData;
+  IPayData: ISerializableSignedAction<IPayData>;
+  IMakeOfferData: ISerializableSignedAction<IMakeOfferData>;
 };
 
 interface MakeOfferComponentProps {
-  evvmID: string;
   nameServiceAddress: string;
 }
 
 export const MakeOfferComponent = ({
-  evvmID,
   nameServiceAddress,
 }: MakeOfferComponentProps) => {
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
 
   const makeSig = async () => {
-    const walletData = await getAccountWithRetry(config);
-    if (!walletData) return;
-
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
-      evvmId: evvmID,
       addressNameService: nameServiceAddress,
       nonceNameService: getValue("nonceNameServiceInput_makeOffer"),
       username: getValue("usernameInput_makeOffer"),
@@ -58,69 +53,66 @@ export const MakeOfferComponent = ({
     };
 
     try {
-      const walletClient = await getWalletClient(config);
-      const signatureBuilder = new (NameServiceSignatureBuilder as any)(
-        walletClient,
-        walletData
-      );
+      const signer = await getEvvmSigner();
+      
+      // Create EVVM service for payment
+      const evvmService = new EVVM({
+        signer,
+        address: formData.addressNameService as `0x${string}`,
+        chainId: getCurrentChainId(),
+      });
+      
+      // Create NameService service
+      const nameServiceService = new NameService({
+        signer,
+        address: formData.addressNameService as `0x${string}`,
+        chainId: getCurrentChainId(),
+      });
 
-      const { paySignature, actionSignature } =
-        await signatureBuilder.signMakeOffer(
-          BigInt(formData.evvmId),
-          formData.addressNameService as `0x${string}`,
-          formData.username,
-          BigInt(formData.expireDate),
-          BigInt(formData.amount),
-          BigInt(formData.nonceNameService),
-          BigInt(formData.priorityFee_EVVM),
-          BigInt(formData.nonceEVVM),
-          formData.priorityFlag
-        );
+      // Sign EVVM payment first
+      const payAction = await evvmService.pay({
+        to: formData.addressNameService,
+        tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+        amount: BigInt(formData.amount),
+        priorityFee: BigInt(formData.priorityFee_EVVM),
+        nonce: BigInt(formData.nonceEVVM),
+        priorityFlag: formData.priorityFlag,
+        executor: formData.addressNameService as `0x${string}`,
+      });
+
+      // Sign make offer action
+      const makeOfferAction = await nameServiceService.makeOffer({
+        user: signer.address,
+        username: formData.username,
+        expireDate: BigInt(formData.expireDate),
+        amount: BigInt(formData.amount),
+        nonce: BigInt(formData.nonceNameService),
+        evvmSignedAction: payAction,
+      });
+
       setDataToGet({
-        PayInputData: {
-          from: walletData.address as `0x${string}`,
-          to_address: formData.addressNameService as `0x${string}`,
-          to_identity: "",
-          token: "0x0000000000000000000000000000000000000001" as `0x${string}`,
-          amount: BigInt(formData.amount),
-          priorityFee: BigInt(formData.priorityFee_EVVM),
-          nonce: BigInt(formData.nonceEVVM),
-          priority: priority === "high",
-          executor: formData.addressNameService as `0x${string}`,
-          signature: paySignature,
-        },
-        MakeOfferInputData: {
-          user: walletData.address as `0x${string}`,
-
-          username: formData.username,
-          expireDate: BigInt(formData.expireDate),
-          amount: BigInt(formData.amount),
-          nonce: BigInt(formData.nonceNameService),
-          signature: actionSignature,
-          priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
-          nonce_EVVM: BigInt(formData.nonceEVVM),
-          priorityFlag_EVVM: formData.priorityFlag,
-          signature_EVVM: paySignature,
-        },
+        IPayData: payAction.toJSON(),
+        IMakeOfferData: makeOfferAction.toJSON(),
       });
     } catch (error) {
       console.error("Error creating signature:", error);
     }
   };
 
-  const execute = async () => {
+  const executeAction = async () => {
     if (!dataToGet) {
       console.error("No data to execute payment");
       return;
     }
 
-    executeMakeOffer(dataToGet.MakeOfferInputData, nameServiceAddress as `0x${string}`)
-      .then(() => {
-        console.log("Make offer executed successfully");
-      })
-      .catch((error) => {
-        console.error("Error executing make offer:", error);
-      });
+    try {
+      const signer = await getEvvmSigner();
+      await execute(signer, dataToGet.IMakeOfferData);
+      console.log("Make offer executed successfully");
+      setDataToGet(null);
+    } catch (error) {
+      console.error("Error executing make offer:", error);
+    }
   };
 
   return (
@@ -197,7 +189,7 @@ export const MakeOfferComponent = ({
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
-        onExecute={execute}
+        onExecute={executeAction}
       />
     </div>
   );

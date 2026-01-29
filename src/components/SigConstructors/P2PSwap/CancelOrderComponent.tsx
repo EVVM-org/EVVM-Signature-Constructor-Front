@@ -1,6 +1,5 @@
 'use client'
 import React from 'react'
-import { config } from '@/config/index'
 import {
   TitleAndLink,
   NumberInputWithGenerator,
@@ -10,28 +9,25 @@ import {
   HelperInfo,
 } from '@/components/SigConstructors/InputsAndModules'
 
-import { getAccountWithRetry } from '@/utils/getAccountWithRetry'
-
-import { getWalletClient } from 'wagmi/actions'
+import { execute } from '@evvm/evvm-js'
+import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
 import {
-  EVVMSignatureBuilder,
-  CancelOrderInputData,
-  P2PSwapSignatureBuilder,
-} from '@evvm/viem-signature-library'
-import { executeCancelOrder } from '@/utils/TransactionExecuter'
+  ICancelOrderData,
+  P2PSwap,
+  EVVM,
+  type ISerializableSignedAction,
+} from '@evvm/evvm-js'
 import { MATE_TOKEN_ADDRESS } from '@/utils/constants'
 
 interface CancelOrderComponentProps {
-  evvmID: string
   p2pSwapAddress: string
 }
 
 export const CancelOrderComponent = ({
-  evvmID,
   p2pSwapAddress,
 }: CancelOrderComponentProps) => {
   const [priority, setPriority] = React.useState('low')
-  const [dataToGet, setDataToGet] = React.useState<CancelOrderInputData | null>(
+  const [dataToGet, setDataToGet] = React.useState<ISerializableSignedAction<ICancelOrderData> | null>(
     null
   )
 
@@ -39,9 +35,6 @@ export const CancelOrderComponent = ({
    * Create the signature, prepare data to make the function call
    */
   const makeSig = async () => {
-    const walletData = await getAccountWithRetry(config)
-    if (!walletData) return
-
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value
 
@@ -55,60 +48,50 @@ export const CancelOrderComponent = ({
     const nonce_EVVM = BigInt(getValue('nonce_EVVM_CancelOrder'))
 
     try {
-      const walletClient = await getWalletClient(config)
-      // two signature builders because we need two signatures in order to make
-      // this one work
-      const evvmSignatureBuilder = new (EVVMSignatureBuilder as any)(
-        walletClient,
-        walletData
-      )
-      const p2pSwapSignatureBuilder = new (P2PSwapSignatureBuilder as any)(
-        walletClient,
-        walletData
-      )
+      const signer = await getEvvmSigner()
+      
+      // Create EVVM service for payment
+      const evvmService = new EVVM({
+        signer,
+        address: p2pSwapAddress as `0x${string}`,
+        chainId: getCurrentChainId(),
+      })
+      
+      // Create P2PSwap service
+      const p2pSwapService = new P2PSwap({
+        signer,
+        address: p2pSwapAddress as `0x${string}`,
+        chainId: getCurrentChainId(),
+      })
 
       // create evvm pay() signature
-      const signatureEVVM = await evvmSignatureBuilder.signPay(
-        BigInt(evvmID),
-        p2pSwapAddress,
-        MATE_TOKEN_ADDRESS,
-        0,
-        priorityFee,
-        nonce_EVVM,
-        priority === 'high',
-        p2pSwapAddress
-      )
+      const payAction = await evvmService.pay({
+        to: p2pSwapAddress,
+        tokenAddress: MATE_TOKEN_ADDRESS as `0x${string}`,
+        amount: 0n,
+        priorityFee: priorityFee,
+        nonce: nonce_EVVM,
+        priorityFlag: priority === 'high',
+        executor: p2pSwapAddress as `0x${string}`,
+      })
 
       // create p2pswap cancelOrder() signature
-      const signatureP2P = await p2pSwapSignatureBuilder.cancelOrder(
-        BigInt(evvmID),
-        nonce,
-        tokenA,
-        tokenB,
-        orderId
-      )
+      const cancelOrderAction = await p2pSwapService.cancelOrder({
+        nonce: nonce,
+        tokenA: tokenA,
+        tokenB: tokenB,
+        orderId: orderId,
+        evvmSignedAction: payAction,
+      })
 
       // prepare data to execute transaction (send it to state)
-      setDataToGet({
-        user: walletData.address as `0x${string}`,
-        metadata: {
-          nonce,
-          tokenA,
-          tokenB,
-          orderId,
-          signature: signatureP2P,
-        },
-        priorityFee,
-        nonce_EVVM,
-        priorityFlag_EVVM: priority === 'high',
-        signature_EVVM: signatureEVVM,
-      })
+      setDataToGet(cancelOrderAction.toJSON())
     } catch (error) {
       console.error('Error creating signature:', error)
     }
   }
 
-  const execute = async () => {
+  const executeAction = async () => {
     if (!dataToGet) {
       console.error('No data to execute cancelOrder')
       return
@@ -119,13 +102,14 @@ export const CancelOrderComponent = ({
       return
     }
 
-    executeCancelOrder(dataToGet, p2pSwapAddress as `0x${string}`)
-      .then(() => {
-        console.log('Order cancelled successfully')
-      })
-      .catch((error) => {
-        console.error('Error executing transaction:', error)
-      })
+    try {
+      const signer = await getEvvmSigner()
+      await execute(signer, dataToGet)
+      console.log('Order cancelled successfully')
+      setDataToGet(null)
+    } catch (error) {
+      console.error('Error executing transaction:', error)
+    }
   }
 
   return (
@@ -220,7 +204,7 @@ export const CancelOrderComponent = ({
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
-        onExecute={execute}
+        onExecute={executeAction}
       />
     </div>
   )

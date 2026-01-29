@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { config } from "@/config/index";
-import { getWalletClient, readContract } from "@wagmi/core";
+import { readContract } from "@wagmi/core";
 import {
   TitleAndLink,
   NumberInputWithGenerator,
@@ -11,29 +11,27 @@ import {
   NumberInputField,
   TextInputField,
 } from "@/components/SigConstructors/InputsAndModules";
-
-import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import { NameServiceABI } from "@evvm/viem-signature-library";
-import { executeRegistrationUsername } from "@/utils/TransactionExecuter/useNameServiceTransactionExecuter";
+import { execute } from "@evvm/evvm-js";
+import { getEvvmSigner, getCurrentChainId } from "@/utils/evvm-signer";
+import { NameServiceABI, EvvmABI } from "@evvm/evvm-js";
 import {
-  EvvmABI,
-  PayInputData,
-  RegistrationUsernameInputData,
-  NameServiceSignatureBuilder,
-} from "@evvm/viem-signature-library";
+  IPayData,
+  IRegistrationUsernameData,
+  NameService,
+  EVVM,
+  type ISerializableSignedAction,
+} from "@evvm/evvm-js";
 
 type InfoData = {
-  PayInputData: PayInputData;
-  RegistrationUsernameInputData: RegistrationUsernameInputData;
+  IPayData: ISerializableSignedAction<IPayData>;
+  IRegistrationUsernameData: ISerializableSignedAction<IRegistrationUsernameData>;
 };
 
 interface RegistrationUsernameComponentProps {
-  evvmID: string;
   nameServiceAddress: string;
 }
 
 export const RegistrationUsernameComponent = ({
-  evvmID,
   nameServiceAddress,
 }: RegistrationUsernameComponentProps) => {
   const [priority, setPriority] = React.useState("low");
@@ -51,11 +49,7 @@ export const RegistrationUsernameComponent = ({
   };
 
   const makeSig = async () => {
-    const walletData = await getAccountWithRetry(config);
-    if (!walletData) return;
-
     const formData = {
-      evvmId: evvmID,
       addressNameService: nameServiceAddress,
       nonceNameService: getValue("nonceNameServiceInput_registrationUsername"),
       username: getValue("usernameInput_registrationUsername"),
@@ -83,51 +77,47 @@ export const RegistrationUsernameComponent = ({
     }
 
     try {
-      const walletClient = await getWalletClient(config);
-      const signatureBuilder = new (NameServiceSignatureBuilder as any)(
-        walletClient,
-        walletData
-      );
+      const signer = await getEvvmSigner();
+      
+      // Create EVVM service for payment
+      const evvmService = new EVVM({
+        signer,
+        address: formData.addressNameService as `0x${string}`,
+        chainId: getCurrentChainId(),
+      });
+      
+      // Create NameService service
+      const nameServiceService = new NameService({
+        signer,
+        address: formData.addressNameService as `0x${string}`,
+        chainId: getCurrentChainId(),
+      });
 
       await readRewardAmount();
 
-      const { paySignature, actionSignature } =
-        await signatureBuilder.signRegistrationUsername(
-          BigInt(formData.evvmId),
-          formData.addressNameService as `0x${string}`,
-          formData.username,
-          BigInt(formData.clowNumber),
-          BigInt(formData.nonceNameService),
-          rewardAmount as bigint,
-          BigInt(formData.priorityFee_EVVM),
-          BigInt(formData.nonceEVVM),
-          formData.priorityFlag
-        );
+      // Sign EVVM payment first
+      const payAction = await evvmService.pay({
+        to: formData.addressNameService,
+        tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+        amount: rewardAmount ? rewardAmount * BigInt(100) : BigInt(0),
+        priorityFee: BigInt(formData.priorityFee_EVVM),
+        nonce: BigInt(formData.nonceEVVM),
+        priorityFlag: formData.priorityFlag,
+        executor: formData.addressNameService as `0x${string}`,
+      });
+
+      // Sign registration username action
+      const registrationAction = await nameServiceService.registrationUsername({
+        user: signer.address,
+        username: formData.username,
+        clowNumber: BigInt(formData.clowNumber),
+        nonce: BigInt(formData.nonceNameService),
+        evvmSignedAction: payAction,
+      });
 
       setDataToGet({
-        PayInputData: {
-          from: walletData.address as `0x${string}`,
-          to_address: formData.addressNameService as `0x${string}`,
-          to_identity: "",
-          token: "0x0000000000000000000000000000000000000001" as `0x${string}`,
-          amount: rewardAmount ? rewardAmount * BigInt(100) : BigInt(0),
-          priorityFee: BigInt(formData.priorityFee_EVVM),
-          nonce: BigInt(formData.nonceEVVM),
-          priority: priority === "high",
-          executor: formData.addressNameService as `0x${string}`,
-          signature: paySignature,
-        },
-        RegistrationUsernameInputData: {
-          user: walletData.address as `0x${string}`,
-          nonce: BigInt(formData.nonceNameService),
-          username: formData.username,
-          clowNumber: BigInt(formData.clowNumber),
-          signature: actionSignature,
-          priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
-          nonce_EVVM: BigInt(formData.nonceEVVM),
-          priorityFlag_EVVM: formData.priorityFlag,
-          signature_EVVM: paySignature,
-        },
+        IPayData: payAction.toJSON(),
+        IRegistrationUsernameData: registrationAction.toJSON(),
       });
     } catch (error) {
       console.error("Error creating signatures:", error);
@@ -172,24 +162,20 @@ export const RegistrationUsernameComponent = ({
     }
   };
 
-  const execute = async () => {
+  const executeAction = async () => {
     if (!dataToGet) {
       console.error("No data to execute payment");
       return;
     }
 
-    console.log("Executing registration username...");
-
-    executeRegistrationUsername(
-      dataToGet.RegistrationUsernameInputData,
-      nameServiceAddress as `0x${string}`
-    )
-      .then(() => {
-        console.log("Registration username executed successfully");
-      })
-      .catch((error) => {
-        console.error("Error executing registration username:", error);
-      });
+    try {
+      const signer = await getEvvmSigner();
+      await execute(signer, dataToGet.IRegistrationUsernameData);
+      console.log("Registration username executed successfully");
+      setDataToGet(null);
+    } catch (error) {
+      console.error("Error executing registration username:", error);
+    }
   };
 
   return (
@@ -268,7 +254,7 @@ export const RegistrationUsernameComponent = ({
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
-        onExecute={execute}
+        onExecute={executeAction}
       />
     </div>
   );

@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { config } from "@/config/index";
-import { getWalletClient, readContract } from "@wagmi/core";
 import {
   TitleAndLink,
   NumberInputWithGenerator,
@@ -11,41 +10,36 @@ import {
   NumberInputField,
   TextInputField,
 } from "@/components/SigConstructors/InputsAndModules";
-import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import { executeAcceptOffer } from "@/utils/TransactionExecuter";
+import { execute } from "@evvm/evvm-js";
+import { getEvvmSigner, getCurrentChainId } from "@/utils/evvm-signer";
 import {
-  NameServiceABI,
-  PayInputData,
-  AcceptOfferInputData,
-  NameServiceSignatureBuilder,
-} from "@evvm/viem-signature-library";
+  IPayData,
+  IAcceptOfferData,
+  NameService,
+  EVVM,
+  type ISerializableSignedAction,
+} from "@evvm/evvm-js";
 
 type InfoData = {
-  PayInputData: PayInputData;
-  AcceptOfferInputData: AcceptOfferInputData;
+  IPayData: ISerializableSignedAction<IPayData>;
+  IAcceptOfferData: ISerializableSignedAction<IAcceptOfferData>;
 };
 
 interface AcceptOfferComponentProps {
-  evvmID: string;
   nameServiceAddress: string;
 }
 
 export const AcceptOfferComponent = ({
-  evvmID,
   nameServiceAddress,
 }: AcceptOfferComponentProps) => {
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
 
   const makeSig = async () => {
-    const walletData = await getAccountWithRetry(config);
-    if (!walletData) return;
-
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
-      evvmId: evvmID,
       addressNameService: nameServiceAddress,
       username: getValue("usernameInput_acceptOffer"),
       offerId: getValue("offerIdInput_acceptOffer"),
@@ -56,67 +50,65 @@ export const AcceptOfferComponent = ({
     };
 
     try {
-      const walletClient = await getWalletClient(config);
-      const signatureBuilder = new (NameServiceSignatureBuilder as any)(
-        walletClient,
-        walletData
-      );
+      const signer = await getEvvmSigner();
+      
+      // Create EVVM service for payment
+      const evvmService = new EVVM({
+        signer,
+        address: formData.addressNameService as `0x${string}`,
+        chainId: getCurrentChainId(),
+      });
+      
+      // Create NameService service
+      const nameServiceService = new NameService({
+        signer,
+        address: formData.addressNameService as `0x${string}`,
+        chainId: getCurrentChainId(),
+      });
 
-      const { paySignature, actionSignature } =
-        await signatureBuilder.signAcceptOffer(
-          BigInt(formData.evvmId),
-          formData.addressNameService as `0x${string}`,
-          formData.username,
-          BigInt(formData.offerId),
-          BigInt(formData.nonce),
-          BigInt(formData.priorityFee_EVVM),
-          BigInt(formData.nonce_EVVM),
-          formData.priorityFlag_EVVM
-        );
+      // Sign EVVM payment first
+      const payAction = await evvmService.pay({
+        to: formData.addressNameService,
+        tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+        amount: BigInt(0),
+        priorityFee: BigInt(formData.priorityFee_EVVM),
+        nonce: BigInt(formData.nonce_EVVM),
+        priorityFlag: formData.priorityFlag_EVVM,
+        executor: formData.addressNameService as `0x${string}`,
+      });
+
+      // Sign accept offer action
+      const acceptOfferAction = await nameServiceService.acceptOffer({
+        user: signer.address,
+        username: formData.username,
+        offerID: BigInt(formData.offerId),
+        nonce: BigInt(formData.nonce),
+        evvmSignedAction: payAction,
+      });
 
       setDataToGet({
-        PayInputData: {
-          from: walletData.address as `0x${string}`,
-          to_address: formData.addressNameService as `0x${string}`,
-          to_identity: "",
-          token: "0x0000000000000000000000000000000000000001" as `0x${string}`,
-          amount: BigInt(0),
-          priorityFee: BigInt(formData.priorityFee_EVVM),
-          nonce: BigInt(formData.nonce_EVVM),
-          priority: priority === "high",
-          executor: formData.addressNameService as `0x${string}`,
-          signature: paySignature,
-        },
-        AcceptOfferInputData: {
-          user: walletData.address as `0x${string}`,
-          username: formData.username,
-          offerID: BigInt(formData.offerId),
-          nonce: formData.nonce,
-          signature: actionSignature,
-          priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
-          nonce_EVVM: BigInt(formData.nonce_EVVM),
-          priorityFlag_EVVM: formData.priorityFlag_EVVM,
-          signature_EVVM: paySignature,
-        },
+        IPayData: payAction.toJSON(),
+        IAcceptOfferData: acceptOfferAction.toJSON(),
       });
     } catch (error) {
       console.error("Error signing accept offer:", error);
     }
   };
 
-  const execute = async () => {
+  const executeAction = async () => {
     if (!dataToGet) {
       console.error("No data to execute payment");
       return;
     }
 
-    executeAcceptOffer(dataToGet.AcceptOfferInputData, nameServiceAddress as `0x${string}`)
-      .then(() => {
-        console.log("Withdraw offer executed successfully");
-      })
-      .catch((error) => {
-        console.error("Error executing withdraw offer:", error);
-      });
+    try {
+      const signer = await getEvvmSigner();
+      await execute(signer, dataToGet.IAcceptOfferData);
+      console.log("Accept offer executed successfully");
+      setDataToGet(null);
+    } catch (error) {
+      console.error("Error executing accept offer:", error);
+    }
   };
 
   return (
@@ -187,7 +179,7 @@ export const AcceptOfferComponent = ({
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
-        onExecute={execute}
+        onExecute={executeAction}
       />
     </div>
   );

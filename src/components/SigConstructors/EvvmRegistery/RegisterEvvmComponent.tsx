@@ -10,7 +10,6 @@ import {
 } from "@/components/SigConstructors/InputsAndModules";
 
 import RegistryEvvmABI from "@/abi/RegistryEvvm.json";
-import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
 
 const REGISTRY_ADDRESS = "0x389dC8fb09211bbDA841D59f4a51160dA2377832" as const;
 
@@ -20,9 +19,6 @@ export const RegisterEvvmComponent = () => {
   const [txHash, setTxHash] = React.useState<string | null>(null);
 
   const makeRegister = async () => {
-    const walletData = await getAccountWithRetry(config);
-    if (!walletData) return;
-
     const chainIdInput = document.getElementById(
       "chainIdInputRegister"
     ) as HTMLInputElement;

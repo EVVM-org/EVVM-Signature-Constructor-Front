@@ -8,8 +8,7 @@ import {
   NumberInputField,
 } from "@/components/SigConstructors/InputsAndModules";
 
-import { EvvmABI } from "@evvm/viem-signature-library";
-import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
+import { EvvmABI } from "@evvm/evvm-js";
 
 interface SetEvvmIdComponentProps {
   evvmAddress: string;
@@ -22,9 +21,6 @@ export const SetEvvmIdComponent = ({
   const [txHash, setTxHash] = React.useState<string | null>(null);
 
   const handleSetEvvmId = async () => {
-    const walletData = await getAccountWithRetry(config);
-    if (!walletData) return;
-
     if (!evvmAddress) {
       alert("Please configure an EVVM address first in the main menu");
       return;

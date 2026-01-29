@@ -1,6 +1,8 @@
-"use client";
-import React from "react";
-import { config } from "@/config/index";
+'use client'
+import React from 'react'
+import { EVVM, type IPayData, type ISerializableSignedAction } from '@evvm/evvm-js'
+import { execute } from '@evvm/evvm-js'
+import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
 import {
   TitleAndLink,
   NumberInputWithGenerator,
@@ -9,107 +11,85 @@ import {
   ExecutorSelector,
   DataDisplayWithClear,
   HelperInfo,
-} from "@/components/SigConstructors/InputsAndModules";
-
-import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import { executePay } from "@/utils/TransactionExecuter/useEVVMTransactionExecuter";
-
-import {
-  EVVMSignatureBuilder,
-  PayInputData,
-} from "@evvm/viem-signature-library";
-
-import { getWalletClient } from "wagmi/actions";
+} from '@/components/SigConstructors/InputsAndModules'
 
 interface PaySignaturesComponentProps {
-  evvmID: string;
-  evvmAddress: string;
+  evvmAddress: string
 }
 
 export const PaySignaturesComponent = ({
-  evvmID,
   evvmAddress,
 }: PaySignaturesComponentProps) => {
-  const [isUsingUsernames, setIsUsingUsernames] = React.useState(false);
-  const [isUsingExecutor, setIsUsingExecutor] = React.useState(false);
-  const [priority, setPriority] = React.useState("low");
-  const [dataToGet, setDataToGet] = React.useState<PayInputData | null>(null);
+  const [isUsingUsernames, setIsUsingUsernames] = React.useState(false)
+  const [isUsingExecutor, setIsUsingExecutor] = React.useState(false)
+  const [priority, setPriority] = React.useState<'low' | 'high'>('low')
+  const [dataToGet, setDataToGet] = React.useState<ISerializableSignedAction<IPayData> | null>(null)
+  const [loading, setLoading] = React.useState(false)
 
   const makeSig = async () => {
-    const walletData = await getAccountWithRetry(config);
-    if (!walletData) return;
-
     const getValue = (id: string) =>
-      (document.getElementById(id) as HTMLInputElement).value;
-
-    const formData = {
-      evvmID: evvmID,
-      nonce: getValue("nonceInput_Pay"),
-      tokenAddress: getValue("tokenAddress_Pay"),
-      to: getValue(isUsingUsernames ? "toUsername" : "toAddress"),
-      executor: isUsingExecutor
-        ? getValue("executorInput_Pay")
-        : "0x0000000000000000000000000000000000000000",
-      amount: getValue("amountTokenInput_Pay"),
-      priorityFee: getValue("priorityFeeInput_Pay"),
-    };
-
-    try {
-      const walletClient = await getWalletClient(config);
-      const signatureBuilder = new (EVVMSignatureBuilder as any)(
-        walletClient,
-        walletData
-      );
-
-      const signature = await signatureBuilder.signPay(
-        BigInt(formData.evvmID),
-        formData.to,
-        formData.tokenAddress as `0x${string}`,
-        BigInt(formData.amount),
-        BigInt(formData.priorityFee),
-        BigInt(formData.nonce),
-        priority === "high",
-        formData.executor as `0x${string}`
-      );
-
-      setDataToGet({
-        from: walletData.address as `0x${string}`,
-        to_address: (formData.to.startsWith("0x")
-          ? formData.to
-          : "0x0000000000000000000000000000000000000000") as `0x${string}`,
-        to_identity: formData.to.startsWith("0x") ? "" : formData.to,
-        token: formData.tokenAddress as `0x${string}`,
-        amount: BigInt(formData.amount),
-        priorityFee: BigInt(formData.priorityFee),
-        nonce: BigInt(formData.nonce),
-        priority: priority === "high",
-        executor: formData.executor,
-        signature,
-      });
-    } catch (error) {
-      console.error("Error creating signature:", error);
+      (document.getElementById(id) as HTMLInputElement)?.value
+    if (!evvmAddress) {
+      console.error('EVVM address is required')
+      return
     }
-  };
+
+    const to = getValue(isUsingUsernames ? 'toUsername' : 'toAddress')
+    const tokenAddress = getValue('tokenAddress_Pay')
+    const amount = getValue('amountTokenInput_Pay')
+    const priorityFee = getValue('priorityFeeInput_Pay')
+    const nonce = getValue('nonceInput_Pay')
+    const executor = isUsingExecutor
+      ? getValue('executorInput_Pay')
+      : '0x0000000000000000000000000000000000000000'
+
+    if (!to || !tokenAddress || !amount || !priorityFee || !nonce) {
+      console.error('All fields are required')
+      return
+    }
+
+    setLoading(true)
+    try {
+      const signer = await getEvvmSigner()
+      const evvm = new EVVM({
+        signer,
+        address: evvmAddress as `0x${string}`,
+        chainId: getCurrentChainId(),
+      })
+
+      const signedAction = await evvm.pay({
+        to,
+        tokenAddress: tokenAddress as `0x${string}`,
+        amount: BigInt(amount),
+        priorityFee: BigInt(priorityFee),
+        nonce: BigInt(nonce),
+        priorityFlag: priority === 'high',
+        executor: executor as `0x${string}`,
+      })
+
+      setDataToGet(signedAction.toJSON())
+    } catch (error) {
+      console.error('Error creating signature:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const executePayment = async () => {
-    if (!dataToGet) {
-      console.error("No data to execute payment");
-      return;
+    if (!dataToGet || !evvmAddress) {
+      console.error('Missing data or address')
+      return
     }
 
-    if (!evvmAddress) {
-      console.error("EVVM address is not provided");
-      return;
+    try {
+      const signer = await getEvvmSigner()
+      await execute(signer, dataToGet)
+      console.log('Payment executed successfully')
+      setDataToGet(null)
+    } catch (error) {
+      console.error('Error executing payment:', error)
     }
-
-    executePay(dataToGet, evvmAddress as `0x${string}`)
-      .then(() => {
-        console.log("Payment executed successfully");
-      })
-      .catch((error) => {
-        console.error("Error executing payment:", error);
-      });
-  };
+  }
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
@@ -119,34 +99,31 @@ export const PaySignaturesComponent = ({
       />
       <br />
 
-      {/* EVVM ID and Address are now passed as props */}
-
-      {/* Recipient configuration section */}
-      <div style={{ marginBottom: "1rem" }}>
+      <div style={{ marginBottom: '1rem' }}>
         <p>
-          To:{" "}
+          To:{' '}
           <select
             style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "6rem",
+              color: 'black',
+              backgroundColor: 'white',
+              height: '2rem',
+              width: '6rem',
             }}
-            onChange={(e) => setIsUsingUsernames(e.target.value === "true")}
+            onChange={(e) => setIsUsingUsernames(e.target.value === 'true')}
           >
             <option value="false">Address</option>
             <option value="true">Username</option>
           </select>
           <input
             type="text"
-            placeholder={isUsingUsernames ? "Enter username" : "Enter address"}
-            id={isUsingUsernames ? "toUsername" : "toAddress"}
+            placeholder={isUsingUsernames ? 'Enter username' : 'Enter address'}
+            id={isUsingUsernames ? 'toUsername' : 'toAddress'}
             style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "25rem",
-              marginLeft: "0.5rem",
+              color: 'black',
+              backgroundColor: 'white',
+              height: '2rem',
+              width: '25rem',
+              marginLeft: '0.5rem',
             }}
           />
         </p>
@@ -158,28 +135,25 @@ export const PaySignaturesComponent = ({
         placeholder="Enter token address"
       />
 
-      {/* Basic input fields */}
       {[
-        { label: "Amount", id: "amountTokenInput_Pay", type: "number" },
-        { label: "Priority fee", id: "priorityFeeInput_Pay", type: "number" },
+        { label: 'Amount', id: 'amountTokenInput_Pay', type: 'number' },
+        { label: 'Priority fee', id: 'priorityFeeInput_Pay', type: 'number' },
       ].map(({ label, id, type }) => (
-        <div key={id} style={{ marginBottom: "1rem" }}>
+        <div key={id} style={{ marginBottom: '1rem' }}>
           <p>{label}</p>
           <input
             type={type}
             placeholder={`Enter ${label.toLowerCase()}`}
             id={id}
             style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
-              width: "25rem",
+              color: 'black',
+              backgroundColor: 'white',
+              height: '2rem',
+              width: '25rem',
             }}
           />
         </div>
       ))}
-
-      {/* Executor configuration */}
 
       <ExecutorSelector
         inputId="executorInput_Pay"
@@ -188,21 +162,17 @@ export const PaySignaturesComponent = ({
         isUsingExecutor={isUsingExecutor}
       />
 
-      {/* Priority configuration */}
-
       <PrioritySelector onPriorityChange={setPriority} />
-
-      {/* Nonce section with automatic generator */}
 
       <NumberInputWithGenerator
         label="Nonce"
         inputId="nonceInput_Pay"
         placeholder="Enter nonce"
-        showRandomBtn={priority !== "low"}
+        showRandomBtn={priority !== 'low'}
       />
 
       <div>
-        {priority === "low" && (
+        {priority === 'low' && (
           <HelperInfo label="How to find my sync nonce?">
             <div>
               You can retrieve your next sync nonce from the EVVM contract using
@@ -212,23 +182,23 @@ export const PaySignaturesComponent = ({
         )}
       </div>
 
-      {/* Create signature button */}
       <button
         onClick={makeSig}
+        disabled={loading}
         style={{
-          padding: "0.5rem",
-          marginTop: "1rem",
+          padding: '0.5rem',
+          marginTop: '1rem',
+          opacity: loading ? 0.6 : 1,
         }}
       >
-        Create signature
+        {loading ? 'Creating...' : 'Create signature'}
       </button>
 
-      {/* Results section */}
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
         onExecute={executePayment}
       />
     </div>
-  );
-};
+  )
+}

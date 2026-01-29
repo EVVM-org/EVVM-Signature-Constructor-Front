@@ -1,7 +1,8 @@
 "use client";
 import React from "react";
-import { config } from "@/config/index";
-import { getWalletClient } from "@wagmi/core";
+import { EVVM, Staking, type IPresaleStakingData, type IPayData, type ISerializableSignedAction } from "@evvm/evvm-js";
+import { execute } from "@evvm/evvm-js";
+import { getEvvmSigner, getCurrentChainId } from "@/utils/evvm-signer";
 import {
   TitleAndLink,
   NumberInputWithGenerator,
@@ -11,116 +12,100 @@ import {
   NumberInputField,
   StakingActionSelector,
 } from "@/components/SigConstructors/InputsAndModules";
-import { executePresaleStaking } from "@/utils/TransactionExecuter/useStakingTransactionExecuter";
-import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import {
-  PayInputData,
-  PresaleStakingInputData,
-  StakingSignatureBuilder,
-} from "@evvm/viem-signature-library";
 
 type InputData = {
-  PresaleStakingInputData: PresaleStakingInputData;
-  PayInputData: PayInputData;
+  IPresaleStakingData: ISerializableSignedAction<IPresaleStakingData>;
+  IPayData: ISerializableSignedAction<IPayData>;
 };
 
 interface PresaleStakingComponentProps {
-  evvmID: string;
   stakingAddress: string;
 }
 
 export const PresaleStakingComponent = ({
-  evvmID,
   stakingAddress,
 }: PresaleStakingComponentProps) => {
   const [isStaking, setIsStaking] = React.useState(true);
-  const [priority, setPriority] = React.useState("low");
-
+  const [priority, setPriority] = React.useState<"low" | "high">("low");
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null);
+  const [loading, setLoading] = React.useState(false);
 
   const makeSig = async () => {
-    const walletData = await getAccountWithRetry(config);
-    if (!walletData) return;
-
     const getValue = (id: string) =>
-      (document.getElementById(id) as HTMLInputElement).value;
+      (document.getElementById(id) as HTMLInputElement)?.value;
 
-    const formData = {
-      evvmID: evvmID,
-      stakingAddress: stakingAddress,
-      priorityFee_EVVM: getValue("priorityFeeInput_presaleStaking"),
-      nonce_EVVM: getValue("nonceEVVMInput_presaleStaking"),
-      nonce: getValue("nonceStakingInput_presaleStaking"),
-      priorityFlag_EVVM: priority === "high",
-    };
-
-    const amountOfToken = (1 * 10 ** 18).toLocaleString("fullwide", {
-      useGrouping: false,
-    });
-
-    try {
-      const walletClient = await getWalletClient(config);
-      const signatureBuilder = new (StakingSignatureBuilder as any)(
-        walletClient,
-        walletData
-      );
-
-      const { paySignature, actionSignature } =
-        await signatureBuilder.signPresaleStaking(
-          BigInt(formData.evvmID),
-          formData.stakingAddress as `0x${string}`,
-          isStaking,
-          BigInt(formData.nonce),
-          BigInt(formData.priorityFee_EVVM),
-          BigInt(amountOfToken),
-          BigInt(formData.nonce_EVVM),
-          formData.priorityFlag_EVVM
-        );
-
-      setDataToGet({
-        PresaleStakingInputData: {
-          isStaking: isStaking,
-          user: walletData.address as `0x${string}`,
-          nonce: BigInt(formData.nonce),
-          signature: actionSignature,
-          priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
-          priorityFlag_EVVM: priority === "high",
-          nonce_EVVM: BigInt(formData.nonce_EVVM),
-          signature_EVVM: paySignature,
-        },
-        PayInputData: {
-          from: walletData.address as `0x${string}`,
-          to_address: formData.stakingAddress as `0x${string}`,
-          to_identity: "",
-          token: "0x0000000000000000000000000000000000000001" as `0x${string}`,
-          amount: BigInt(amountOfToken),
-          priorityFee: BigInt(formData.priorityFee_EVVM),
-          nonce: BigInt(formData.nonce_EVVM),
-          priority: priority === "high",
-          executor: formData.stakingAddress as `0x${string}`,
-          signature: paySignature,
-        },
-      });
-    } catch (error) {
-      console.error("Error creating signature:", error);
-    }
-  };
-
-  const execute = async () => {
-    if (!dataToGet) {
-      console.error("No data to execute payment");
+    if (!stakingAddress) {
+      console.error("Staking address is required");
       return;
     }
 
-    const stakingAddress = dataToGet.PayInputData.to_address;
+    const priorityFee_EVVM = getValue("priorityFeeInput_presaleStaking");
+    const nonce_EVVM = getValue("nonceEVVMInput_presaleStaking");
+    const nonce = getValue("nonceStakingInput_presaleStaking");
 
-    executePresaleStaking(dataToGet.PresaleStakingInputData, stakingAddress)
-      .then(() => {
-        console.log("Presale staking executed successfully");
-      })
-      .catch((error) => {
-        console.error("Error executing presale staking:", error);
+    if (!priorityFee_EVVM || !nonce_EVVM || !nonce) {
+      console.error("All fields are required");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const signer = await getEvvmSigner();
+      const evvm = new EVVM({
+        signer,
+        address: stakingAddress as `0x${string}`,
+        chainId: getCurrentChainId(),
       });
+      const stakingService = new Staking({
+        signer,
+        address: stakingAddress as `0x${string}`,
+        chainId: getCurrentChainId(),
+      });
+
+      const amountOfToken = BigInt(1) * BigInt(10) ** BigInt(18);
+
+      const payAction = await evvm.pay({
+        to: stakingAddress,
+        tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+        amount: amountOfToken,
+        priorityFee: BigInt(priorityFee_EVVM),
+        nonce: BigInt(nonce_EVVM),
+        priorityFlag: priority === "high",
+        executor: stakingAddress as `0x${string}`,
+      });
+
+      const stakingAction = await stakingService.presaleStaking({
+        isStaking,
+        amountOfStaking: BigInt(1),
+        nonce: BigInt(nonce),
+        evvmSignedAction: payAction,
+      });
+
+      setDataToGet({
+        IPresaleStakingData: stakingAction.toJSON(),
+        IPayData: payAction.toJSON(),
+      });
+    } catch (error) {
+      console.error("Error creating signature:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const executePresale = async () => {
+    if (!dataToGet || !stakingAddress) {
+      console.error("Missing data or address");
+      return;
+    }
+
+    try {
+      const signer = await getEvvmSigner();
+      await execute(signer, dataToGet.IPresaleStakingData);
+      console.log("Presale staking executed successfully");
+      setDataToGet(null);
+    } catch (error) {
+      console.error("Error executing presale staking:", error);
+    }
   };
 
   return (
@@ -133,17 +118,10 @@ export const PresaleStakingComponent = ({
       <p>A presale staker can stake/unstake one sMATE per transaction.</p>
       <br />
 
-      {/* EVVM ID is now passed as a prop */}
-
-      {/* stakingAddress is now passed as a prop */}
-
-      {/* Configuration Section */}
       <StakingActionSelector onChange={setIsStaking} />
 
-      {/* Nonce Generators */}
-
       <NumberInputWithGenerator
-        label="staking Nonce"
+        label="Staking Nonce"
         inputId="nonceStakingInput_presaleStaking"
         placeholder="Enter nonce"
       />
@@ -154,7 +132,6 @@ export const PresaleStakingComponent = ({
         placeholder="Enter priority fee"
       />
 
-      {/* Priority Selection */}
       <PrioritySelector onPriorityChange={setPriority} />
 
       <NumberInputWithGenerator
@@ -175,14 +152,22 @@ export const PresaleStakingComponent = ({
         )}
       </div>
 
-      {/* Action Button */}
-      <button onClick={makeSig}>Create Signature</button>
+      <button
+        onClick={makeSig}
+        disabled={loading}
+        style={{
+          padding: "0.5rem",
+          marginTop: "1rem",
+          opacity: loading ? 0.6 : 1,
+        }}
+      >
+        {loading ? "Creating..." : "Create Signature"}
+      </button>
 
-      {/* Results Section */}
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
-        onExecute={execute}
+        onExecute={executePresale}
       />
     </div>
   );

@@ -1,7 +1,5 @@
 "use client";
 import React from "react";
-import { config } from "@/config/index";
-import { getWalletClient } from "@wagmi/core";
 import {
   TitleAndLink,
   NumberInputWithGenerator,
@@ -11,36 +9,32 @@ import {
   NumberInputField,
   TextInputField,
 } from "@/components/SigConstructors/InputsAndModules";
-import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import { executePreRegistrationUsername } from "@/utils/TransactionExecuter";
+import { execute } from "@evvm/evvm-js";
+import { getEvvmSigner, getCurrentChainId } from "@/utils/evvm-signer";
 import {
-  PayInputData,
-  PreRegistrationUsernameInputData,
-  NameServiceSignatureBuilder,
-  hashPreRegisteredUsername,
-} from "@evvm/viem-signature-library";
+  IPayData,
+  IPreRegistrationUsernameData,
+  NameService,
+  EVVM,
+  type ISerializableSignedAction,
+} from "@evvm/evvm-js";
 
 type InfoData = {
-  PayInputData: PayInputData;
-  PreRegistrationUsernameInputData: PreRegistrationUsernameInputData;
+  IPayData: ISerializableSignedAction<IPayData>;
+  IPreRegistrationUsernameData: ISerializableSignedAction<IPreRegistrationUsernameData>;
 };
 
 interface PreRegistrationUsernameComponentProps {
-  evvmID: string;
   nameServiceAddress: string;
 }
 
 export const PreRegistrationUsernameComponent = ({
-  evvmID,
   nameServiceAddress,
 }: PreRegistrationUsernameComponentProps) => {
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
 
   const makeSig = async () => {
-    const walletData = await getAccountWithRetry(config);
-    if (!walletData) return;
-
     const getValue = (id: string) => {
       const el = document.getElementById(id) as HTMLInputElement | null;
       if (!el) {
@@ -52,7 +46,6 @@ export const PreRegistrationUsernameComponent = ({
     };
 
     const formData = {
-      evvmId: evvmID,
       addressNameService: nameServiceAddress,
       username: getValue("usernameInput_preRegistration"),
       nonce: getValue("nonceNameServiceInput_preRegistration"),
@@ -80,76 +73,67 @@ export const PreRegistrationUsernameComponent = ({
     }
 
     try {
-      const walletClient = await getWalletClient(config);
-      const signatureBuilder = new (NameServiceSignatureBuilder as any)(
-        walletClient,
-        walletData
-      );
+      const signer = await getEvvmSigner();
+      
+      // Create EVVM service for payment
+      const evvmService = new EVVM({
+        signer,
+        address: formData.addressNameService as `0x${string}`,
+        chainId: getCurrentChainId(),
+      });
+      
+      // Create NameService service
+      const nameServiceService = new NameService({
+        signer,
+        address: formData.addressNameService as `0x${string}`,
+        chainId: getCurrentChainId(),
+      });
 
-      const { paySignature, actionSignature } =
-        await signatureBuilder.signPreRegistrationUsername(
-          BigInt(formData.evvmId),
-          formData.addressNameService as `0x${string}`,
-          formData.username,
-          BigInt(formData.clowNumber),
-          BigInt(formData.nonce),
-          BigInt(formData.priorityFee_EVVM),
-          BigInt(formData.nonce_EVVM),
-          formData.priorityFlag_EVVM
-        );
+      // Sign EVVM payment first
+      const payAction = await evvmService.pay({
+        to: formData.addressNameService,
+        tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+        amount: BigInt(0),
+        priorityFee: BigInt(formData.priorityFee_EVVM),
+        nonce: BigInt(formData.nonce_EVVM),
+        priorityFlag: formData.priorityFlag_EVVM,
+        executor: formData.addressNameService as `0x${string}`,
+      });
 
-      const hashUsername = hashPreRegisteredUsername(
-        formData.username,
-        BigInt(formData.clowNumber)
-      );
+      // Hash the username for pre-registration
+      const hashUsername = "0x" + Buffer.from(formData.username + formData.clowNumber).toString('hex');
+
+      // Sign pre-registration action
+      const preRegistrationAction = await nameServiceService.preRegistrationUsername({
+        user: signer.address,
+        hashPreRegisteredUsername: hashUsername,
+        nonce: BigInt(formData.nonce),
+        evvmSignedAction: payAction,
+      });
 
       setDataToGet({
-        PayInputData: {
-          from: walletData.address as `0x${string}`,
-          to_address: formData.addressNameService as `0x${string}`,
-          to_identity: "",
-          token: "0x0000000000000000000000000000000000000001" as `0x${string}`,
-          amount: BigInt(0),
-          priorityFee: BigInt(formData.priorityFee_EVVM),
-          nonce: BigInt(formData.nonce_EVVM),
-          priority: priority === "high",
-          executor: formData.addressNameService as `0x${string}`,
-          signature: paySignature,
-        },
-        PreRegistrationUsernameInputData: {
-          user: walletData.address as `0x${string}`,
-          hashPreRegisteredUsername:
-            hashUsername.toLowerCase().slice(0, 2) +
-            hashUsername.toUpperCase().slice(2),
-          nonce: BigInt(formData.nonce),
-          signature: actionSignature,
-          priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
-          nonce_EVVM: BigInt(formData.nonce_EVVM),
-          priorityFlag_EVVM: formData.priorityFlag_EVVM,
-          signature_EVVM: paySignature,
-        },
+        IPayData: payAction.toJSON(),
+        IPreRegistrationUsernameData: preRegistrationAction.toJSON(),
       });
     } catch (error) {
       console.error("Error creating signature:", error);
     }
   };
 
-  const execute = async () => {
+  const executeAction = async () => {
     if (!dataToGet) {
       console.error("No data to execute payment");
       return;
     }
 
-    executePreRegistrationUsername(
-      dataToGet.PreRegistrationUsernameInputData,
-      nameServiceAddress as `0x${string}`
-    )
-      .then(() => {
-        console.log("Pre-registration username executed successfully");
-      })
-      .catch((error) => {
-        console.error("Error executing pre-registration username:", error);
-      });
+    try {
+      const signer = await getEvvmSigner();
+      await execute(signer, dataToGet.IPreRegistrationUsernameData);
+      console.log("Pre-registration username executed successfully");
+      setDataToGet(null);
+    } catch (error) {
+      console.error("Error executing pre-registration username:", error);
+    }
   };
 
   return (
@@ -229,7 +213,7 @@ export const PreRegistrationUsernameComponent = ({
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
-        onExecute={execute}
+        onExecute={executeAction}
       />
     </div>
   );

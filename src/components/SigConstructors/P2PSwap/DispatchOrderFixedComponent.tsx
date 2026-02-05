@@ -1,6 +1,5 @@
 'use client'
 import React, { useMemo } from 'react'
-import { config } from '@/config/index'
 import {
   TitleAndLink,
   NumberInputWithGenerator,
@@ -10,30 +9,27 @@ import {
   HelperInfo,
 } from '@/components/SigConstructors/InputsAndModules'
 
-import { getAccountWithRetry } from '@/utils/getAccountWithRetry'
-
-import { getWalletClient } from 'wagmi/actions'
+import { execute } from '@evvm/evvm-js'
+import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
 import {
-  EVVMSignatureBuilder,
-  DispatchOrderFillFixedFeeInputData,
-  P2PSwapSignatureBuilder,
-} from '@evvm/viem-signature-library'
-import { executeDispatchOrderFillFixedFee } from '@/utils/TransactionExecuter'
+  IDispatchOrderFixedFeeData,
+  P2PSwap,
+  EVVM,
+  type ISerializableSignedAction,
+} from '@evvm/evvm-js'
 
 interface DispatchOrderFillFixedFeeComponentProps {
-  evvmID: string
   p2pSwapAddress: string
 }
 
 export const DispatchOrderFillFixedFeeComponent = ({
-  evvmID,
   p2pSwapAddress,
 }: DispatchOrderFillFixedFeeComponentProps) => {
   const [priority, setPriority] = React.useState('low')
   const [amountB, setAmountB] = React.useState(0n)
   const [amountOut, setAmountOut] = React.useState(1000000000000000000n)
   const [dataToGet, setDataToGet] =
-    React.useState<DispatchOrderFillFixedFeeInputData | null>(null)
+    React.useState<ISerializableSignedAction<IDispatchOrderFixedFeeData> | null>(null)
 
   const fee: bigint = useMemo(() => {
     const propFee = (amountB * 500n) / 10_000n
@@ -48,9 +44,6 @@ export const DispatchOrderFillFixedFeeComponent = ({
    * Create the signature, prepare data to make the function call
    */
   const makeSig = async () => {
-    const walletData = await getAccountWithRetry(config)
-    if (!walletData) return
-
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value
 
@@ -69,64 +62,54 @@ export const DispatchOrderFillFixedFeeComponent = ({
     const amountOfTokenBToFill = amountB + fee
 
     try {
-      const walletClient = await getWalletClient(config)
-      // two signature builders because we need two signatures in order to make
-      // this one work
-      const evvmSignatureBuilder = new (EVVMSignatureBuilder as any)(
-        walletClient,
-        walletData
-      )
-      const p2pSwapSignatureBuilder = new (P2PSwapSignatureBuilder as any)(
-        walletClient,
-        walletData
-      )
+      const signer = await getEvvmSigner()
+      
+      // Create EVVM service for payment
+      const evvmService = new EVVM({
+        signer,
+        address: p2pSwapAddress as `0x${string}`,
+        chainId: getCurrentChainId(),
+      })
+      
+      // Create P2PSwap service
+      const p2pSwapService = new P2PSwap({
+        signer,
+        address: p2pSwapAddress as `0x${string}`,
+        chainId: getCurrentChainId(),
+      })
 
       // create evvm pay() signature
-      const signatureEVVM = await evvmSignatureBuilder.signPay(
-        BigInt(evvmID),
-        p2pSwapAddress,
-        tokenB,
-        amountOfTokenBToFill,
-        priorityFee,
-        nonce_EVVM,
-        priority === 'high',
-        p2pSwapAddress
-      )
+      const payAction = await evvmService.pay({
+        to: p2pSwapAddress,
+        tokenAddress: tokenB,
+        amount: amountOfTokenBToFill,
+        priorityFee: priorityFee,
+        nonce: nonce_EVVM,
+        priorityFlag: priority === 'high',
+        executor: p2pSwapAddress as `0x${string}`,
+      })
 
       // create p2pswap dispatchOrderFillFixedFee() signature
-      const signatureP2P = await p2pSwapSignatureBuilder.dispatchOrder(
-        BigInt(evvmID),
-        nonce,
-        tokenA,
-        tokenB,
-        orderId
-      )
+      const dispatchOrderAction = await p2pSwapService.dispatchOrder_fillFixedFee({
+        nonce: nonce,
+        tokenA: tokenA,
+        tokenB: tokenB,
+        orderId: orderId,
+        amountOfTokenBToFill: amountOfTokenBToFill,
+        maxFillFixedFee: amountOut,
+        evvmSignedAction: payAction,
+      })
       if (!fee) throw new Error('Error calculating fee')
       if (!amountOut) throw new Error('Error calculating fee')
 
       // prepare data to execute transaction (send it to state)
-      setDataToGet({
-        user: walletData.address as `0x${string}`,
-        metadata: {
-          nonce,
-          tokenA,
-          tokenB,
-          orderId,
-          amountOfTokenBToFill,
-          signature: signatureP2P,
-        },
-        priorityFee,
-        nonce_EVVM,
-        priorityFlag_EVVM: priority === 'high',
-        signature_EVVM: signatureEVVM,
-        amountOut: BigInt(amountOut),
-      })
+      setDataToGet(dispatchOrderAction.toJSON())
     } catch (error) {
       console.error('Error creating signature:', error)
     }
   }
 
-  const execute = async () => {
+  const executeAction = async () => {
     if (!dataToGet) {
       console.error('No data to execute dispatchOrderFillFixedFee')
       return
@@ -137,13 +120,14 @@ export const DispatchOrderFillFixedFeeComponent = ({
       return
     }
 
-    executeDispatchOrderFillFixedFee(dataToGet, p2pSwapAddress as `0x${string}`)
-      .then(() => {
-        console.log('Order dispatched successfully')
-      })
-      .catch((error) => {
-        console.error('Error executing transaction:', error)
-      })
+    try {
+      const signer = await getEvvmSigner()
+      await execute(signer, dataToGet)
+      console.log('Order dispatched successfully')
+      setDataToGet(null)
+    } catch (error) {
+      console.error('Error executing transaction:', error)
+    }
   }
 
   return (
@@ -274,7 +258,7 @@ export const DispatchOrderFillFixedFeeComponent = ({
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
-        onExecute={execute}
+        onExecute={executeAction}
       />
     </div>
   )

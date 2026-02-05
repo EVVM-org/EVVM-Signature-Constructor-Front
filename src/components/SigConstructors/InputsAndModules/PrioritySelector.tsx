@@ -1,7 +1,7 @@
 import React from "react";
 
 interface PrioritySelectorProps {
-  onPriorityChange: (priority: string) => void;
+  onPriorityChange: (priority: "low" | "high") => void;
   marginTop?: string;
 }
 
@@ -22,7 +22,7 @@ export const PrioritySelector: React.FC<PrioritySelectorProps> = ({
           height: "2rem",
           width: "12rem",
         }}
-        onChange={(e) => onPriorityChange(e.target.value)}
+        onChange={(e) => onPriorityChange(e.target.value as "low" | "high")}
       >
         <option value="low">synchronous nonce</option>
         <option value="high">asynchronous nonce</option>

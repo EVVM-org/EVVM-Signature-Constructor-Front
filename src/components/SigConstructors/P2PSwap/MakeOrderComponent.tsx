@@ -1,6 +1,5 @@
 'use client'
 import React from 'react'
-import { config } from '@/config/index'
 import {
   TitleAndLink,
   NumberInputWithGenerator,
@@ -10,27 +9,24 @@ import {
   HelperInfo,
 } from '@/components/SigConstructors/InputsAndModules'
 
-import { getAccountWithRetry } from '@/utils/getAccountWithRetry'
-
-import { getWalletClient } from 'wagmi/actions'
+import { execute } from '@evvm/evvm-js'
+import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
 import {
-  EVVMSignatureBuilder,
-  MakeOrderInputData,
-  P2PSwapSignatureBuilder,
-} from '@evvm/viem-signature-library'
-import { executeMakeOrder } from '@/utils/TransactionExecuter'
+  IMakeOrderData,
+  P2PSwap,
+  EVVM,
+  type ISerializableSignedAction,
+} from '@evvm/evvm-js'
 
 interface MakeOrderComponentProps {
-  evvmID: string
   p2pSwapAddress: string
 }
 
 export const MakeOrderComponent = ({
-  evvmID,
   p2pSwapAddress,
 }: MakeOrderComponentProps) => {
   const [priority, setPriority] = React.useState('low')
-  const [dataToGet, setDataToGet] = React.useState<MakeOrderInputData | null>(
+  const [dataToGet, setDataToGet] = React.useState<ISerializableSignedAction<IMakeOrderData> | null>(
     null
   )
 
@@ -38,9 +34,6 @@ export const MakeOrderComponent = ({
    * Create the signature, prepare data to make the function call
    */
   const makeSig = async () => {
-    const walletData = await getAccountWithRetry(config)
-    if (!walletData) return
-
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement).value
 
@@ -55,62 +48,51 @@ export const MakeOrderComponent = ({
     const nonce_EVVM = BigInt(getValue('nonce_EVVM_MakeOrder'))
 
     try {
-      const walletClient = await getWalletClient(config)
-      // two signature builders because we need two signatures in order to make
-      // this one work
-      const evvmSignatureBuilder = new (EVVMSignatureBuilder as any)(
-        walletClient,
-        walletData
-      )
-      const p2pSwapSignatureBuilder = new (P2PSwapSignatureBuilder as any)(
-        walletClient,
-        walletData
-      )
+      const signer = await getEvvmSigner()
+      
+      // Create EVVM service for payment
+      const evvmService = new EVVM({
+        signer,
+        address: p2pSwapAddress as `0x${string}`,
+        chainId: getCurrentChainId(),
+      })
+      
+      // Create P2PSwap service
+      const p2pSwapService = new P2PSwap({
+        signer,
+        address: p2pSwapAddress as `0x${string}`,
+        chainId: getCurrentChainId(),
+      })
 
       // create evvm pay() signature
-      const signatureEVVM = await evvmSignatureBuilder.signPay(
-        BigInt(evvmID),
-        p2pSwapAddress,
-        tokenA,
-        amountA,
-        priorityFee,
-        nonce_EVVM,
-        priority === 'high',
-        p2pSwapAddress
-      )
+      const payAction = await evvmService.pay({
+        to: p2pSwapAddress,
+        tokenAddress: tokenA,
+        amount: amountA,
+        priorityFee: priorityFee,
+        nonce: nonce_EVVM,
+        priorityFlag: priority === 'high',
+        executor: p2pSwapAddress as `0x${string}`,
+      })
 
       // create p2pswap makeOrder() signature
-      const signatureP2P = await p2pSwapSignatureBuilder.makeOrder(
-        BigInt(evvmID),
-        nonce,
-        tokenA,
-        tokenB,
-        amountA,
-        amountB
-      )
+      const makeOrderAction = await p2pSwapService.makeOrder({
+        nonce: nonce,
+        tokenA: tokenA,
+        tokenB: tokenB,
+        amountA: amountA,
+        amountB: amountB,
+        evvmSignedAction: payAction,
+      })
 
       // prepare data to execute transaction (send it to state)
-      setDataToGet({
-        user: walletData.address as `0x${string}`,
-        metadata: {
-          nonce,
-          tokenA,
-          tokenB,
-          amountA,
-          amountB,
-        },
-        signature: signatureP2P,
-        priorityFee,
-        nonce_EVVM,
-        priorityFlag_EVVM: priority === 'high',
-        signature_EVVM: signatureEVVM,
-      })
+      setDataToGet(makeOrderAction.toJSON())
     } catch (error) {
       console.error('Error creating signature:', error)
     }
   }
 
-  const execute = async () => {
+  const executeAction = async () => {
     if (!dataToGet) {
       console.error('No data to execute makeOrder')
       return
@@ -121,13 +103,14 @@ export const MakeOrderComponent = ({
       return
     }
 
-    executeMakeOrder(dataToGet, p2pSwapAddress as `0x${string}`)
-      .then(() => {
-        console.log('Order created successfully')
-      })
-      .catch((error) => {
-        console.error('Error executing order:', error)
-      })
+    try {
+      const signer = await getEvvmSigner()
+      await execute(signer, dataToGet)
+      console.log('Order created successfully')
+      setDataToGet(null)
+    } catch (error) {
+      console.error('Error executing order:', error)
+    }
   }
 
   return (
@@ -220,7 +203,7 @@ export const MakeOrderComponent = ({
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
-        onExecute={execute}
+        onExecute={executeAction}
       />
     </div>
   )

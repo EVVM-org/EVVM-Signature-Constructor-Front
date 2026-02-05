@@ -1,7 +1,8 @@
 "use client";
 import React from "react";
-import { config } from "@/config/index";
-import { getWalletClient } from "@wagmi/core";
+import { EVVM, Staking, type IPublicStakingData, type IPayData, type ISerializableSignedAction } from "@evvm/evvm-js";
+import { execute } from "@evvm/evvm-js";
+import { getEvvmSigner, getCurrentChainId } from "@/utils/evvm-signer";
 import {
   TitleAndLink,
   NumberInputWithGenerator,
@@ -11,121 +12,102 @@ import {
   NumberInputField,
   StakingActionSelector,
 } from "@/components/SigConstructors/InputsAndModules";
-import { executePublicStaking } from "@/utils/TransactionExecuter/useStakingTransactionExecuter";
-import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import {
-  PayInputData,
-  PublicStakingInputData,
-  StakingSignatureBuilder,
-} from "@evvm/viem-signature-library";
 
 type InputData = {
-  PublicStakingInputData: PublicStakingInputData;
-  PayInputData: PayInputData;
+  IPublicStakingData: ISerializableSignedAction<IPublicStakingData>;
+  IPayData: ISerializableSignedAction<IPayData>;
 };
 
 interface PublicStakingComponentProps {
-  evvmID: string;
   stakingAddress: string;
 }
 
 export const PublicStakingComponent = ({
-  evvmID,
   stakingAddress,
 }: PublicStakingComponentProps) => {
   const [isStaking, setIsStaking] = React.useState(true);
-  const [priority, setPriority] = React.useState("low");
+  const [priority, setPriority] = React.useState<"low" | "high">("low");
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null);
+  const [loading, setLoading] = React.useState(false);
 
   const makeSig = async () => {
-    const walletData = await getAccountWithRetry(config);
-    if (!walletData) return;
-
     const getValue = (id: string) =>
-      (document.getElementById(id) as HTMLInputElement).value;
+      (document.getElementById(id) as HTMLInputElement)?.value;
 
-    const formData = {
-      evvmID: evvmID,
-      stakingAddress: stakingAddress,
-      nonceEVVM: getValue("nonceEVVMInput_PublicStaking"),
-      nonceStaking: getValue("nonceStakingInput_PublicStaking"),
-      amountOfStaking: Number(getValue("amountOfStakingInput_PublicStaking")),
-      priorityFee: getValue("priorityFeeInput_PublicStaking"),
-    };
-
-    if (!formData.stakingAddress) {
-      alert("Please enter a staking address");
+    if (!stakingAddress) {
+      console.error("Staking address is required");
       return;
     }
 
-    const amountOfToken =
-      BigInt(formData.amountOfStaking) *
-      (BigInt(5083) * BigInt(10) ** BigInt(18));
+    const nonceEVVM = getValue("nonceEVVMInput_PublicStaking");
+    const nonceStaking = getValue("nonceStakingInput_PublicStaking");
+    const amountOfStaking = getValue("amountOfStakingInput_PublicStaking");
+    const priorityFee = getValue("priorityFeeInput_PublicStaking");
 
+    if (!nonceEVVM || !nonceStaking || !amountOfStaking || !priorityFee) {
+      console.error("All fields are required");
+      return;
+    }
+
+    setLoading(true);
     try {
-      const walletClient = await getWalletClient(config);
-      const signatureBuilder = new (StakingSignatureBuilder as any)(
-        walletClient,
-        walletData
-      );
+      const signer = await getEvvmSigner();
+      const evvm = new EVVM({
+        signer,
+        address: stakingAddress as `0x${string}`,
+        chainId: getCurrentChainId(),
+      });
+      const stakingService = new Staking({
+        signer,
+        address: stakingAddress as `0x${string}`,
+        chainId: getCurrentChainId(),
+      });
 
-      const { paySignature, actionSignature } =
-        await signatureBuilder.signPublicStaking(
-          BigInt(formData.evvmID),
-          formData.stakingAddress as `0x${string}`,
-          isStaking,
-          BigInt(formData.amountOfStaking),
-          BigInt(formData.nonceStaking),
-          amountOfToken,
-          BigInt(formData.priorityFee),
-          BigInt(formData.nonceEVVM),
-          priority === "high"
-        );
+      const amountOfToken =
+        BigInt(amountOfStaking) * (BigInt(5083) * BigInt(10) ** BigInt(18));
+
+      const payAction = await evvm.pay({
+        to: stakingAddress,
+        tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+        amount: amountOfToken,
+        priorityFee: BigInt(priorityFee),
+        nonce: BigInt(nonceEVVM),
+        priorityFlag: priority === "high",
+        executor: stakingAddress as `0x${string}`,
+      });
+
+      const stakingAction = await stakingService.publicStaking({
+        isStaking,
+        amountOfStaking: BigInt(amountOfStaking),
+        nonce: BigInt(nonceStaking),
+        evvmSignedAction: payAction,
+      });
+
       setDataToGet({
-        PublicStakingInputData: {
-          isStaking: isStaking,
-          user: walletData.address as `0x${string}`,
-          nonce: BigInt(formData.nonceStaking),
-          amountOfStaking: BigInt(formData.amountOfStaking),
-          signature: actionSignature,
-          priorityFee_EVVM: BigInt(formData.priorityFee),
-          priorityFlag_EVVM: priority === "high",
-          nonce_EVVM: BigInt(formData.nonceEVVM),
-          signature_EVVM: paySignature,
-        },
-        PayInputData: {
-          from: walletData.address as `0x${string}`,
-          to_address: formData.stakingAddress as `0x${string}`,
-          to_identity: "",
-          token: "0x0000000000000000000000000000000000000001" as `0x${string}`,
-          amount: BigInt(amountOfToken),
-          priorityFee: BigInt(formData.priorityFee),
-          nonce: BigInt(formData.nonceEVVM),
-          priority: priority === "high",
-          executor: formData.stakingAddress as `0x${string}`,
-          signature: paySignature,
-        },
+        IPublicStakingData: stakingAction.toJSON(),
+        IPayData: payAction.toJSON(),
       });
     } catch (error) {
       console.error("Error creating signature:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const execute = async () => {
-    if (!dataToGet) {
-      console.error("No data to execute payment");
+  const executePublic = async () => {
+    if (!dataToGet || !stakingAddress) {
+      console.error("Missing data or address");
       return;
     }
 
-    const stakingAddress = dataToGet.PayInputData.to_address;
-
-    executePublicStaking(dataToGet.PublicStakingInputData, stakingAddress)
-      .then(() => {
-        console.log("Public staking executed successfully");
-      })
-      .catch((error) => {
-        console.error("Error executing public staking:", error);
-      });
+    try {
+      const signer = await getEvvmSigner();
+      await execute(signer, dataToGet.IPublicStakingData);
+      console.log("Public staking executed successfully");
+      setDataToGet(null);
+    } catch (error) {
+      console.error("Error executing public staking:", error);
+    }
   };
 
   return (
@@ -136,22 +118,14 @@ export const PublicStakingComponent = ({
       />
       <br />
 
-      {/* EVVM ID is now passed as a prop */}
-
-      {/* stakingAddress is now passed as a prop */}
-
-      {/* Configuration Section */}
       <StakingActionSelector onChange={setIsStaking} />
 
-      {/* Nonce Generators */}
-
       <NumberInputWithGenerator
-        label="staking Nonce"
+        label="Staking Nonce"
         inputId="nonceStakingInput_PublicStaking"
         placeholder="Enter nonce"
       />
 
-      {/* Amount Inputs */}
       <NumberInputField
         label={
           isStaking
@@ -168,7 +142,6 @@ export const PublicStakingComponent = ({
         placeholder="Enter priority fee"
       />
 
-      {/* Priority Selection */}
       <PrioritySelector onPriorityChange={setPriority} />
 
       <NumberInputWithGenerator
@@ -189,14 +162,22 @@ export const PublicStakingComponent = ({
         )}
       </div>
 
-      {/* Action Button */}
-      <button onClick={makeSig}>Create Signature</button>
+      <button
+        onClick={makeSig}
+        disabled={loading}
+        style={{
+          padding: "0.5rem",
+          marginTop: "1rem",
+          opacity: loading ? 0.6 : 1,
+        }}
+      >
+        {loading ? "Creating..." : "Create Signature"}
+      </button>
 
-      {/* Results Section */}
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
-        onExecute={execute}
+        onExecute={executePublic}
       />
     </div>
   );

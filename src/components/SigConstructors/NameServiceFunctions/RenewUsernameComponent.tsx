@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { config } from "@/config/index";
-import { getWalletClient, readContract } from "@wagmi/core";
+import { readContract } from "@wagmi/core";
 import {
   TitleAndLink,
   NumberInputWithGenerator,
@@ -11,27 +11,27 @@ import {
   NumberInputField,
   TextInputField,
 } from "@/components/SigConstructors/InputsAndModules";
-import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import { executeRenewUsername } from "@/utils/TransactionExecuter";
+import { execute } from "@evvm/evvm-js";
+import { getEvvmSigner, getCurrentChainId } from "@/utils/evvm-signer";
+import { NameServiceABI } from "@evvm/evvm-js";
 import {
-  NameServiceABI,
-  PayInputData,
-  RenewUsernameInputData,
-  NameServiceSignatureBuilder,
-} from "@evvm/viem-signature-library";
+  IPayData,
+  IRenewUsernameData,
+  NameService,
+  EVVM,
+  type ISerializableSignedAction,
+} from "@evvm/evvm-js";
 
 type InfoData = {
-  PayInputData: PayInputData;
-  RenewUsernameInputData: RenewUsernameInputData;
+  IPayData: ISerializableSignedAction<IPayData>;
+  IRenewUsernameData: ISerializableSignedAction<IRenewUsernameData>;
 };
 
 interface RenewUsernameComponentProps {
-  evvmID: string;
   nameServiceAddress: string;
 }
 
 export const RenewUsernameComponent = ({
-  evvmID,
   nameServiceAddress,
 }: RenewUsernameComponentProps) => {
   const [priority, setPriority] = React.useState("low");
@@ -39,9 +39,6 @@ export const RenewUsernameComponent = ({
   const [amountToRenew, setAmountToRenew] = React.useState<bigint | null>(null);
 
   const makeSig = async () => {
-    const walletData = await getAccountWithRetry(config);
-    if (!walletData) return;
-
     // Get values from input fields except evvmID and evvmAddress, which come from props
     const getValue = (id: string) => {
       const el = document.getElementById(id) as HTMLInputElement | null;
@@ -53,7 +50,6 @@ export const RenewUsernameComponent = ({
       return el.value;
     };
     const formData = {
-      evvmId: BigInt(evvmID),
       addressNameService: nameServiceAddress,
       username: getValue("usernameInput_renewUsername"),
       nonceNameService: BigInt(getValue("nonceNameServiceInput_renewUsername")),
@@ -64,47 +60,44 @@ export const RenewUsernameComponent = ({
     };
 
     try {
-      const walletClient = await getWalletClient(config);
-      const signatureBuilder = new (NameServiceSignatureBuilder as any)(
-        walletClient,
-        walletData
-      );
+      const signer = await getEvvmSigner();
+      
+      // Create EVVM service for payment
+      const evvmService = new EVVM({
+        signer,
+        address: formData.addressNameService as `0x${string}`,
+        chainId: getCurrentChainId(),
+      });
+      
+      // Create NameService service
+      const nameServiceService = new NameService({
+        signer,
+        address: formData.addressNameService as `0x${string}`,
+        chainId: getCurrentChainId(),
+      });
 
-      const { paySignature, actionSignature } =
-        await signatureBuilder.signRenewUsername(
-          formData.evvmId,
-          formData.addressNameService as `0x${string}`,
-          formData.username,
-          formData.nonceNameService,
-          formData.amountToRenew,
-          formData.priorityFee_EVVM,
-          formData.nonceEVVM,
-          formData.priorityFlag
-        );
-        
+      // Sign EVVM payment first
+      const payAction = await evvmService.pay({
+        to: formData.addressNameService,
+        tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+        amount: formData.amountToRenew,
+        priorityFee: BigInt(0),
+        nonce: formData.nonceEVVM,
+        priorityFlag: formData.priorityFlag,
+        executor: formData.addressNameService as `0x${string}`,
+      });
+
+      // Sign renew username action
+      const renewUsernameAction = await nameServiceService.renewUsername({
+        user: signer.address,
+        username: formData.username,
+        nonce: formData.nonceNameService,
+        evvmSignedAction: payAction,
+      });
+
       setDataToGet({
-        PayInputData: {
-          from: walletData.address as `0x${string}`,
-          to_address: formData.addressNameService as `0x${string}`,
-          to_identity: "",
-          token: "0x0000000000000000000000000000000000000001" as `0x${string}`,
-          amount: formData.priorityFee_EVVM,
-          priorityFee: BigInt(0),
-          nonce: formData.nonceEVVM,
-          priority: priority === "high",
-          executor: formData.addressNameService as `0x${string}`,
-          signature: paySignature,
-        },
-        RenewUsernameInputData: {
-          user: walletData.address as `0x${string}`,
-          nonce: formData.nonceNameService,
-          username: formData.username,
-          priorityFee_EVVM: formData.priorityFee_EVVM,
-          signature: actionSignature,
-          nonce_EVVM: formData.nonceEVVM,
-          priorityFlag_EVVM: formData.priorityFlag,
-          signature_EVVM: paySignature,
-        },
+        IPayData: payAction.toJSON(),
+        IRenewUsernameData: renewUsernameAction.toJSON(),
       });
     } catch (error) {
       console.error("Error signing renew username:", error);
@@ -141,19 +134,20 @@ export const RenewUsernameComponent = ({
   };
 
   // Handler for executing the transaction
-  const execute = async () => {
+  const executeAction = async () => {
     if (!dataToGet) {
       console.error("No data to execute payment");
       return;
     }
     console.log("Executing renew username with data:", dataToGet);
-    executeRenewUsername(dataToGet.RenewUsernameInputData, nameServiceAddress as `0x${string}`)
-      .then(() => {
-        console.log("Renew username executed successfully");
-      })
-      .catch((error) => {
-        console.error("Error executing renew username:", error);
-      });
+    try {
+      const signer = await getEvvmSigner();
+      await execute(signer, dataToGet.IRenewUsernameData);
+      console.log("Renew username executed successfully");
+      setDataToGet(null);
+    } catch (error) {
+      console.error("Error executing renew username:", error);
+    }
   };
 
   return (
@@ -219,7 +213,7 @@ export const RenewUsernameComponent = ({
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
-        onExecute={execute}
+        onExecute={executeAction}
       />
     </div>
   );

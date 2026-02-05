@@ -1,7 +1,8 @@
 "use client";
 import React from "react";
-import { config } from "@/config/index";
-import { getAccount, getWalletClient } from "@wagmi/core";
+import { EVVM, type IDispersePayData, type ISerializableSignedAction } from "@evvm/evvm-js";
+import { execute } from "@evvm/evvm-js";
+import { getEvvmSigner, getCurrentChainId } from "@/utils/evvm-signer";
 import {
   TitleAndLink,
   NumberInputWithGenerator,
@@ -13,126 +14,118 @@ import {
   NumberInputField,
 } from "@/components/SigConstructors/InputsAndModules";
 
-import {
-  EVVMSignatureBuilder,
-  DispersePayInputData,
-  DispersePayMetadata,
-} from "@evvm/viem-signature-library";
-
-import { executeDispersePay } from "@/utils/TransactionExecuter/useEVVMTransactionExecuter";
-
-import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-
 interface DispersePayComponentProps {
-  evvmID: string;
   evvmAddress: string;
 }
 
 export const DispersePayComponent = ({
-  evvmID,
   evvmAddress,
 }: DispersePayComponentProps) => {
-  let account = getAccount(config);
   const [isUsingExecutorDisperse, setIsUsingExecutorDisperse] =
     React.useState(false);
-  const [priorityDisperse, setPriorityDisperse] = React.useState("low");
+  const [priorityDisperse, setPriorityDisperse] = React.useState<"low" | "high">("low");
   const [isUsingUsernameOnDisperse, setIsUsingUsernameOnDisperse] =
     React.useState<Array<boolean>>([false, false, false, false, false]);
   const [numberOfUsersToDisperse, setNumberOfUsersToDisperse] =
     React.useState(1);
-
-  const [dataToGet, setDataToGet] = React.useState<DispersePayInputData | null>(
+  const [dataToGet, setDataToGet] = React.useState<ISerializableSignedAction<IDispersePayData> | null>(
     null
   );
+  const [loading, setLoading] = React.useState(false);
 
   const makeSig = async () => {
-    const walletData = await getAccountWithRetry(config);
-    if (!walletData) return;
-
     const getValue = (id: string) =>
-      (document.getElementById(id) as HTMLInputElement).value;
+      (document.getElementById(id) as HTMLInputElement)?.value;
 
-    const formData = {
-      evvmID: evvmID,
-      tokenAddress: getValue("tokenAddressDispersePay"),
-      amount: getValue("amountTokenInputSplit"),
-      priorityFee: getValue("priorityFeeInputSplit"),
-      nonce: getValue("nonceInputDispersePay"),
-      executor: isUsingExecutorDisperse
-        ? getValue("executorInputSplit")
-        : "0x0000000000000000000000000000000000000000",
-    };
+    if (!evvmAddress) {
+      console.error("EVVM address is required");
+      return;
+    }
 
-    const toData: DispersePayMetadata[] = [];
+    const tokenAddress = getValue("tokenAddressDispersePay");
+    const amount = getValue("amountTokenInputSplit");
+    const priorityFee = getValue("priorityFeeInputSplit");
+    const nonce = getValue("nonceInputDispersePay");
+    const executor = isUsingExecutorDisperse
+      ? getValue("executorInputSplit")
+      : "0x0000000000000000000000000000000000000000";
+
+    if (!tokenAddress || !amount || !priorityFee || !nonce) {
+      console.error("All fields are required");
+      return;
+    }
+
+    type ToDataItem = { amount: bigint; toAddress: `0x${string}`; toIdentity: undefined } | { amount: bigint; toAddress: undefined; toIdentity: string };
+    const toData: ToDataItem[] = [];
     for (let i = 0; i < numberOfUsersToDisperse; i++) {
       const isUsingUsername = isUsingUsernameOnDisperse[i];
       const toInputId = isUsingUsername
         ? `toUsernameSplitUserNumber${i}`
         : `toAddressSplitUserNumber${i}`;
       const to = getValue(toInputId);
-      const amount = getValue(`amountTokenToGiveUser${i}`);
+      const amountForUser = getValue(`amountTokenToGiveUser${i}`);
 
-      toData.push({
-        amount: BigInt(amount),
-        to_address: isUsingUsername
-          ? "0x0000000000000000000000000000000000000000"
-          : (to as `0x${string}`),
-        to_identity: isUsingUsername ? to : "",
-      });
+      if (!to || !amountForUser) {
+        console.error(`Missing data for user ${i + 1}`);
+        return;
+      }
+
+      if (isUsingUsername) {
+        toData.push({
+          amount: BigInt(amountForUser),
+          toAddress: undefined,
+          toIdentity: to,
+        });
+      } else {
+        toData.push({
+          amount: BigInt(amountForUser),
+          toAddress: to as `0x${string}`,
+          toIdentity: undefined,
+        });
+      }
     }
 
+    setLoading(true);
     try {
-      const walletClient = await getWalletClient(config);
-      const signatureBuilder = new (EVVMSignatureBuilder as any)(
-        walletClient,
-        walletData
-      );
-
-      const dispersePaySignature = await signatureBuilder.signDispersePay(
-        BigInt(formData.evvmID),
-        toData,
-        formData.tokenAddress as `0x${string}`,
-        BigInt(formData.amount),
-        BigInt(formData.priorityFee),
-        BigInt(formData.nonce),
-        priorityDisperse === "high",
-        formData.executor as `0x${string}`
-      );
-
-      setDataToGet({
-        from: walletData.address as `0x${string}`,
-        toData,
-        token: formData.tokenAddress as `0x${string}`,
-        amount: BigInt(formData.amount),
-        priorityFee: BigInt(formData.priorityFee),
-        priority: priorityDisperse === "high",
-        nonce: BigInt(formData.nonce),
-        executor: formData.executor,
-        signature: dispersePaySignature,
+      const signer = await getEvvmSigner();
+      const evvm = new EVVM({
+        signer,
+        address: evvmAddress as `0x${string}`,
+        chainId: getCurrentChainId(),
       });
+
+      const signedAction = await evvm.dispersePay({
+        toData,
+        tokenAddress: tokenAddress as `0x${string}`,
+        amount: BigInt(amount),
+        priorityFee: BigInt(priorityFee),
+        nonce: BigInt(nonce),
+        priorityFlag: priorityDisperse === "high",
+        executor: executor as `0x${string}`,
+      });
+
+      setDataToGet(signedAction.toJSON());
     } catch (error) {
       console.error("Error creating signature:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const executeDispersePayment = async () => {
-    if (!dataToGet) {
-      console.error("No data to execute payment");
+    if (!dataToGet || !evvmAddress) {
+      console.error("Missing data or address");
       return;
     }
 
-    if (!evvmAddress) {
-      console.error("EVVM address is not provided");
-      return;
+    try {
+      const signer = await getEvvmSigner();
+      await execute(signer, dataToGet);
+      console.log("Disperse payment executed successfully");
+      setDataToGet(null);
+    } catch (error) {
+      console.error("Error executing disperse payment:", error);
     }
-
-    executeDispersePay(dataToGet, evvmAddress as `0x${string}`)
-      .then(() => {
-        console.log("Disperse payment executed successfully");
-      })
-      .catch((error) => {
-        console.error("Error executing disperse payment:", error);
-      });
   };
 
   return (
@@ -143,14 +136,11 @@ export const DispersePayComponent = ({
       />
       <br />
 
-      {/* Token address */}
       <AddressInputField
         label="Token address"
         inputId="tokenAddressDispersePay"
         placeholder="Enter token address"
       />
-
-      {/* Amount */}
 
       <NumberInputField
         label="Total Amount (sum of all payments)"
@@ -158,15 +148,12 @@ export const DispersePayComponent = ({
         placeholder="Enter amount"
       />
 
-      {/* Priority fee */}
-
       <NumberInputField
         label="Priority fee"
         inputId="priorityFeeInputSplit"
         placeholder="Enter priority fee"
       />
 
-      {/* Executor selection */}
       <ExecutorSelector
         inputId="executorInputSplit"
         placeholder="Enter executor"
@@ -174,7 +161,6 @@ export const DispersePayComponent = ({
         isUsingExecutor={isUsingExecutorDisperse}
       />
 
-      {/* Number of users */}
       <div style={{ marginBottom: "1rem" }}>
         <p>Number of accounts to split the payment</p>
         <select
@@ -194,12 +180,6 @@ export const DispersePayComponent = ({
         </select>
       </div>
 
-      <p>
-        For testing purposes, the number of users is 5 but you can change it
-        from the repo.
-      </p>
-
-      {/* User inputs */}
       {Array.from({ length: numberOfUsersToDisperse }).map((_, index) => (
         <div key={index}>
           <h4 style={{ color: "black", marginTop: "1rem" }}>{`Payment ${
@@ -258,10 +238,7 @@ export const DispersePayComponent = ({
         </div>
       ))}
 
-      {/* Priority selection */}
       <PrioritySelector onPriorityChange={setPriorityDisperse} />
-
-      {/* Nonce input */}
 
       <NumberInputWithGenerator
         label="Nonce"
@@ -281,15 +258,18 @@ export const DispersePayComponent = ({
         )}
       </div>
 
-      {/* Create signature button */}
       <button
         onClick={makeSig}
-        style={{ padding: "0.5rem", marginTop: "1rem" }}
+        disabled={loading}
+        style={{
+          padding: "0.5rem",
+          marginTop: "1rem",
+          opacity: loading ? 0.6 : 1,
+        }}
       >
-        Create signature
+        {loading ? "Creating..." : "Create signature"}
       </button>
 
-      {/* Display results */}
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}

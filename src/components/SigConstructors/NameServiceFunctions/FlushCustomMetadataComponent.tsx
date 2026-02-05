@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { config } from "@/config/index";
-import { getWalletClient, readContract } from "@wagmi/core";
+import { readContract } from "@wagmi/core";
 import {
   TitleAndLink,
   NumberInputWithGenerator,
@@ -11,27 +11,27 @@ import {
   NumberInputField,
   TextInputField,
 } from "@/components/SigConstructors/InputsAndModules";
-import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import { executeFlushCustomMetadata } from "@/utils/TransactionExecuter";
+import { execute } from "@evvm/evvm-js";
+import { getEvvmSigner, getCurrentChainId } from "@/utils/evvm-signer";
+import { NameServiceABI } from "@evvm/evvm-js";
 import {
-  NameServiceABI,
-  FlushCustomMetadataInputData,
-  PayInputData,
-  NameServiceSignatureBuilder,
-} from "@evvm/viem-signature-library";
+  IPayData,
+  IFlushCustomMetadataData,
+  NameService,
+  EVVM,
+  type ISerializableSignedAction,
+} from "@evvm/evvm-js";
 
 type InfoData = {
-  PayInputData: PayInputData;
-  FlushCustomMetadataInputData: FlushCustomMetadataInputData;
+  IPayData: ISerializableSignedAction<IPayData>;
+  IFlushCustomMetadataData: ISerializableSignedAction<IFlushCustomMetadataData>;
 };
 
 interface FlushCustomMetadataComponentProps {
-  evvmID: string;
   nameServiceAddress: string;
 }
 
 export const FlushCustomMetadataComponent = ({
-  evvmID,
   nameServiceAddress,
 }: FlushCustomMetadataComponentProps) => {
   const [priority, setPriority] = React.useState("low");
@@ -41,11 +41,7 @@ export const FlushCustomMetadataComponent = ({
     (document.getElementById(id) as HTMLInputElement).value;
 
   const makeSig = async () => {
-    const walletData = await getAccountWithRetry(config);
-    if (!walletData) return;
-
     const formData = {
-      evvmId: evvmID,
       addressNameService: nameServiceAddress,
       nonceNameService: getValue("nonceNameServiceInput_flushCustomMetadata"),
       identity: getValue("identityInput_flushCustomMetadata"),
@@ -55,11 +51,21 @@ export const FlushCustomMetadataComponent = ({
     };
 
     try {
-      const walletClient = await getWalletClient(config);
-      const signatureBuilder = new (NameServiceSignatureBuilder as any)(
-        walletClient,
-        walletData
-      );
+      const signer = await getEvvmSigner();
+      
+      // Create EVVM service for payment
+      const evvmService = new EVVM({
+        signer,
+        address: formData.addressNameService as `0x${string}`,
+        chainId: getCurrentChainId(),
+      });
+      
+      // Create NameService service
+      const nameServiceService = new NameService({
+        signer,
+        address: formData.addressNameService as `0x${string}`,
+        chainId: getCurrentChainId(),
+      });
 
       const price = await readContract(config, {
         abi: NameServiceABI,
@@ -68,62 +74,48 @@ export const FlushCustomMetadataComponent = ({
         args: [formData.identity],
       });
 
-      const { paySignature, actionSignature } =
-        await signatureBuilder.signFlushCustomMetadata(
-          BigInt(formData.evvmId),
-          formData.addressNameService as `0x${string}`,
-          formData.identity,
-          BigInt(formData.nonceNameService),
-          price as bigint,
-          BigInt(formData.priorityFee_EVVM),
-          BigInt(formData.nonce_EVVM),
-          formData.priorityFlag_EVVM
-        );
+      // Sign EVVM payment first
+      const payAction = await evvmService.pay({
+        to: formData.addressNameService,
+        tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+        amount: price as bigint,
+        priorityFee: BigInt(formData.priorityFee_EVVM),
+        nonce: BigInt(formData.nonce_EVVM),
+        priorityFlag: formData.priorityFlag_EVVM,
+        executor: formData.addressNameService as `0x${string}`,
+      });
+
+      // Sign flush custom metadata action
+      const flushCustomMetadataAction = await nameServiceService.flushCustomMetadata({
+        user: signer.address,
+        identity: formData.identity,
+        nonce: BigInt(formData.nonceNameService),
+        evvmSignedAction: payAction,
+      });
+
       setDataToGet({
-        PayInputData: {
-          from: walletData.address as `0x${string}`,
-          to_address: formData.addressNameService as `0x${string}`,
-          to_identity: "",
-          token: "0x0000000000000000000000000000000000000001" as `0x${string}`,
-          amount: price as bigint,
-          priorityFee: BigInt(formData.priorityFee_EVVM),
-          nonce: BigInt(formData.nonce_EVVM),
-          priority: priority === "high",
-          executor: formData.addressNameService as `0x${string}`,
-          signature: paySignature,
-        },
-        FlushCustomMetadataInputData: {
-          user: walletData.address as `0x${string}`,
-          identity: formData.identity,
-          nonce: BigInt(formData.nonceNameService),
-          signature: actionSignature,
-          priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
-          nonce_EVVM: BigInt(formData.nonce_EVVM),
-          priorityFlag_EVVM: formData.priorityFlag_EVVM,
-          signature_EVVM: paySignature,
-        },
+        IPayData: payAction.toJSON(),
+        IFlushCustomMetadataData: flushCustomMetadataAction.toJSON(),
       });
     } catch (error) {
       console.error("Error creating signature:", error);
     }
   };
 
-  const execute = async () => {
+  const executeAction = async () => {
     if (!dataToGet) {
       console.error("No data to execute payment");
       return;
     }
 
-    executeFlushCustomMetadata(
-      dataToGet.FlushCustomMetadataInputData,
-      nameServiceAddress as `0x${string}`
-    )
-      .then(() => {
-        console.log("Flush custom metadata executed successfully");
-      })
-      .catch((error) => {
-        console.error("Error executing flush custom metadata:", error);
-      });
+    try {
+      const signer = await getEvvmSigner();
+      await execute(signer, dataToGet.IFlushCustomMetadataData);
+      console.log("Flush custom metadata executed successfully");
+      setDataToGet(null);
+    } catch (error) {
+      console.error("Error executing flush custom metadata:", error);
+    }
   };
 
   return (
@@ -190,7 +182,7 @@ export const FlushCustomMetadataComponent = ({
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
-        onExecute={execute}
+        onExecute={executeAction}
       />
     </div>
   );

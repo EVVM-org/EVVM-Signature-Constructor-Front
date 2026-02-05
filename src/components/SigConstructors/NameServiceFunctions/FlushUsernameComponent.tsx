@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { config } from "@/config/index";
-import { getWalletClient, readContract } from "@wagmi/core";
+import { readContract } from "@wagmi/core";
 import {
   TitleAndLink,
   NumberInputWithGenerator,
@@ -11,27 +11,27 @@ import {
   NumberInputField,
   TextInputField,
 } from "@/components/SigConstructors/InputsAndModules";
-import { getAccountWithRetry } from "@/utils/getAccountWithRetry";
-import { executeFlushUsername } from "@/utils/TransactionExecuter";
+import { execute } from "@evvm/evvm-js";
+import { getEvvmSigner, getCurrentChainId } from "@/utils/evvm-signer";
+import { NameServiceABI } from "@evvm/evvm-js";
 import {
-  NameServiceABI,
-  PayInputData,
-  FlushUsernameInputData,
-  NameServiceSignatureBuilder,
-} from "@evvm/viem-signature-library";
+  IPayData,
+  IFlushUsernameData,
+  NameService,
+  EVVM,
+  type ISerializableSignedAction,
+} from "@evvm/evvm-js";
 
 type InfoData = {
-  PayInputData: PayInputData;
-  FlushUsernameInputData: FlushUsernameInputData;
+  IPayData: ISerializableSignedAction<IPayData>;
+  IFlushUsernameData: ISerializableSignedAction<IFlushUsernameData>;
 };
 
 interface FlushUsernameComponentProps {
-  evvmID: string;
   nameServiceAddress: string;
 }
 
 export const FlushUsernameComponent = ({
-  evvmID,
   nameServiceAddress,
 }: FlushUsernameComponentProps) => {
   const [priority, setPriority] = React.useState("low");
@@ -41,11 +41,7 @@ export const FlushUsernameComponent = ({
     (document.getElementById(id) as HTMLInputElement).value;
 
   const makeSig = async () => {
-    const walletData = await getAccountWithRetry(config);
-    if (!walletData) return;
-
     const formData = {
-      evvmId: evvmID,
       addressNameService: nameServiceAddress,
       nonceNameService: getValue("nonceNameServiceInput_flushUsername"),
       username: getValue("usernameInput_flushUsername"),
@@ -55,11 +51,21 @@ export const FlushUsernameComponent = ({
     };
 
     try {
-      const walletClient = await getWalletClient(config);
-      const signatureBuilder = new (NameServiceSignatureBuilder as any)(
-        walletClient,
-        walletData
-      );
+      const signer = await getEvvmSigner();
+      
+      // Create EVVM service for payment
+      const evvmService = new EVVM({
+        signer,
+        address: formData.addressNameService as `0x${string}`,
+        chainId: getCurrentChainId(),
+      });
+      
+      // Create NameService service
+      const nameServiceService = new NameService({
+        signer,
+        address: formData.addressNameService as `0x${string}`,
+        chainId: getCurrentChainId(),
+      });
 
       const priceToFlushUsername = await readContract(config, {
         abi: NameServiceABI,
@@ -72,59 +78,48 @@ export const FlushUsernameComponent = ({
         return;
       }
 
-      const { paySignature, actionSignature } =
-        await signatureBuilder.signFlushUsername(
-          BigInt(formData.evvmId),
-          formData.addressNameService as `0x${string}`,
-          formData.username,
-          BigInt(formData.nonceNameService),
-          priceToFlushUsername as bigint,
-          BigInt(formData.priorityFee_EVVM),
-          BigInt(formData.nonce_EVVM),
-          formData.priorityFlag_EVVM
-        );
+      // Sign EVVM payment first
+      const payAction = await evvmService.pay({
+        to: formData.addressNameService,
+        tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+        amount: priceToFlushUsername as bigint,
+        priorityFee: BigInt(formData.priorityFee_EVVM),
+        nonce: BigInt(formData.nonce_EVVM),
+        priorityFlag: formData.priorityFlag_EVVM,
+        executor: formData.addressNameService as `0x${string}`,
+      });
+
+      // Sign flush username action
+      const flushUsernameAction = await nameServiceService.flushUsername({
+        user: signer.address,
+        username: formData.username,
+        nonce: BigInt(formData.nonceNameService),
+        evvmSignedAction: payAction,
+      });
+
       setDataToGet({
-        PayInputData: {
-          from: walletData.address as `0x${string}`,
-          to_address: formData.addressNameService as `0x${string}`,
-          to_identity: "",
-          token: "0x0000000000000000000000000000000000000001" as `0x${string}`,
-          amount: priceToFlushUsername as bigint,
-          priorityFee: BigInt(formData.priorityFee_EVVM),
-          nonce: BigInt(formData.nonce_EVVM),
-          priority: formData.priorityFlag_EVVM,
-          executor: formData.addressNameService as `0x${string}`,
-          signature: paySignature,
-        },
-        FlushUsernameInputData: {
-          user: walletData.address as `0x${string}`,
-          username: formData.username,
-          nonce: BigInt(formData.nonceNameService),
-          signature: actionSignature,
-          priorityFee_EVVM: BigInt(formData.priorityFee_EVVM),
-          nonce_EVVM: BigInt(formData.nonce_EVVM),
-          priorityFlag_EVVM: formData.priorityFlag_EVVM,
-          signature_EVVM: paySignature,
-        },
+        IPayData: payAction.toJSON(),
+        IFlushUsernameData: flushUsernameAction.toJSON(),
       });
     } catch (error) {
       console.error("Error creating signature:", error);
     }
   };
 
-  const execute = async () => {
+  const executeAction = async () => {
     if (!dataToGet) {
       console.error("No data to execute payment");
       return;
     }
 
-    executeFlushUsername(dataToGet.FlushUsernameInputData, nameServiceAddress as `0x${string}`)
-      .then(() => {
-        console.log("Registration username executed successfully");
-      })
-      .catch((error) => {
-        console.error("Error executing registration username:", error);
-      });
+    try {
+      const signer = await getEvvmSigner();
+      await execute(signer, dataToGet.IFlushUsernameData);
+      console.log("Flush username executed successfully");
+      setDataToGet(null);
+    } catch (error) {
+      console.error("Error executing flush username:", error);
+    }
   };
 
   return (
@@ -195,7 +190,7 @@ export const FlushUsernameComponent = ({
       <DataDisplayWithClear
         dataToGet={dataToGet}
         onClear={() => setDataToGet(null)}
-        onExecute={execute}
+        onExecute={executeAction}
       />
     </div>
   );

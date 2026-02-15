@@ -9,11 +9,10 @@ module.exports = {
     browser: true,
     node: true,
   },
-  plugins: ["@typescript-eslint", "@next/eslint-plugin-next"],
+  plugins: ["@typescript-eslint"],
   extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:@next/next/recommended",
     "next/core-web-vitals"
   ],
   rules: {

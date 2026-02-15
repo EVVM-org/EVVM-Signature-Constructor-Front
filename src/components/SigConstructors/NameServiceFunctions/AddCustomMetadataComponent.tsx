@@ -62,7 +62,7 @@ export const AddCustomMetadataComponent = ({
       priorityFlag: priority === "high",
     };
 
-    let valueCustomMetadata = `${formData.schema}:${formData.subschema}>${formData.value}`;
+    const valueCustomMetadata = `${formData.schema}:${formData.subschema}>${formData.value}`;
 
     try {
       const signer = await getEvvmSigner();

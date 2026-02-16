@@ -22,22 +22,22 @@ export const RegisterEvvmComponent = () => {
     const chainIdInput = document.getElementById(
       "chainIdInputRegister"
     ) as HTMLInputElement;
-    const evvmAddressInput = document.getElementById(
-      "evvmAddressInputRegister"
+    const coreAddressInput = document.getElementById(
+      "coreAddressInputRegister"
     ) as HTMLInputElement;
 
     console.log('Chain ID Input:', chainIdInput);
     console.log('Chain ID Value:', chainIdInput?.value);
-    console.log('EVVM Address Input:', evvmAddressInput);
-    console.log('EVVM Address Value:', evvmAddressInput?.value);
+    console.log('EVVM Address Input:', coreAddressInput);
+    console.log('EVVM Address Value:', coreAddressInput?.value);
 
-    if (!chainIdInput?.value || !evvmAddressInput?.value) {
+    if (!chainIdInput?.value || !coreAddressInput?.value) {
       alert("Please fill in all required fields");
       return;
     }
 
     const chainId = BigInt(chainIdInput.value);
-    const evvmAddress = evvmAddressInput.value as `0x${string}`;
+    const coreAddress = coreAddressInput.value as `0x${string}`;
 
     setIsLoading(true);
     setResultEvvmId(null);
@@ -59,7 +59,7 @@ export const RegisterEvvmComponent = () => {
         address: REGISTRY_ADDRESS,
         abi: RegistryCoreABI.abi,
         functionName: "registerEvvm",
-        args: [chainId, evvmAddress],
+        args: [chainId, coreAddress],
         chainId: sepolia.id,
       });
 
@@ -73,7 +73,7 @@ export const RegisterEvvmComponent = () => {
         address: REGISTRY_ADDRESS,
         abi: RegistryCoreABI.abi,
         functionName: "registerEvvm",
-        args: [chainId, evvmAddress],
+        args: [chainId, coreAddress],
         chainId: sepolia.id,
       });
 
@@ -103,7 +103,7 @@ export const RegisterEvvmComponent = () => {
       {/* EVVM Address */}
       <AddressInputField
         label="EVVM Contract Address"
-        inputId="evvmAddressInputRegister"
+        inputId="coreAddressInputRegister"
         placeholder="Enter EVVM contract address"
       />
 

@@ -11,17 +11,17 @@ import {
 import { CoreABI } from "@evvm/evvm-js";
 
 interface SetEvvmIdComponentProps {
-  evvmAddress: string;
+  coreAddress: string;
 }
 
 export const SetEvvmIdComponent = ({
-  evvmAddress,
+  coreAddress,
 }: SetEvvmIdComponentProps) => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [txHash, setTxHash] = React.useState<string | null>(null);
 
   const handleSetEvvmId = async () => {
-    if (!evvmAddress) {
+    if (!coreAddress) {
       alert("Please configure an EVVM address first in the main menu");
       return;
     }
@@ -30,7 +30,7 @@ export const SetEvvmIdComponent = ({
       "newEvvmIdInput"
     ) as HTMLInputElement;
 
-    console.log('EVVM Address from props:', evvmAddress);
+    console.log('EVVM Address from props:', coreAddress);
     console.log('New EVVM ID Input:', newEvvmIdInput);
     console.log('New EVVM ID Value:', newEvvmIdInput?.value);
 
@@ -47,7 +47,7 @@ export const SetEvvmIdComponent = ({
     try {
       // Execute the transaction
       const hash = await writeContract(config, {
-        address: evvmAddress as `0x${string}`,
+        address: coreAddress as `0x${string}`,
         abi: CoreABI,
         functionName: "setEvvmID",
         args: [newEvvmId],
@@ -69,7 +69,7 @@ export const SetEvvmIdComponent = ({
       <br />
 
       {/* Display current EVVM Address */}
-      {evvmAddress && (
+      {coreAddress && (
         <div style={{ 
           marginBottom: "1.5rem", 
           padding: "1rem", 
@@ -86,7 +86,7 @@ export const SetEvvmIdComponent = ({
             fontFamily: "monospace",
             fontSize: "0.9rem"
           }}>
-            {evvmAddress}
+            {coreAddress}
           </p>
         </div>
       )}

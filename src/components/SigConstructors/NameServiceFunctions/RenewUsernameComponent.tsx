@@ -39,7 +39,7 @@ export const RenewUsernameComponent = ({
   const [amountToRenew, setAmountToRenew] = React.useState<bigint | null>(null);
 
   const makeSig = async () => {
-    // Get values from input fields except evvmID and evvmAddress, which come from props
+    // Get values from input fields except evvmID and coreAddress, which come from props
     const getValue = (id: string) => {
       const el = document.getElementById(id) as HTMLInputElement | null;
       if (!el) {

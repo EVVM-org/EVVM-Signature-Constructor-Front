@@ -8,11 +8,11 @@ import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { HelperInfo } from "../InputsAndModules/HelperInfo";
 
 interface FaucetBalanceCheckerProps {
-  evvmAddress: string;
+  coreAddress: string;
 }
 
 export const FaucetBalanceChecker: React.FC<FaucetBalanceCheckerProps> = ({
-  evvmAddress,
+  coreAddress,
 }) => {
   const [balance, setBalance] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -28,7 +28,7 @@ export const FaucetBalanceChecker: React.FC<FaucetBalanceCheckerProps> = ({
     try {
       const result = await readContract(config, {
         abi: CoreABI,
-        address: evvmAddress as `0x${string}`,
+        address: coreAddress as `0x${string}`,
         functionName: "getBalance",
         args: [user, token],
       });

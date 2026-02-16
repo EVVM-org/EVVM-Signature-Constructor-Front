@@ -51,9 +51,10 @@ const selectStyle = {
 
 export const SigMenu = () => {
   const [menu, setMenu] = useState('pay')
-  const [evvmAddress, setEvvmAddress] = useState('')
+  const [coreAddress, setEvvmAddress] = useState('')
   const [stakingAddress, setStakingAddress] = useState('')
   const [nameserviceAddress, setNameserviceAddress] = useState('')
+  const [evvmId, setEvvmId] = useState(0)
   const [p2pswapAddress, setP2pswapAddress] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -112,7 +113,7 @@ export const SigMenu = () => {
   }
 
   const fetchContracts = async () => {
-    if (!evvmAddress) {
+    if (!coreAddress) {
       alert('Please enter a valid EVVM address')
       return
     }
@@ -121,27 +122,47 @@ export const SigMenu = () => {
       const contracts = [
         {
           abi: CoreABI as any,
-          address: evvmAddress as `0x${string}`,
+          address: coreAddress as `0x${string}`,
           functionName: 'getStakingContractAddress',
           args: [],
         },
         {
           abi: CoreABI as any,
-          address: evvmAddress as `0x${string}`,
+          address: coreAddress as `0x${string}`,
           functionName: 'getNameServiceAddress',
+          args: [],
+        },
+        {
+          abi: CoreABI as any,
+          address: coreAddress as `0x${string}`,
+          functionName: 'getEvvmID',
           args: [],
         },
       ]
       const results = await readContracts(config, { contracts })
-      const [stakingAddrResult, nsAddrResult] = results
+      const [stakingAddrResult, nsAddrResult, evvmIdResult] = results
       setStakingAddress(
         typeof stakingAddrResult?.result === 'string'
           ? stakingAddrResult.result
           : ''
       )
+
+      console.log('EVVM ID result:', evvmIdResult) // Log the EVVM ID result for debugging
       setNameserviceAddress(
         typeof nsAddrResult?.result === 'string' ? nsAddrResult.result : ''
       )
+
+      // evvmId may come back as string | number | bigint depending on provider/viem
+      const rawEvvmId = evvmIdResult?.result
+      const evvmIdValue =
+        typeof rawEvvmId === 'string'
+          ? parseInt(rawEvvmId)
+          : typeof rawEvvmId === 'bigint'
+          ? Number(rawEvvmId)
+          : typeof rawEvvmId === 'number'
+          ? rawEvvmId
+          : 0
+      setEvvmId(evvmIdValue)
     } catch (err) {
       setStakingAddress('')
       setNameserviceAddress('')
@@ -152,17 +173,14 @@ export const SigMenu = () => {
   }
 
   const payComponents = [
-    <PaySignaturesComponent key="pay" evvmAddress={evvmAddress} />,
-    <DispersePayComponent key="disperse" evvmAddress={evvmAddress} />,
+    <PaySignaturesComponent key="pay" coreAddress={coreAddress} />,
+    <DispersePayComponent key="disperse" coreAddress={coreAddress} />,
   ]
 
   const stakingComponents = [
     <GoldenStakingComponent key="golden" stakingAddress={stakingAddress} />,
-    <PresaleStakingComponent
-      key="presale"
-      stakingAddress={stakingAddress}
-    />,
-    <PublicStakingComponent key="public" stakingAddress={stakingAddress} />,
+    <PresaleStakingComponent key="presale" stakingAddress={stakingAddress} coreAddress={coreAddress} />,
+    <PublicStakingComponent key="public" stakingAddress={stakingAddress} coreAddress={coreAddress} />,
   ]
 
   const mnsComponents = [
@@ -223,14 +241,17 @@ export const SigMenu = () => {
 
   const registryComponents = [
     <RegisterEvvmComponent key="registerEvvm" />,
-    <SetEvvmIdComponent key="setEvvmId" evvmAddress={evvmAddress} />,
+    <SetEvvmIdComponent key="setEvvmId" coreAddress={coreAddress} />,
   ]
 
   const components =
     menu === 'faucet'
       ? [
-          <FaucetFunctionsComponent key="faucet" evvmAddress={evvmAddress} />,
-          <FaucetBalanceChecker key="faucetBalance" evvmAddress={evvmAddress} />,
+          <FaucetFunctionsComponent key="faucet" coreAddress={coreAddress} />,
+          <FaucetBalanceChecker
+            key="faucetBalance"
+            coreAddress={coreAddress}
+          />,
         ]
       : menu === 'pay'
         ? payComponents
@@ -279,7 +300,12 @@ export const SigMenu = () => {
             <div
               style={{ fontSize: 15, color: '#444', fontFamily: 'monospace' }}
             >
-              <strong>EVVM:</strong> {evvmAddress}
+              <strong>EVVM ID:</strong> {evvmId}
+            </div>
+            <div
+              style={{ fontSize: 15, color: '#444', fontFamily: 'monospace' }}
+            >
+              <strong>EVVM:</strong> {coreAddress}
             </div>
             <div
               style={{ fontSize: 15, color: '#444', fontFamily: 'monospace' }}
@@ -304,7 +330,7 @@ export const SigMenu = () => {
             <input
               type="text"
               placeholder="EVVM Contract Address"
-              value={evvmAddress}
+              value={coreAddress}
               onChange={(e) => setEvvmAddress(e.target.value)}
               style={{
                 padding: '0.75rem 1rem',

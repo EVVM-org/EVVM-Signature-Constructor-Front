@@ -18,11 +18,11 @@ import {
 } from '@/components/SigConstructors/InputsAndModules'
 
 interface PaySignaturesComponentProps {
-  evvmAddress: string
+  coreAddress: string
 }
 
 export const PaySignaturesComponent = ({
-  evvmAddress,
+  coreAddress,
 }: PaySignaturesComponentProps) => {
   const [isUsingUsernames, setIsUsingUsernames] = React.useState(false)
   const [isUsingExecutor, setIsUsingExecutor] = React.useState(false)
@@ -34,7 +34,7 @@ export const PaySignaturesComponent = ({
   const makeSig = async () => {
     const getValue = (id: string) =>
       (document.getElementById(id) as HTMLInputElement)?.value
-    if (!evvmAddress) {
+    if (!coreAddress) {
       console.error('EVVM address is required')
       return
     }
@@ -58,7 +58,7 @@ export const PaySignaturesComponent = ({
       const signer = await getEvvmSigner()
       const evvm = new Core({
         signer,
-        address: evvmAddress as `0x${string}`,
+        address: coreAddress as `0x${string}`,
         chainId: getCurrentChainId(),
       })
 
@@ -94,7 +94,7 @@ export const PaySignaturesComponent = ({
   }
 
   const executePayment = async () => {
-    if (!dataToGet || !evvmAddress) {
+    if (!dataToGet || !coreAddress) {
       console.error('Missing data or address')
       return
     }

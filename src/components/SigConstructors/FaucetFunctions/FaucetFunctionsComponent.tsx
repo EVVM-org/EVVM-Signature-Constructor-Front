@@ -9,11 +9,11 @@ import { CoreABI } from "@evvm/evvm-js";
 import { HelperInfo } from "../InputsAndModules/HelperInfo";
 
 interface FaucetFunctionsComponentProps {
-  evvmAddress: string;
+  coreAddress: string;
 }
 
 export const FaucetFunctionsComponent = ({
-  evvmAddress,
+  coreAddress,
 }: FaucetFunctionsComponentProps) => {
   const account = getAccount(config);
 
@@ -22,7 +22,7 @@ export const FaucetFunctionsComponent = ({
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
-      evvmAddress: evvmAddress,
+      coreAddress: coreAddress,
       user: getValue("addressGive_faucet"),
       token: getValue("tokenAddress_faucet"),
       quantity: getValue("amountTokenInput_faucet"),
@@ -30,7 +30,7 @@ export const FaucetFunctionsComponent = ({
 
     writeContract(config, {
       abi: CoreABI,
-      address: formData.evvmAddress as `0x${string}`,
+      address: formData.coreAddress as `0x${string}`,
       functionName: "addBalance",
       args: [formData.user, formData.token, formData.quantity],
     })

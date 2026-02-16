@@ -20,10 +20,12 @@ type InputData = {
 
 interface PublicStakingComponentProps {
   stakingAddress: string;
+  coreAddress: string,
 }
 
 export const PublicStakingComponent = ({
   stakingAddress,
+  coreAddress,
 }: PublicStakingComponentProps) => {
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState<"low" | "high">("low");
@@ -54,7 +56,7 @@ export const PublicStakingComponent = ({
       const signer = await getEvvmSigner();
       const evvm = new Core({
         signer,
-        address: stakingAddress as `0x${string}`,
+        address: coreAddress as `0x${string}`,
         chainId: getCurrentChainId(),
       });
       const stakingService = new Staking({

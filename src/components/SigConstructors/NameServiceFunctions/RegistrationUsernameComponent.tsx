@@ -134,14 +134,14 @@ export const RegistrationUsernameComponent = ({
         functionName: "getEvvmAddress",
         args: [],
       })
-        .then((evvmAddress) => {
-          if (!evvmAddress) {
+        .then((coreAddress) => {
+          if (!coreAddress) {
             setRewardAmount(null);
           }
 
           readContract(config, {
             abi: CoreABI,
-            address: evvmAddress as `0x${string}`,
+            address: coreAddress as `0x${string}`,
             functionName: "getRewardAmount",
             args: [],
           })

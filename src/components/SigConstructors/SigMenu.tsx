@@ -4,29 +4,37 @@ import { switchChain } from '@wagmi/core'
 import { readContracts } from '@wagmi/core'
 import { config, networks } from '@/config/index'
 import { CoreABI } from '@evvm/evvm-js'
+import {
+  PreRegistrationUsernameComponent,
+  RegistrationUsernameComponent,
+  MakeOfferComponent,
+  WithdrawOfferComponent,
+  AcceptOfferComponent,
+  RenewUsernameComponent,
+  AddCustomMetadataComponent,
+  RemoveCustomMetadataComponent,
+  FlushCustomMetadataComponent,
+  FlushUsernameComponent,
+} from './NameServiceFunctions'
 import { FaucetFunctionsComponent } from './FaucetFunctions/FaucetFunctionsComponent'
-import { PaySignaturesComponent } from './PaymentFunctions/PaySignaturesComponent'
-import { DispersePayComponent } from './PaymentFunctions/DispersePayComponent'
-import { GoldenStakingComponent } from './StakingFunctions/GoldenStakingComponent'
-import { PresaleStakingComponent } from './StakingFunctions/PresaleStakingComponent'
-import { PublicStakingComponent } from './StakingFunctions/PublicStakingComponent'
-import { PreRegistrationUsernameComponent } from './NameServiceFunctions/PreRegistrationUsernameComponent'
-import { RegistrationUsernameComponent } from './NameServiceFunctions/RegistrationUsernameComponent'
-import { MakeOfferComponent } from './NameServiceFunctions/MakeOfferComponent'
-import { WithdrawOfferComponent } from './NameServiceFunctions/WithdrawOfferComponent'
-import { AcceptOfferComponent } from './NameServiceFunctions/AcceptOfferComponent'
-import { RenewUsernameComponent } from './NameServiceFunctions/RenewUsernameComponent'
-import { AddCustomMetadataComponent } from './NameServiceFunctions/AddCustomMetadataComponent'
-import { RemoveCustomMetadataComponent } from './NameServiceFunctions/RemoveCustomMetadataComponent'
-import { FlushCustomMetadataComponent } from './NameServiceFunctions/FlushCustomMetadataComponent'
-import { FlushUsernameComponent } from './NameServiceFunctions/FlushUsernameComponent'
+import {
+  PaySignaturesComponent,
+  DispersePayComponent,
+} from './PaymentFunctions'
+import {
+  GoldenStakingComponent,
+  PresaleStakingComponent,
+  PublicStakingComponent,
+} from './StakingFunctions'
+
 import { FaucetBalanceChecker } from './FaucetFunctions/FaucetBalanceChecker'
-import { MakeOrderComponent } from './P2PSwap/MakeOrderComponent'
-import { CancelOrderComponent } from './P2PSwap/CancelOrderComponent'
-import { DispatchOrderFillPropotionalFeeComponent } from './P2PSwap/DispatchOrderPropotionalComponent'
-import { DispatchOrderFillFixedFeeComponent } from './P2PSwap/DispatchOrderFixedComponent'
-import { RegisterEvvmComponent } from './EvvmRegistery/RegisterEvvmComponent'
-import { SetEvvmIdComponent } from './EvvmRegistery/SetEvvmIdComponent'
+import {
+  MakeOrderComponent,
+  CancelOrderComponent,
+  DispatchOrderFillPropotionalFeeComponent,
+  DispatchOrderFillFixedFeeComponent,
+} from './P2PSwap'
+import { RegisterEvvmComponent, SetEvvmIdComponent } from './EvvmRegistery'
 
 const boxStyle = {
   display: 'flex',

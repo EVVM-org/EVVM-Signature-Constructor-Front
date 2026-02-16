@@ -44,16 +44,16 @@ export const AcceptOfferComponent = ({
       username: getValue("usernameInput_acceptOffer"),
       offerId: getValue("offerIdInput_acceptOffer"),
       nonce: getValue("nonceInput_acceptOffer"),
-      priorityFeePay: getValue("priorityFeeEVVMInput_acceptOffer"),
+      priorityFeePay: getValue("priorityFeePayInput_acceptOffer"),
       isAsyncExecPay: priority === "high",
-      noncePay: getValue("nonceEVVMInput_acceptOffer"),
+      noncePay: getValue("noncePayInput_acceptOffer"),
     };
 
     try {
       const signer = await getEvvmSigner();
       
-      // Create EVVM service for payment
-      const evvmService = new Core({
+      // Create Croe service for payment
+      const coreService = new Core({
         signer,
         address: formData.addressNameService as `0x${string}`,
         chainId: getCurrentChainId(),
@@ -67,7 +67,7 @@ export const AcceptOfferComponent = ({
       });
 
       // Sign EVVM payment first
-      const payAction = await evvmService.pay({
+      const payAction = await coreService.pay({
         toAddress: formData.addressNameService as `0x${string}`,
         tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
         amount: BigInt(0),
@@ -139,7 +139,7 @@ export const AcceptOfferComponent = ({
 
       <NumberInputField
         label="Priority fee"
-        inputId="priorityFeeEVVMInput_acceptOffer"
+        inputId="priorityFeePayInput_acceptOffer"
         placeholder="Enter priority fee"
       />
 
@@ -148,7 +148,7 @@ export const AcceptOfferComponent = ({
 
       <NumberInputWithGenerator
         label="EVVM Nonce"
-        inputId="nonceEVVMInput_acceptOffer"
+        inputId="noncePayInput_acceptOffer"
         placeholder="Enter nonce"
         showRandomBtn={priority !== "low"}
       />
@@ -157,7 +157,7 @@ export const AcceptOfferComponent = ({
         {priority === "low" && (
           <HelperInfo label="How to find my sync nonce?">
             <div>
-              You can retrieve your next sync nonce from the EVVM contract using
+              You can retrieve your next sync nonce from the Core contract using
               the <code>getNextCurrentSyncNonce</code> function.
             </div>
           </HelperInfo>

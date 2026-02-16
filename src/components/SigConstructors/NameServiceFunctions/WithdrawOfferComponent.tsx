@@ -52,7 +52,7 @@ export const WithdrawOfferComponent = ({
       const signer = await getEvvmSigner();
       
       // Create EVVM service for payment
-      const evvmService = new Core({
+      const coreService = new Core({
         signer,
         address: formData.addressNameService as `0x${string}`,
         chainId: getCurrentChainId(),
@@ -66,7 +66,7 @@ export const WithdrawOfferComponent = ({
       });
 
       // Sign EVVM payment first
-      const payAction = await evvmService.pay({
+      const payAction = await coreService.pay({
         toAddress: formData.addressNameService as `0x${string}`,
         tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
         amount: BigInt(0),

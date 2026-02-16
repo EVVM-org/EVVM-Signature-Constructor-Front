@@ -178,7 +178,7 @@ export const SigMenu = () => {
   ]
 
   const stakingComponents = [
-    <GoldenStakingComponent key="golden" stakingAddress={stakingAddress} />,
+    <GoldenStakingComponent key="golden" stakingAddress={stakingAddress} coreAddress={coreAddress} />,
     <PresaleStakingComponent key="presale" stakingAddress={stakingAddress} coreAddress={coreAddress} />,
     <PublicStakingComponent key="public" stakingAddress={stakingAddress} coreAddress={coreAddress} />,
   ]

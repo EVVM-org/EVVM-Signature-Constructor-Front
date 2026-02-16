@@ -12,16 +12,12 @@ import {
   NumberInputField,
   StakingActionSelector,
 } from "@/components/SigConstructors/InputsAndModules";
+import { PublicStakingComponentProps } from "@/types";
 
 type InputData = {
   IPublicStakingData: ISerializableSignedAction<IPublicStakingData>;
   IPayData: ISerializableSignedAction<IPayData>;
 };
-
-interface PublicStakingComponentProps {
-  stakingAddress: string;
-  coreAddress: string,
-}
 
 export const PublicStakingComponent = ({
   stakingAddress,

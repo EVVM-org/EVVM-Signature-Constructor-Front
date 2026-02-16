@@ -19,14 +19,11 @@ import {
   StakingActionSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 
+import { PresaleStakingComponentProps } from "@/types";
+
 type InputData = {
   IPresaleStakingData: ISerializableSignedAction<IPresaleStakingData>
   IPayData: ISerializableSignedAction<IPayData>
-}
-
-interface PresaleStakingComponentProps {
-  stakingAddress: string,
-  coreAddress: string,
 }
 
 export const PresaleStakingComponent = ({

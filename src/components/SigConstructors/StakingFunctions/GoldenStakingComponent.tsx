@@ -12,12 +12,11 @@ import {
   StakingActionSelector,
 } from "@/components/SigConstructors/InputsAndModules";
 
-interface GoldenStakingComponentProps {
-  stakingAddress: string;
-}
+import { GoldenStakingComponentProps } from "@/types";
 
 export const GoldenStakingComponent = ({
   stakingAddress,
+  coreAddress
 }: GoldenStakingComponentProps) => {
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState<"low" | "high">("low");
@@ -48,7 +47,7 @@ export const GoldenStakingComponent = ({
       const signer = await getEvvmSigner();
       const stakingService = new Staking({
         signer,
-        address: stakingAddress as `0x${string}`,
+        address: coreAddress as `0x${string}`,
         chainId: getCurrentChainId(),
       });
 

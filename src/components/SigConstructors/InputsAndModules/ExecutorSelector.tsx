@@ -9,9 +9,9 @@ interface ExecutorSelectorProps {
 }
 
 export const ExecutorSelector: React.FC<ExecutorSelectorProps> = ({
-  label = "Are you using an executor?",
+  label = "Are you using an senderExecutor?",
   inputId,
-  placeholder = "Enter executor",
+  placeholder = "Enter senderExecutor",
   onExecutorToggle,
   isUsingExecutor,
 }) => {

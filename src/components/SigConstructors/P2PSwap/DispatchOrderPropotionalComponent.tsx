@@ -14,7 +14,7 @@ import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
 import {
   IDispatchOrderData,
   P2PSwap,
-  EVVM,
+  Core,
   type ISerializableSignedAction,
 } from '@evvm/evvm-js'
 
@@ -56,8 +56,8 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
     const priorityFee = BigInt(
       getValue('priorityFee_DispatchOrderFillPropotionalFee')
     )
-    const nonce_EVVM = BigInt(
-      getValue('nonce_EVVM_DispatchOrderFillPropotionalFee')
+    const noncePay = BigInt(
+      getValue('noncePay_DispatchOrderFillPropotionalFee')
     )
 
     const amountOfTokenBToFill = amountB + fee
@@ -66,7 +66,7 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
       const signer = await getEvvmSigner()
       
       // Create EVVM service for payment
-      const evvmService = new EVVM({
+      const evvmService = new Core({
         signer,
         address: p2pSwapAddress as `0x${string}`,
         chainId: getCurrentChainId(),
@@ -81,13 +81,13 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
 
       // create evvm pay() signature
       const payAction = await evvmService.pay({
-        to: p2pSwapAddress,
+        toAddress: p2pSwapAddress as `0x${string}`,
         tokenAddress: tokenB,
         amount: amountOfTokenBToFill,
         priorityFee: priorityFee,
-        nonce: nonce_EVVM,
-        priorityFlag: priority === 'high',
-        executor: p2pSwapAddress as `0x${string}`,
+        nonce: noncePay,
+        isAsyncExec: priority === 'high',
+        senderExecutor: p2pSwapAddress as `0x${string}`,
       })
 
       // create p2pswap dispatchOrderFillPropotionalFee() signature
@@ -208,7 +208,7 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
 
       <NumberInputWithGenerator
         label="Nonce for EVVM contract interaction"
-        inputId="nonce_EVVM_DispatchOrderFillPropotionalFee"
+        inputId="noncePay_DispatchOrderFillPropotionalFee"
         placeholder="Enter nonce"
         showRandomBtn={priority !== 'low'}
       />

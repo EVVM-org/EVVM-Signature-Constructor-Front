@@ -18,7 +18,7 @@ import {
   IPayData,
   IRemoveCustomMetadataData,
   NameService,
-  EVVM,
+  Core,
   type ISerializableSignedAction,
 } from "@evvm/evvm-js";
 
@@ -46,16 +46,16 @@ export const RemoveCustomMetadataComponent = ({
       nonceNameService: getValue("nonceNameServiceInput_removeCustomMetadata"),
       identity: getValue("identityInput_removeCustomMetadata"),
       key: getValue("keyInput_removeCustomMetadata"),
-      priorityFee_EVVM: getValue("priorityFeeInput_removeCustomMetadata"),
+      priorityFeePay: getValue("priorityFeeInput_removeCustomMetadata"),
       nonceEVVM: getValue("nonceEVVMInput_removeCustomMetadata"),
-      priorityFlag: priority === "high",
+      isAsyncExec: priority === "high",
     };
 
     try {
       const signer = await getEvvmSigner();
       
       // Create EVVM service for payment
-      const evvmService = new EVVM({
+      const evvmService = new Core({
         signer,
         address: formData.addressNameService as `0x${string}`,
         chainId: getCurrentChainId(),
@@ -81,18 +81,17 @@ export const RemoveCustomMetadataComponent = ({
 
       // Sign EVVM payment first
       const payAction = await evvmService.pay({
-        to: formData.addressNameService,
+        toAddress: formData.addressNameService as `0x${string}`,
         tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
         amount: price as bigint,
-        priorityFee: BigInt(formData.priorityFee_EVVM),
+        priorityFee: BigInt(formData.priorityFeePay),
         nonce: BigInt(formData.nonceEVVM),
-        priorityFlag: formData.priorityFlag,
-        executor: formData.addressNameService as `0x${string}`,
+        isAsyncExec: formData.isAsyncExec,
+        senderExecutor: formData.addressNameService as `0x${string}`,
       });
 
       // Sign remove custom metadata action
       const removeCustomMetadataAction = await nameServiceService.removeCustomMetadata({
-        user: signer.address,
         identity: formData.identity,
         key: BigInt(formData.key),
         nonce: BigInt(formData.nonceNameService),

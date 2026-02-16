@@ -15,7 +15,7 @@ import {
   IPayData,
   IWithdrawOfferData,
   NameService,
-  EVVM,
+  Core,
   type ISerializableSignedAction,
 } from "@evvm/evvm-js";
 
@@ -43,16 +43,16 @@ export const WithdrawOfferComponent = ({
       nonceNameService: getValue("nonceNameServiceInput_withdrawOffer"),
       username: getValue("usernameInput_withdrawOffer"),
       offerId: getValue("offerIdInput_withdrawOffer"),
-      priorityFee_EVVM: getValue("priorityFeeInput_withdrawOffer"),
-      nonce_EVVM: getValue("nonceEVVMInput_withdrawOffer"),
-      priorityFlag_EVVM: priority === "high",
+      priorityFeePay: getValue("priorityFeeInput_withdrawOffer"),
+      noncePay: getValue("nonceEVVMInput_withdrawOffer"),
+      isAsyncExecPay: priority === "high",
     };
 
     try {
       const signer = await getEvvmSigner();
       
       // Create EVVM service for payment
-      const evvmService = new EVVM({
+      const evvmService = new Core({
         signer,
         address: formData.addressNameService as `0x${string}`,
         chainId: getCurrentChainId(),
@@ -67,18 +67,17 @@ export const WithdrawOfferComponent = ({
 
       // Sign EVVM payment first
       const payAction = await evvmService.pay({
-        to: formData.addressNameService,
+        toAddress: formData.addressNameService as `0x${string}`,
         tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
         amount: BigInt(0),
-        priorityFee: BigInt(formData.priorityFee_EVVM),
-        nonce: BigInt(formData.nonce_EVVM),
-        priorityFlag: formData.priorityFlag_EVVM,
-        executor: formData.addressNameService as `0x${string}`,
+        priorityFee: BigInt(formData.priorityFeePay),
+        nonce: BigInt(formData.noncePay),
+        isAsyncExec: formData.isAsyncExecPay,
+        senderExecutor: formData.addressNameService as `0x${string}`,
       });
 
       // Sign withdraw offer action
       const withdrawOfferAction = await nameServiceService.withdrawOffer({
-        user: signer.address,
         username: formData.username,
         offerID: BigInt(formData.offerId),
         nonce: BigInt(formData.nonceNameService),

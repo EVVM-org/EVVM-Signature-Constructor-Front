@@ -13,12 +13,12 @@ import {
 } from "@/components/SigConstructors/InputsAndModules";
 import { execute } from "@evvm/evvm-js";
 import { getEvvmSigner, getCurrentChainId } from "@/utils/evvm-signer";
-import { NameServiceABI, EvvmABI } from "@evvm/evvm-js";
+import { NameServiceABI, CoreABI } from "@evvm/evvm-js";
 import {
   IPayData,
   IRegistrationUsernameData,
   NameService,
-  EVVM,
+  Core,
   type ISerializableSignedAction,
 } from "@evvm/evvm-js";
 
@@ -53,10 +53,10 @@ export const RegistrationUsernameComponent = ({
       addressNameService: nameServiceAddress,
       nonceNameService: getValue("nonceNameServiceInput_registrationUsername"),
       username: getValue("usernameInput_registrationUsername"),
-      clowNumber: getValue("clowNumberInput_registrationUsername"),
-      priorityFee_EVVM: getValue("priorityFeeInput_registrationUsername"),
+      lockNumber: getValue("lockNumberInput_registrationUsername"),
+      priorityFeePay: getValue("priorityFeeInput_registrationUsername"),
       nonceEVVM: getValue("nonceEVVMInput_registrationUsername"),
-      priorityFlag: priority === "high",
+      isAsyncExec: priority === "high",
     };
 
     // Validate that required fields are not empty
@@ -66,13 +66,13 @@ export const RegistrationUsernameComponent = ({
     if (!formData.nonceNameService) {
       throw new Error("NameService nonce is required");
     }
-    if (!formData.clowNumber) {
+    if (!formData.lockNumber) {
       throw new Error("Clow number is required");
     }
     if (!formData.nonceEVVM) {
       throw new Error("EVVM nonce is required");
     }
-    if (!formData.priorityFee_EVVM) {
+    if (!formData.priorityFeePay) {
       throw new Error("Priority fee is required");
     }
 
@@ -80,7 +80,7 @@ export const RegistrationUsernameComponent = ({
       const signer = await getEvvmSigner();
       
       // Create EVVM service for payment
-      const evvmService = new EVVM({
+      const evvmService = new Core({
         signer,
         address: formData.addressNameService as `0x${string}`,
         chainId: getCurrentChainId(),
@@ -97,20 +97,19 @@ export const RegistrationUsernameComponent = ({
 
       // Sign EVVM payment first
       const payAction = await evvmService.pay({
-        to: formData.addressNameService,
+        toAddress: formData.addressNameService as `0x${string}`,
         tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
         amount: rewardAmount ? rewardAmount * BigInt(100) : BigInt(0),
-        priorityFee: BigInt(formData.priorityFee_EVVM),
+        priorityFee: BigInt(formData.priorityFeePay),
         nonce: BigInt(formData.nonceEVVM),
-        priorityFlag: formData.priorityFlag,
-        executor: formData.addressNameService as `0x${string}`,
+        isAsyncExec: formData.isAsyncExec,
+        senderExecutor: formData.addressNameService as `0x${string}`,
       });
 
       // Sign registration username action
       const registrationAction = await nameServiceService.registrationUsername({
-        user: signer.address,
         username: formData.username,
-        clowNumber: BigInt(formData.clowNumber),
+        lockNumber: BigInt(formData.lockNumber),
         nonce: BigInt(formData.nonceNameService),
         evvmSignedAction: payAction,
       });
@@ -141,7 +140,7 @@ export const RegistrationUsernameComponent = ({
           }
 
           readContract(config, {
-            abi: EvvmABI,
+            abi: CoreABI,
             address: evvmAddress as `0x${string}`,
             functionName: "getRewardAmount",
             args: [],
@@ -203,7 +202,7 @@ export const RegistrationUsernameComponent = ({
 
       <NumberInputField
         label="Clow Number"
-        inputId="clowNumberInput_registrationUsername"
+        inputId="lockNumberInput_registrationUsername"
         placeholder="Enter clow number"
       />
 

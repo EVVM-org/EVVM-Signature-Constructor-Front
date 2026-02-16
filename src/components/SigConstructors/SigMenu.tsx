@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { switchChain } from '@wagmi/core'
 import { readContracts } from '@wagmi/core'
 import { config, networks } from '@/config/index'
-import { EvvmABI } from '@evvm/evvm-js'
+import { CoreABI } from '@evvm/evvm-js'
 import { FaucetFunctionsComponent } from './FaucetFunctions/FaucetFunctionsComponent'
 import { PaySignaturesComponent } from './PaymentFunctions/PaySignaturesComponent'
 import { DispersePayComponent } from './PaymentFunctions/DispersePayComponent'
@@ -120,13 +120,13 @@ export const SigMenu = () => {
     try {
       const contracts = [
         {
-          abi: EvvmABI as any,
+          abi: CoreABI as any,
           address: evvmAddress as `0x${string}`,
           functionName: 'getStakingContractAddress',
           args: [],
         },
         {
-          abi: EvvmABI as any,
+          abi: CoreABI as any,
           address: evvmAddress as `0x${string}`,
           functionName: 'getNameServiceAddress',
           args: [],

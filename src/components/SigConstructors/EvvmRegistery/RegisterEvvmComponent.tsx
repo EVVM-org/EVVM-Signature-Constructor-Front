@@ -9,7 +9,7 @@ import {
   NumberInputField,
 } from "@/components/SigConstructors/InputsAndModules";
 
-import RegistryEvvmABI from "@/abi/RegistryEvvm.json";
+import RegistryCoreABI from "@/abi/RegistryEvvm.json";
 
 const REGISTRY_ADDRESS = "0x389dC8fb09211bbDA841D59f4a51160dA2377832" as const;
 
@@ -57,7 +57,7 @@ export const RegisterEvvmComponent = () => {
       // First, simulate the contract call to get the evvmID that would be returned
       const { result } = await simulateContract(config, {
         address: REGISTRY_ADDRESS,
-        abi: RegistryEvvmABI.abi,
+        abi: RegistryCoreABI.abi,
         functionName: "registerEvvm",
         args: [chainId, evvmAddress],
         chainId: sepolia.id,
@@ -71,7 +71,7 @@ export const RegisterEvvmComponent = () => {
       // Now execute the actual transaction
       const hash = await writeContract(config, {
         address: REGISTRY_ADDRESS,
-        abi: RegistryEvvmABI.abi,
+        abi: RegistryCoreABI.abi,
         functionName: "registerEvvm",
         args: [chainId, evvmAddress],
         chainId: sepolia.id,

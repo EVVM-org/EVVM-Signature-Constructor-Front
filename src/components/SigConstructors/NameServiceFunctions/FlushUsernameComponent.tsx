@@ -18,7 +18,7 @@ import {
   IPayData,
   IFlushUsernameData,
   NameService,
-  EVVM,
+  Core,
   type ISerializableSignedAction,
 } from "@evvm/evvm-js";
 
@@ -45,16 +45,16 @@ export const FlushUsernameComponent = ({
       addressNameService: nameServiceAddress,
       nonceNameService: getValue("nonceNameServiceInput_flushUsername"),
       username: getValue("usernameInput_flushUsername"),
-      priorityFee_EVVM: getValue("priorityFeeInput_flushUsername"),
-      nonce_EVVM: getValue("nonceEVVMInput_flushUsername"),
-      priorityFlag_EVVM: priority === "high",
+      priorityFeePay: getValue("priorityFeeInput_flushUsername"),
+      noncePay: getValue("nonceEVVMInput_flushUsername"),
+      isAsyncExecPay: priority === "high",
     };
 
     try {
       const signer = await getEvvmSigner();
       
       // Create EVVM service for payment
-      const evvmService = new EVVM({
+      const evvmService = new Core({
         signer,
         address: formData.addressNameService as `0x${string}`,
         chainId: getCurrentChainId(),
@@ -80,18 +80,17 @@ export const FlushUsernameComponent = ({
 
       // Sign EVVM payment first
       const payAction = await evvmService.pay({
-        to: formData.addressNameService,
+        toAddress: formData.addressNameService as `0x${string}`,
         tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
         amount: priceToFlushUsername as bigint,
-        priorityFee: BigInt(formData.priorityFee_EVVM),
-        nonce: BigInt(formData.nonce_EVVM),
-        priorityFlag: formData.priorityFlag_EVVM,
-        executor: formData.addressNameService as `0x${string}`,
+        priorityFee: BigInt(formData.priorityFeePay),
+        nonce: BigInt(formData.noncePay),
+        isAsyncExec: formData.isAsyncExecPay,
+        senderExecutor: formData.addressNameService as `0x${string}`,
       });
 
       // Sign flush username action
       const flushUsernameAction = await nameServiceService.flushUsername({
-        user: signer.address,
         username: formData.username,
         nonce: BigInt(formData.nonceNameService),
         evvmSignedAction: payAction,

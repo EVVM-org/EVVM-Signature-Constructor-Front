@@ -18,7 +18,7 @@ import {
   IPayData,
   IFlushCustomMetadataData,
   NameService,
-  EVVM,
+  Core,
   type ISerializableSignedAction,
 } from "@evvm/evvm-js";
 
@@ -45,16 +45,16 @@ export const FlushCustomMetadataComponent = ({
       addressNameService: nameServiceAddress,
       nonceNameService: getValue("nonceNameServiceInput_flushCustomMetadata"),
       identity: getValue("identityInput_flushCustomMetadata"),
-      priorityFee_EVVM: getValue("priorityFeeInput_flushCustomMetadata"),
-      nonce_EVVM: getValue("nonceEVVMInput_flushCustomMetadata"),
-      priorityFlag_EVVM: priority === "high",
+      priorityFeePay: getValue("priorityFeeInput_flushCustomMetadata"),
+      noncePay: getValue("nonceEVVMInput_flushCustomMetadata"),
+      isAsyncExecPay: priority === "high",
     };
 
     try {
       const signer = await getEvvmSigner();
       
       // Create EVVM service for payment
-      const evvmService = new EVVM({
+      const evvmService = new Core({
         signer,
         address: formData.addressNameService as `0x${string}`,
         chainId: getCurrentChainId(),
@@ -76,18 +76,17 @@ export const FlushCustomMetadataComponent = ({
 
       // Sign EVVM payment first
       const payAction = await evvmService.pay({
-        to: formData.addressNameService,
+        toAddress: formData.addressNameService as `0x${string}`,
         tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
         amount: price as bigint,
-        priorityFee: BigInt(formData.priorityFee_EVVM),
-        nonce: BigInt(formData.nonce_EVVM),
-        priorityFlag: formData.priorityFlag_EVVM,
-        executor: formData.addressNameService as `0x${string}`,
+        priorityFee: BigInt(formData.priorityFeePay),
+        nonce: BigInt(formData.noncePay),
+        isAsyncExec: formData.isAsyncExecPay,
+        senderExecutor: formData.addressNameService as `0x${string}`,
       });
 
       // Sign flush custom metadata action
       const flushCustomMetadataAction = await nameServiceService.flushCustomMetadata({
-        user: signer.address,
         identity: formData.identity,
         nonce: BigInt(formData.nonceNameService),
         evvmSignedAction: payAction,

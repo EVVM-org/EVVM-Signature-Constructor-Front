@@ -18,7 +18,7 @@ import {
   IPayData,
   IRenewUsernameData,
   NameService,
-  EVVM,
+  Core,
   type ISerializableSignedAction,
 } from "@evvm/evvm-js";
 
@@ -54,16 +54,16 @@ export const RenewUsernameComponent = ({
       username: getValue("usernameInput_renewUsername"),
       nonceNameService: BigInt(getValue("nonceNameServiceInput_renewUsername")),
       amountToRenew: BigInt(getValue("amountToRenew_renewUsername")),
-      priorityFee_EVVM: BigInt(getValue("priorityFeeInput_renewUsername")),
+      priorityFeePay: BigInt(getValue("priorityFeeInput_renewUsername")),
       nonceEVVM: BigInt(getValue("nonceEVVMInput_renewUsername")),
-      priorityFlag: priority === "high",
+      isAsyncExec: priority === "high",
     };
 
     try {
       const signer = await getEvvmSigner();
       
       // Create EVVM service for payment
-      const evvmService = new EVVM({
+      const evvmService = new Core({
         signer,
         address: formData.addressNameService as `0x${string}`,
         chainId: getCurrentChainId(),
@@ -78,18 +78,17 @@ export const RenewUsernameComponent = ({
 
       // Sign EVVM payment first
       const payAction = await evvmService.pay({
-        to: formData.addressNameService,
+        toAddress: formData.addressNameService as `0x${string}`,
         tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
         amount: formData.amountToRenew,
         priorityFee: BigInt(0),
         nonce: formData.nonceEVVM,
-        priorityFlag: formData.priorityFlag,
-        executor: formData.addressNameService as `0x${string}`,
+        isAsyncExec: formData.isAsyncExec,
+        senderExecutor: formData.addressNameService as `0x${string}`,
       });
 
       // Sign renew username action
       const renewUsernameAction = await nameServiceService.renewUsername({
-        user: signer.address,
         username: formData.username,
         nonce: formData.nonceNameService,
         evvmSignedAction: payAction,

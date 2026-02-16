@@ -1,8 +1,14 @@
-"use client";
-import React from "react";
-import { EVVM, Staking, type IPresaleStakingData, type IPayData, type ISerializableSignedAction } from "@evvm/evvm-js";
-import { execute } from "@evvm/evvm-js";
-import { getEvvmSigner, getCurrentChainId } from "@/utils/evvm-signer";
+'use client'
+import React from 'react'
+import {
+  Core,
+  Staking,
+  type IPresaleStakingData,
+  type IPayData,
+  type ISerializableSignedAction,
+} from '@evvm/evvm-js'
+import { execute } from '@evvm/evvm-js'
+import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
 import {
   TitleAndLink,
   NumberInputWithGenerator,
@@ -11,102 +17,102 @@ import {
   HelperInfo,
   NumberInputField,
   StakingActionSelector,
-} from "@/components/SigConstructors/InputsAndModules";
+} from '@/components/SigConstructors/InputsAndModules'
 
 type InputData = {
-  IPresaleStakingData: ISerializableSignedAction<IPresaleStakingData>;
-  IPayData: ISerializableSignedAction<IPayData>;
-};
+  IPresaleStakingData: ISerializableSignedAction<IPresaleStakingData>
+  IPayData: ISerializableSignedAction<IPayData>
+}
 
 interface PresaleStakingComponentProps {
-  stakingAddress: string;
+  stakingAddress: string
 }
 
 export const PresaleStakingComponent = ({
   stakingAddress,
 }: PresaleStakingComponentProps) => {
-  const [isStaking, setIsStaking] = React.useState(true);
-  const [priority, setPriority] = React.useState<"low" | "high">("low");
-  const [dataToGet, setDataToGet] = React.useState<InputData | null>(null);
-  const [loading, setLoading] = React.useState(false);
+  const [isStaking, setIsStaking] = React.useState(true)
+  const [priority, setPriority] = React.useState<'low' | 'high'>('low')
+  const [dataToGet, setDataToGet] = React.useState<InputData | null>(null)
+  const [loading, setLoading] = React.useState(false)
 
   const makeSig = async () => {
     const getValue = (id: string) =>
-      (document.getElementById(id) as HTMLInputElement)?.value;
+      (document.getElementById(id) as HTMLInputElement)?.value
 
     if (!stakingAddress) {
-      console.error("Staking address is required");
-      return;
+      console.error('Staking address is required')
+      return
     }
 
-    const priorityFee_EVVM = getValue("priorityFeeInput_presaleStaking");
-    const nonce_EVVM = getValue("nonceEVVMInput_presaleStaking");
-    const nonce = getValue("nonceStakingInput_presaleStaking");
+    const priorityFeePay = getValue('priorityFeeInput_presaleStaking')
+    const noncePay = getValue('nonceEVVMInput_presaleStaking')
+    const nonce = getValue('nonceStakingInput_presaleStaking')
 
-    if (!priorityFee_EVVM || !nonce_EVVM || !nonce) {
-      console.error("All fields are required");
-      return;
+    if (!priorityFeePay || !noncePay || !nonce) {
+      console.error('All fields are required')
+      return
     }
 
-    setLoading(true);
+    setLoading(true)
     try {
-      const signer = await getEvvmSigner();
-      const evvm = new EVVM({
+      const signer = await getEvvmSigner()
+      const evvm = new Core({
         signer,
         address: stakingAddress as `0x${string}`,
         chainId: getCurrentChainId(),
-      });
+      })
       const stakingService = new Staking({
         signer,
         address: stakingAddress as `0x${string}`,
         chainId: getCurrentChainId(),
-      });
+      })
 
-      const amountOfToken = BigInt(1) * BigInt(10) ** BigInt(18);
+      const amountOfToken = BigInt(1) * BigInt(10) ** BigInt(18)
 
       const payAction = await evvm.pay({
-        to: stakingAddress,
-        tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+        toAddress: stakingAddress as `0x${string}`,
+        tokenAddress:
+          '0x0000000000000000000000000000000000000001' as `0x${string}`,
         amount: amountOfToken,
-        priorityFee: BigInt(priorityFee_EVVM),
-        nonce: BigInt(nonce_EVVM),
-        priorityFlag: priority === "high",
-        executor: stakingAddress as `0x${string}`,
-      });
+        priorityFee: BigInt(priorityFeePay),
+        nonce: BigInt(noncePay),
+        isAsyncExec: priority === 'high',
+        senderExecutor: stakingAddress as `0x${string}`,
+      })
 
       const stakingAction = await stakingService.presaleStaking({
         isStaking,
-        amountOfStaking: BigInt(1),
         nonce: BigInt(nonce),
         evvmSignedAction: payAction,
-      });
+      })
 
       setDataToGet({
         IPresaleStakingData: stakingAction.toJSON(),
         IPayData: payAction.toJSON(),
-      });
+      })
     } catch (error) {
-      console.error("Error creating signature:", error);
+      console.error('Error creating signature:', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const executePresale = async () => {
     if (!dataToGet || !stakingAddress) {
-      console.error("Missing data or address");
-      return;
+      console.error('Missing data or address')
+      return
     }
 
     try {
-      const signer = await getEvvmSigner();
-      await execute(signer, dataToGet.IPresaleStakingData);
-      console.log("Presale staking executed successfully");
-      setDataToGet(null);
+      const signer = await getEvvmSigner()
+      await execute(signer, dataToGet.IPresaleStakingData)
+      console.log('Presale staking executed successfully')
+      setDataToGet(null)
     } catch (error) {
-      console.error("Error executing presale staking:", error);
+      console.error('Error executing presale staking:', error)
     }
-  };
+  }
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
@@ -138,11 +144,11 @@ export const PresaleStakingComponent = ({
         label="EVVM Nonce"
         inputId="nonceEVVMInput_presaleStaking"
         placeholder="Enter nonce"
-        showRandomBtn={priority !== "low"}
+        showRandomBtn={priority !== 'low'}
       />
 
       <div>
-        {priority === "low" && (
+        {priority === 'low' && (
           <HelperInfo label="How to find my sync nonce?">
             <div>
               You can retrieve your next sync nonce from the EVVM contract using
@@ -156,12 +162,12 @@ export const PresaleStakingComponent = ({
         onClick={makeSig}
         disabled={loading}
         style={{
-          padding: "0.5rem",
-          marginTop: "1rem",
+          padding: '0.5rem',
+          marginTop: '1rem',
           opacity: loading ? 0.6 : 1,
         }}
       >
-        {loading ? "Creating..." : "Create Signature"}
+        {loading ? 'Creating...' : 'Create Signature'}
       </button>
 
       <DataDisplayWithClear
@@ -170,5 +176,5 @@ export const PresaleStakingComponent = ({
         onExecute={executePresale}
       />
     </div>
-  );
-};
+  )
+}

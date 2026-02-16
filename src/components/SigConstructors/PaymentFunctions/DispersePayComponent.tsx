@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { EVVM, type IDispersePayData, type ISerializableSignedAction } from "@evvm/evvm-js";
+import { Core, type IDispersePayData, type ISerializableSignedAction } from "@evvm/evvm-js";
 import { execute } from "@evvm/evvm-js";
 import { getEvvmSigner, getCurrentChainId } from "@/utils/evvm-signer";
 import {
@@ -46,8 +46,8 @@ export const DispersePayComponent = ({
     const amount = getValue("amountTokenInputSplit");
     const priorityFee = getValue("priorityFeeInputSplit");
     const nonce = getValue("nonceInputDispersePay");
-    const executor = isUsingExecutorDisperse
-      ? getValue("executorInputSplit")
+    const senderExecutor = isUsingExecutorDisperse
+      ? getValue("senderExecutorInputSplit")
       : "0x0000000000000000000000000000000000000000";
 
     if (!tokenAddress || !amount || !priorityFee || !nonce) {
@@ -88,7 +88,7 @@ export const DispersePayComponent = ({
     setLoading(true);
     try {
       const signer = await getEvvmSigner();
-      const evvm = new EVVM({
+      const evvm = new Core({
         signer,
         address: evvmAddress as `0x${string}`,
         chainId: getCurrentChainId(),
@@ -100,8 +100,8 @@ export const DispersePayComponent = ({
         amount: BigInt(amount),
         priorityFee: BigInt(priorityFee),
         nonce: BigInt(nonce),
-        priorityFlag: priorityDisperse === "high",
-        executor: executor as `0x${string}`,
+        isAsyncExec: priorityDisperse === "high",
+        senderExecutor: senderExecutor as `0x${string}`,
       });
 
       setDataToGet(signedAction.toJSON());
@@ -155,8 +155,8 @@ export const DispersePayComponent = ({
       />
 
       <ExecutorSelector
-        inputId="executorInputSplit"
-        placeholder="Enter executor"
+        inputId="senderExecutorInputSplit"
+        placeholder="Enter senderExecutor"
         onExecutorToggle={setIsUsingExecutorDisperse}
         isUsingExecutor={isUsingExecutorDisperse}
       />

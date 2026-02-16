@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { EVVM, Staking, type IPublicStakingData, type IPayData, type ISerializableSignedAction } from "@evvm/evvm-js";
+import { Core, Staking, type IPublicStakingData, type IPayData, type ISerializableSignedAction } from "@evvm/evvm-js";
 import { execute } from "@evvm/evvm-js";
 import { getEvvmSigner, getCurrentChainId } from "@/utils/evvm-signer";
 import {
@@ -52,7 +52,7 @@ export const PublicStakingComponent = ({
     setLoading(true);
     try {
       const signer = await getEvvmSigner();
-      const evvm = new EVVM({
+      const evvm = new Core({
         signer,
         address: stakingAddress as `0x${string}`,
         chainId: getCurrentChainId(),
@@ -67,13 +67,13 @@ export const PublicStakingComponent = ({
         BigInt(amountOfStaking) * (BigInt(5083) * BigInt(10) ** BigInt(18));
 
       const payAction = await evvm.pay({
-        to: stakingAddress,
+        toAddress: stakingAddress as `0x${string}`,
         tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
         amount: amountOfToken,
         priorityFee: BigInt(priorityFee),
         nonce: BigInt(nonceEVVM),
-        priorityFlag: priority === "high",
-        executor: stakingAddress as `0x${string}`,
+        isAsyncExec: priority === "high",
+        senderExecutor: stakingAddress as `0x${string}`,
       });
 
       const stakingAction = await stakingService.publicStaking({

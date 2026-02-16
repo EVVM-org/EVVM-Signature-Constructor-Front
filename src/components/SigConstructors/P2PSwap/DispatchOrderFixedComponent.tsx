@@ -14,7 +14,7 @@ import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
 import {
   IDispatchOrderFixedFeeData,
   P2PSwap,
-  EVVM,
+  Core,
   type ISerializableSignedAction,
 } from '@evvm/evvm-js'
 
@@ -57,7 +57,7 @@ export const DispatchOrderFillFixedFeeComponent = ({
     const priorityFee = BigInt(
       getValue('priorityFee_DispatchOrderFillFixedFee')
     )
-    const nonce_EVVM = BigInt(getValue('nonce_EVVM_DispatchOrderFillFixedFee'))
+    const noncePay = BigInt(getValue('noncePay_DispatchOrderFillFixedFee'))
 
     const amountOfTokenBToFill = amountB + fee
 
@@ -65,7 +65,7 @@ export const DispatchOrderFillFixedFeeComponent = ({
       const signer = await getEvvmSigner()
       
       // Create EVVM service for payment
-      const evvmService = new EVVM({
+      const evvmService = new Core({
         signer,
         address: p2pSwapAddress as `0x${string}`,
         chainId: getCurrentChainId(),
@@ -80,13 +80,13 @@ export const DispatchOrderFillFixedFeeComponent = ({
 
       // create evvm pay() signature
       const payAction = await evvmService.pay({
-        to: p2pSwapAddress,
+        toAddress: p2pSwapAddress as `0x${string}`,
         tokenAddress: tokenB,
         amount: amountOfTokenBToFill,
         priorityFee: priorityFee,
-        nonce: nonce_EVVM,
-        priorityFlag: priority === 'high',
-        executor: p2pSwapAddress as `0x${string}`,
+        nonce: noncePay,
+        isAsyncExec: priority === 'high',
+        senderExecutor: p2pSwapAddress as `0x${string}`,
       })
 
       // create p2pswap dispatchOrderFillFixedFee() signature
@@ -227,7 +227,7 @@ export const DispatchOrderFillFixedFeeComponent = ({
 
       <NumberInputWithGenerator
         label="Nonce for EVVM contract interaction"
-        inputId="nonce_EVVM_DispatchOrderFillFixedFee"
+        inputId="noncePay_DispatchOrderFillFixedFee"
         placeholder="Enter nonce"
         showRandomBtn={priority !== 'low'}
       />

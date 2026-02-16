@@ -18,7 +18,7 @@ import {
   IPayData,
   IMakeOfferData,
   NameService,
-  EVVM,
+  Core,
   type ISerializableSignedAction,
 } from "@evvm/evvm-js";
 
@@ -46,17 +46,17 @@ export const MakeOfferComponent = ({
       nonceNameService: getValue("nonceNameServiceInput_makeOffer"),
       username: getValue("usernameInput_makeOffer"),
       amount: getValue("amountInput_makeOffer"),
-      expireDate: dateToUnixTimestamp(getValue("expireDateInput_makeOffer")),
-      priorityFee_EVVM: getValue("priorityFeeInput_makeOffer"),
+      expirationDate: dateToUnixTimestamp(getValue("expirationDateInput_makeOffer")),
+      priorityFeePay: getValue("priorityFeeInput_makeOffer"),
       nonceEVVM: getValue("nonceEVVMInput_makeOffer"),
-      priorityFlag: priority === "high",
+      isAsyncExec: priority === "high",
     };
 
     try {
       const signer = await getEvvmSigner();
       
       // Create EVVM service for payment
-      const evvmService = new EVVM({
+      const evvmService = new Core({
         signer,
         address: formData.addressNameService as `0x${string}`,
         chainId: getCurrentChainId(),
@@ -71,20 +71,19 @@ export const MakeOfferComponent = ({
 
       // Sign EVVM payment first
       const payAction = await evvmService.pay({
-        to: formData.addressNameService,
+        toAddress: formData.addressNameService as `0x${string}`,
         tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
         amount: BigInt(formData.amount),
-        priorityFee: BigInt(formData.priorityFee_EVVM),
+        priorityFee: BigInt(formData.priorityFeePay),
         nonce: BigInt(formData.nonceEVVM),
-        priorityFlag: formData.priorityFlag,
-        executor: formData.addressNameService as `0x${string}`,
+        isAsyncExec: formData.isAsyncExec,
+        senderExecutor: formData.addressNameService as `0x${string}`,
       });
 
       // Sign make offer action
       const makeOfferAction = await nameServiceService.makeOffer({
-        user: signer.address,
         username: formData.username,
-        expireDate: BigInt(formData.expireDate),
+        expirationDate: BigInt(formData.expirationDate),
         amount: BigInt(formData.amount),
         nonce: BigInt(formData.nonceNameService),
         evvmSignedAction: payAction,
@@ -144,7 +143,7 @@ export const MakeOfferComponent = ({
 
       <DateInputField
         label="Expiration Date"
-        inputId="expireDateInput_makeOffer"
+        inputId="expirationDateInput_makeOffer"
         defaultValue="2025-12-31"
       />
 

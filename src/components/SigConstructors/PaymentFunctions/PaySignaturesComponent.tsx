@@ -1,6 +1,10 @@
 'use client'
 import React from 'react'
-import { EVVM, type IPayData, type ISerializableSignedAction } from '@evvm/evvm-js'
+import {
+  Core,
+  type IPayData,
+  type ISerializableSignedAction,
+} from '@evvm/evvm-js'
 import { execute } from '@evvm/evvm-js'
 import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
 import {
@@ -23,7 +27,8 @@ export const PaySignaturesComponent = ({
   const [isUsingUsernames, setIsUsingUsernames] = React.useState(false)
   const [isUsingExecutor, setIsUsingExecutor] = React.useState(false)
   const [priority, setPriority] = React.useState<'low' | 'high'>('low')
-  const [dataToGet, setDataToGet] = React.useState<ISerializableSignedAction<IPayData> | null>(null)
+  const [dataToGet, setDataToGet] =
+    React.useState<ISerializableSignedAction<IPayData> | null>(null)
   const [loading, setLoading] = React.useState(false)
 
   const makeSig = async () => {
@@ -39,8 +44,8 @@ export const PaySignaturesComponent = ({
     const amount = getValue('amountTokenInput_Pay')
     const priorityFee = getValue('priorityFeeInput_Pay')
     const nonce = getValue('nonceInput_Pay')
-    const executor = isUsingExecutor
-      ? getValue('executorInput_Pay')
+    const senderExecutor = isUsingExecutor
+      ? getValue('senderExecutorInput_Pay')
       : '0x0000000000000000000000000000000000000000'
 
     if (!to || !tokenAddress || !amount || !priorityFee || !nonce) {
@@ -51,21 +56,34 @@ export const PaySignaturesComponent = ({
     setLoading(true)
     try {
       const signer = await getEvvmSigner()
-      const evvm = new EVVM({
+      const evvm = new Core({
         signer,
         address: evvmAddress as `0x${string}`,
         chainId: getCurrentChainId(),
       })
 
-      const signedAction = await evvm.pay({
-        to,
-        tokenAddress: tokenAddress as `0x${string}`,
-        amount: BigInt(amount),
-        priorityFee: BigInt(priorityFee),
-        nonce: BigInt(nonce),
-        priorityFlag: priority === 'high',
-        executor: executor as `0x${string}`,
-      })
+      let signedAction
+      if (isUsingUsernames) {
+        signedAction = await evvm.pay({
+          toIdentity: to,
+          tokenAddress: tokenAddress as `0x${string}`,
+          amount: BigInt(amount),
+          priorityFee: BigInt(priorityFee),
+          nonce: BigInt(nonce),
+          isAsyncExec: priority === 'high',
+          senderExecutor: senderExecutor as `0x${string}`,
+        })
+      } else {
+        signedAction = await evvm.pay({
+          toAddress: to as `0x${string}`,
+          tokenAddress: tokenAddress as `0x${string}`,
+          amount: BigInt(amount),
+          priorityFee: BigInt(priorityFee),
+          nonce: BigInt(nonce),
+          isAsyncExec: priority === 'high',
+          senderExecutor: senderExecutor as `0x${string}`,
+        })
+      }
 
       setDataToGet(signedAction.toJSON())
     } catch (error) {
@@ -156,8 +174,8 @@ export const PaySignaturesComponent = ({
       ))}
 
       <ExecutorSelector
-        inputId="executorInput_Pay"
-        placeholder="Enter executor address"
+        inputId="senderExecutorInput_Pay"
+        placeholder="Enter senderExecutor address"
         onExecutorToggle={setIsUsingExecutor}
         isUsingExecutor={isUsingExecutor}
       />

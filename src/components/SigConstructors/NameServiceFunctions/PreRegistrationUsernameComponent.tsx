@@ -15,7 +15,7 @@ import {
   IPayData,
   IPreRegistrationUsernameData,
   NameService,
-  EVVM,
+  Core,
   type ISerializableSignedAction,
 } from "@evvm/evvm-js";
 
@@ -49,10 +49,10 @@ export const PreRegistrationUsernameComponent = ({
       addressNameService: nameServiceAddress,
       username: getValue("usernameInput_preRegistration"),
       nonce: getValue("nonceNameServiceInput_preRegistration"),
-      clowNumber: getValue("clowNumberInput_preRegistration"),
-      nonce_EVVM: getValue("nonceEVVMInput_preRegistration"),
-      priorityFee_EVVM: getValue("priorityFeeInput_preRegistration"),
-      priorityFlag_EVVM: priority === "high",
+      lockNumber: getValue("lockNumberInput_preRegistration"),
+      noncePay: getValue("nonceEVVMInput_preRegistration"),
+      priorityFeePay: getValue("priorityFeeInput_preRegistration"),
+      isAsyncExecPay: priority === "high",
     };
 
     // Validate that required fields are not empty
@@ -62,13 +62,13 @@ export const PreRegistrationUsernameComponent = ({
     if (!formData.nonce) {
       throw new Error("NameService nonce is required");
     }
-    if (!formData.clowNumber) {
+    if (!formData.lockNumber) {
       throw new Error("Clow number is required");
     }
-    if (!formData.nonce_EVVM) {
+    if (!formData.noncePay) {
       throw new Error("EVVM nonce is required");
     }
-    if (!formData.priorityFee_EVVM) {
+    if (!formData.priorityFeePay) {
       throw new Error("Priority fee is required");
     }
 
@@ -76,7 +76,7 @@ export const PreRegistrationUsernameComponent = ({
       const signer = await getEvvmSigner();
       
       // Create EVVM service for payment
-      const evvmService = new EVVM({
+      const evvmService = new Core({
         signer,
         address: formData.addressNameService as `0x${string}`,
         chainId: getCurrentChainId(),
@@ -91,21 +91,20 @@ export const PreRegistrationUsernameComponent = ({
 
       // Sign EVVM payment first
       const payAction = await evvmService.pay({
-        to: formData.addressNameService,
+        toAddress: formData.addressNameService as `0x${string}`,
         tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
         amount: BigInt(0),
-        priorityFee: BigInt(formData.priorityFee_EVVM),
-        nonce: BigInt(formData.nonce_EVVM),
-        priorityFlag: formData.priorityFlag_EVVM,
-        executor: formData.addressNameService as `0x${string}`,
+        priorityFee: BigInt(formData.priorityFeePay),
+        nonce: BigInt(formData.noncePay),
+        isAsyncExec: formData.isAsyncExecPay,
+        senderExecutor: formData.addressNameService as `0x${string}`,
       });
 
       // Hash the username for pre-registration
-      const hashUsername = "0x" + Buffer.from(formData.username + formData.clowNumber).toString('hex');
+      const hashUsername = "0x" + Buffer.from(formData.username + formData.lockNumber).toString('hex');
 
       // Sign pre-registration action
       const preRegistrationAction = await nameServiceService.preRegistrationUsername({
-        user: signer.address,
         hashPreRegisteredUsername: hashUsername,
         nonce: BigInt(formData.nonce),
         evvmSignedAction: payAction,
@@ -154,7 +153,7 @@ export const PreRegistrationUsernameComponent = ({
 
       <NumberInputWithGenerator
         label="Clow Number"
-        inputId="clowNumberInput_preRegistration"
+        inputId="lockNumberInput_preRegistration"
         placeholder="Enter clow number"
       />
 

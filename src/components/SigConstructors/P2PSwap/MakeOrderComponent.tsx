@@ -14,7 +14,7 @@ import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
 import {
   IMakeOrderData,
   P2PSwap,
-  EVVM,
+  Core,
   type ISerializableSignedAction,
 } from '@evvm/evvm-js'
 
@@ -45,13 +45,13 @@ export const MakeOrderComponent = ({
     const amountA = BigInt(getValue('amountA_MakeOrder'))
     const amountB = BigInt(getValue('amountB_MakeOrder'))
     const priorityFee = BigInt(getValue('priorityFee_MakeOrder'))
-    const nonce_EVVM = BigInt(getValue('nonce_EVVM_MakeOrder'))
+    const noncePay = BigInt(getValue('noncePay_MakeOrder'))
 
     try {
       const signer = await getEvvmSigner()
       
       // Create EVVM service for payment
-      const evvmService = new EVVM({
+      const evvmService = new Core({
         signer,
         address: p2pSwapAddress as `0x${string}`,
         chainId: getCurrentChainId(),
@@ -66,13 +66,13 @@ export const MakeOrderComponent = ({
 
       // create evvm pay() signature
       const payAction = await evvmService.pay({
-        to: p2pSwapAddress,
+        toAddress: p2pSwapAddress as `0x${string}`,
         tokenAddress: tokenA,
         amount: amountA,
         priorityFee: priorityFee,
-        nonce: nonce_EVVM,
-        priorityFlag: priority === 'high',
-        executor: p2pSwapAddress as `0x${string}`,
+        nonce: noncePay,
+        isAsyncExec: priority === 'high',
+        senderExecutor: p2pSwapAddress as `0x${string}`,
       })
 
       // create p2pswap makeOrder() signature
@@ -172,7 +172,7 @@ export const MakeOrderComponent = ({
 
       <NumberInputWithGenerator
         label="Nonce for EVVM contract interaction"
-        inputId="nonce_EVVM_MakeOrder"
+        inputId="noncePay_MakeOrder"
         placeholder="Enter nonce"
         showRandomBtn={priority !== 'low'}
       />

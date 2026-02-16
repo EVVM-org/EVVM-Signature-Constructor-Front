@@ -7,7 +7,8 @@ export async function getEvvmSigner() {
   if (!walletClient) {
     throw new Error("Wallet not connected");
   }
-  return createSignerWithViem(walletClient);
+  // cast to any to avoid cross-package `viem` type incompatibilities
+  return createSignerWithViem(walletClient as unknown as any);
 }
 
 export function getCurrentChainId(): number {

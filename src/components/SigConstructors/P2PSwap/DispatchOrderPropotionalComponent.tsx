@@ -66,7 +66,7 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
       const signer = await getEvvmSigner()
       
       // Create EVVM service for payment
-      const evvmService = new Core({
+      const coreService = new Core({
         signer,
         address: p2pSwapAddress as `0x${string}`,
         chainId: getCurrentChainId(),
@@ -80,7 +80,7 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
       })
 
       // create evvm pay() signature
-      const payAction = await evvmService.pay({
+      const payAction = await coreService.pay({
         toAddress: p2pSwapAddress as `0x${string}`,
         tokenAddress: tokenB,
         amount: amountOfTokenBToFill,

@@ -249,15 +249,25 @@ export const SigMenu = () => {
   ]
 
   const p2pComponents = [
-    <MakeOrderComponent key="makeOrder" p2pSwapAddress={p2pswapAddress} />,
-    <CancelOrderComponent key="cancelOrder" p2pSwapAddress={p2pswapAddress} />,
+    <MakeOrderComponent
+      key="makeOrder"
+      p2pSwapAddress={p2pswapAddress}
+      coreAddress={coreAddress}
+    />,
+    <CancelOrderComponent
+      key="cancelOrder"
+      p2pSwapAddress={p2pswapAddress}
+      coreAddress={coreAddress}
+    />,
     <DispatchOrderFillPropotionalFeeComponent
       key="dispatchOrder_fillPropotionalFee"
       p2pSwapAddress={p2pswapAddress}
+      coreAddress={coreAddress}
     />,
     <DispatchOrderFillFixedFeeComponent
       key="dispatchOrder_fillFixedFee"
       p2pSwapAddress={p2pswapAddress}
+      coreAddress={coreAddress}
     />,
   ]
 

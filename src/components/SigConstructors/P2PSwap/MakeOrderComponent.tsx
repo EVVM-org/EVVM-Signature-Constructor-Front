@@ -17,18 +17,15 @@ import {
   Core,
   type ISerializableSignedAction,
 } from '@evvm/evvm-js'
-
-interface MakeOrderComponentProps {
-  p2pSwapAddress: string
-}
+import { P2PSwapComponentProps } from '@/types'
 
 export const MakeOrderComponent = ({
   p2pSwapAddress,
-}: MakeOrderComponentProps) => {
+  coreAddress,
+}: P2PSwapComponentProps) => {
   const [priority, setPriority] = React.useState('low')
-  const [dataToGet, setDataToGet] = React.useState<ISerializableSignedAction<IMakeOrderData> | null>(
-    null
-  )
+  const [dataToGet, setDataToGet] =
+    React.useState<ISerializableSignedAction<IMakeOrderData> | null>(null)
 
   /**
    * Create the signature, prepare data to make the function call
@@ -49,14 +46,14 @@ export const MakeOrderComponent = ({
 
     try {
       const signer = await getEvvmSigner()
-      
+
       // Create EVVM service for payment
       const coreService = new Core({
         signer,
-        address: p2pSwapAddress as `0x${string}`,
+        address: coreAddress as `0x${string}`,
         chainId: getCurrentChainId(),
       })
-      
+
       // Create P2PSwap service
       const p2pSwapService = new P2PSwap({
         signer,

@@ -17,19 +17,19 @@ import {
   Core,
   type ISerializableSignedAction,
 } from '@evvm/evvm-js'
-
-interface DispatchOrderFillFixedFeeComponentProps {
-  p2pSwapAddress: string
-}
+import { P2PSwapComponentProps } from '@/types'
 
 export const DispatchOrderFillFixedFeeComponent = ({
   p2pSwapAddress,
-}: DispatchOrderFillFixedFeeComponentProps) => {
+  coreAddress,
+}: P2PSwapComponentProps) => {
   const [priority, setPriority] = React.useState('low')
   const [amountB, setAmountB] = React.useState(0n)
   const [amountOut, setAmountOut] = React.useState(1000000000000000000n)
   const [dataToGet, setDataToGet] =
-    React.useState<ISerializableSignedAction<IDispatchOrderFixedFeeData> | null>(null)
+    React.useState<ISerializableSignedAction<IDispatchOrderFixedFeeData> | null>(
+      null
+    )
 
   const fee: bigint = useMemo(() => {
     const propFee = (amountB * 500n) / 10_000n
@@ -63,14 +63,14 @@ export const DispatchOrderFillFixedFeeComponent = ({
 
     try {
       const signer = await getEvvmSigner()
-      
+
       // Create EVVM service for payment
       const coreService = new Core({
         signer,
-        address: p2pSwapAddress as `0x${string}`,
+        address: coreAddress as `0x${string}`,
         chainId: getCurrentChainId(),
       })
-      
+
       // Create P2PSwap service
       const p2pSwapService = new P2PSwap({
         signer,
@@ -90,15 +90,16 @@ export const DispatchOrderFillFixedFeeComponent = ({
       })
 
       // create p2pswap dispatchOrderFillFixedFee() signature
-      const dispatchOrderAction = await p2pSwapService.dispatchOrder_fillFixedFee({
-        nonce: nonce,
-        tokenA: tokenA,
-        tokenB: tokenB,
-        orderId: orderId,
-        amountOfTokenBToFill: amountOfTokenBToFill,
-        maxFillFixedFee: amountOut,
-        evvmSignedAction: payAction,
-      })
+      const dispatchOrderAction =
+        await p2pSwapService.dispatchOrder_fillFixedFee({
+          nonce: nonce,
+          tokenA: tokenA,
+          tokenB: tokenB,
+          orderId: orderId,
+          amountOfTokenBToFill: amountOfTokenBToFill,
+          maxFillFixedFee: amountOut,
+          evvmSignedAction: payAction,
+        })
       if (!fee) throw new Error('Error calculating fee')
       if (!amountOut) throw new Error('Error calculating fee')
 

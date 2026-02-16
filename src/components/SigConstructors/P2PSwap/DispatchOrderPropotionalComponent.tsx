@@ -17,23 +17,18 @@ import {
   Core,
   type ISerializableSignedAction,
 } from '@evvm/evvm-js'
-
-interface DispatchOrderFillPropotionalFeeComponentProps {
-  p2pSwapAddress: string
-}
+import { P2PSwapComponentProps } from '@/types'
 
 export const DispatchOrderFillPropotionalFeeComponent = ({
   p2pSwapAddress,
-}: DispatchOrderFillPropotionalFeeComponentProps) => {
+  coreAddress,
+}: P2PSwapComponentProps) => {
   const [priority, setPriority] = React.useState('low')
   const [amountB, setAmountB] = React.useState(0n)
   const [dataToGet, setDataToGet] =
     React.useState<ISerializableSignedAction<IDispatchOrderData> | null>(null)
 
-  const fee: bigint = useMemo(
-    () => (amountB * 500n) / 10_000n,
-    [amountB]
-  )
+  const fee: bigint = useMemo(() => (amountB * 500n) / 10_000n, [amountB])
 
   /**
    * Create the signature, prepare data to make the function call
@@ -64,14 +59,14 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
 
     try {
       const signer = await getEvvmSigner()
-      
+
       // Create EVVM service for payment
       const coreService = new Core({
         signer,
-        address: p2pSwapAddress as `0x${string}`,
+        address: coreAddress as `0x${string}`,
         chainId: getCurrentChainId(),
       })
-      
+
       // Create P2PSwap service
       const p2pSwapService = new P2PSwap({
         signer,
@@ -91,14 +86,15 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
       })
 
       // create p2pswap dispatchOrderFillPropotionalFee() signature
-      const dispatchOrderAction = await p2pSwapService.dispatchOrder_fillPropotionalFee({
-        nonce: nonce,
-        tokenA: tokenA,
-        tokenB: tokenB,
-        orderId: orderId,
-        amountOfTokenBToFill: amountOfTokenBToFill,
-        evvmSignedAction: payAction,
-      })
+      const dispatchOrderAction =
+        await p2pSwapService.dispatchOrder_fillPropotionalFee({
+          nonce: nonce,
+          tokenA: tokenA,
+          tokenB: tokenB,
+          orderId: orderId,
+          amountOfTokenBToFill: amountOfTokenBToFill,
+          evvmSignedAction: payAction,
+        })
       if (!fee) throw new Error('Error calculating fee')
 
       // prepare data to execute transaction (send it to state)

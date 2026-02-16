@@ -1,7 +1,7 @@
-"use client";
-import React from "react";
-import { config } from "@/config/index";
-import { readContract } from "@wagmi/core";
+'use client'
+import React from 'react'
+import { config } from '@/config/index'
+import { readContract } from '@wagmi/core'
 import {
   TitleAndLink,
   NumberInputWithGenerator,
@@ -10,118 +10,118 @@ import {
   HelperInfo,
   NumberInputField,
   TextInputField,
-} from "@/components/SigConstructors/InputsAndModules";
-import { execute } from "@evvm/evvm-js";
-import { getEvvmSigner, getCurrentChainId } from "@/utils/evvm-signer";
-import { NameServiceABI } from "@evvm/evvm-js";
+} from '@/components/SigConstructors/InputsAndModules'
+import { execute } from '@evvm/evvm-js'
+import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
+import { NameServiceABI } from '@evvm/evvm-js'
 import {
   IPayData,
   IRemoveCustomMetadataData,
   NameService,
   Core,
   type ISerializableSignedAction,
-} from "@evvm/evvm-js";
+} from '@evvm/evvm-js'
+import { NameServiceComponentProps } from '@/types'
 
 type InfoData = {
-  IPayData: ISerializableSignedAction<IPayData>;
-  IRemoveCustomMetadataData: ISerializableSignedAction<IRemoveCustomMetadataData>;
-};
-
-interface RemoveCustomMetadataComponentProps {
-  nameServiceAddress: string;
+  IPayData: ISerializableSignedAction<IPayData>
+  IRemoveCustomMetadataData: ISerializableSignedAction<IRemoveCustomMetadataData>
 }
 
 export const RemoveCustomMetadataComponent = ({
   nameServiceAddress,
-}: RemoveCustomMetadataComponentProps) => {
-  const [priority, setPriority] = React.useState("low");
-  const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
+  coreAddress,
+}: NameServiceComponentProps) => {
+  const [priority, setPriority] = React.useState('low')
+  const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
 
   const getValue = (id: string) =>
-    (document.getElementById(id) as HTMLInputElement).value;
+    (document.getElementById(id) as HTMLInputElement).value
 
   const makeSig = async () => {
     const formData = {
       addressNameService: nameServiceAddress,
-      nonceNameService: getValue("nonceNameServiceInput_removeCustomMetadata"),
-      identity: getValue("identityInput_removeCustomMetadata"),
-      key: getValue("keyInput_removeCustomMetadata"),
-      priorityFeePay: getValue("priorityFeeInput_removeCustomMetadata"),
-      nonceEVVM: getValue("nonceEVVMInput_removeCustomMetadata"),
-      isAsyncExec: priority === "high",
-    };
+      nonceNameService: getValue('nonceNameServiceInput_removeCustomMetadata'),
+      identity: getValue('identityInput_removeCustomMetadata'),
+      key: getValue('keyInput_removeCustomMetadata'),
+      priorityFeePay: getValue('priorityFeeInput_removeCustomMetadata'),
+      nonceEVVM: getValue('nonceEVVMInput_removeCustomMetadata'),
+      isAsyncExec: priority === 'high',
+    }
 
     try {
-      const signer = await getEvvmSigner();
-      
+      const signer = await getEvvmSigner()
+
       // Create EVVM service for payment
       const coreService = new Core({
         signer,
-        address: formData.addressNameService as `0x${string}`,
+        address: coreAddress as `0x${string}`,
         chainId: getCurrentChainId(),
-      });
-      
+      })
+
       // Create NameService service
       const nameServiceService = new NameService({
         signer,
         address: formData.addressNameService as `0x${string}`,
         chainId: getCurrentChainId(),
-      });
+      })
 
       const price = await readContract(config, {
         abi: NameServiceABI,
         address: formData.addressNameService as `0x${string}`,
-        functionName: "getPriceToRemoveCustomMetadata",
+        functionName: 'getPriceToRemoveCustomMetadata',
         args: [],
-      });
+      })
       if (!price) {
-        console.error("Price to remove custom metadata is not available");
-        return;
+        console.error('Price to remove custom metadata is not available')
+        return
       }
 
       // Sign EVVM payment first
       const payAction = await coreService.pay({
         toAddress: formData.addressNameService as `0x${string}`,
-        tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+        tokenAddress:
+          '0x0000000000000000000000000000000000000001' as `0x${string}`,
         amount: price as bigint,
         priorityFee: BigInt(formData.priorityFeePay),
         nonce: BigInt(formData.nonceEVVM),
         isAsyncExec: formData.isAsyncExec,
         senderExecutor: formData.addressNameService as `0x${string}`,
-      });
+      })
 
       // Sign remove custom metadata action
-      const removeCustomMetadataAction = await nameServiceService.removeCustomMetadata({
-        identity: formData.identity,
-        key: BigInt(formData.key),
-        nonce: BigInt(formData.nonceNameService),
-        evvmSignedAction: payAction,
-      });
+      const removeCustomMetadataAction =
+        await nameServiceService.removeCustomMetadata({
+          identity: formData.identity,
+          key: BigInt(formData.key),
+          nonce: BigInt(formData.nonceNameService),
+          evvmSignedAction: payAction,
+        })
 
       setDataToGet({
         IPayData: payAction.toJSON(),
         IRemoveCustomMetadataData: removeCustomMetadataAction.toJSON(),
-      });
+      })
     } catch (error) {
-      console.error("Error signing accept offer:", error);
+      console.error('Error signing accept offer:', error)
     }
-  };
+  }
 
   const executeAction = async () => {
     if (!dataToGet) {
-      console.error("No data to execute payment");
-      return;
+      console.error('No data to execute payment')
+      return
     }
 
     try {
-      const signer = await getEvvmSigner();
-      await execute(signer, dataToGet.IRemoveCustomMetadataData);
-      console.log("Remove custom metadata executed successfully");
-      setDataToGet(null);
+      const signer = await getEvvmSigner()
+      await execute(signer, dataToGet.IRemoveCustomMetadataData)
+      console.log('Remove custom metadata executed successfully')
+      setDataToGet(null)
     } catch (error) {
-      console.error("Error executing remove custom metadata:", error);
+      console.error('Error executing remove custom metadata:', error)
     }
-  };
+  }
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
@@ -165,11 +165,11 @@ export const RemoveCustomMetadataComponent = ({
         label="EVVM Nonce"
         inputId="nonceEVVMInput_removeCustomMetadata"
         placeholder="Enter nonce"
-        showRandomBtn={priority !== "low"}
+        showRandomBtn={priority !== 'low'}
       />
 
       <div>
-        {priority === "low" && (
+        {priority === 'low' && (
           <HelperInfo label="How to find my sync nonce?">
             <div>
               You can retrieve your next sync nonce from the EVVM contract using
@@ -183,8 +183,8 @@ export const RemoveCustomMetadataComponent = ({
       <button
         onClick={makeSig}
         style={{
-          padding: "0.5rem",
-          marginTop: "1rem",
+          padding: '0.5rem',
+          marginTop: '1rem',
         }}
       >
         Create signature
@@ -196,5 +196,5 @@ export const RemoveCustomMetadataComponent = ({
         onExecute={executeAction}
       />
     </div>
-  );
-};
+  )
+}

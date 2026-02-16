@@ -21,19 +21,17 @@ import {
   Core,
   type ISerializableSignedAction,
 } from "@evvm/evvm-js";
+import { NameServiceComponentProps } from "@/types";
 
 type InfoData = {
   IPayData: ISerializableSignedAction<IPayData>;
   IFlushCustomMetadataData: ISerializableSignedAction<IFlushCustomMetadataData>;
 };
 
-interface FlushCustomMetadataComponentProps {
-  nameServiceAddress: string;
-}
-
 export const FlushCustomMetadataComponent = ({
   nameServiceAddress,
-}: FlushCustomMetadataComponentProps) => {
+  coreAddress,
+}: NameServiceComponentProps) => {
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
 
@@ -56,7 +54,7 @@ export const FlushCustomMetadataComponent = ({
       // Create EVVM service for payment
       const coreService = new Core({
         signer,
-        address: formData.addressNameService as `0x${string}`,
+        address: coreAddress as `0x${string}`,
         chainId: getCurrentChainId(),
       });
       

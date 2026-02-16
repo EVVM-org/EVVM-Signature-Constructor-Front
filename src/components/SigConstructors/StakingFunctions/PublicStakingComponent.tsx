@@ -12,7 +12,7 @@ import {
   NumberInputField,
   StakingActionSelector,
 } from "@/components/SigConstructors/InputsAndModules";
-import { PublicStakingComponentProps } from "@/types";
+import { StakingComponentProps } from "@/types";
 
 type InputData = {
   IPublicStakingData: ISerializableSignedAction<IPublicStakingData>;
@@ -22,7 +22,7 @@ type InputData = {
 export const PublicStakingComponent = ({
   stakingAddress,
   coreAddress,
-}: PublicStakingComponentProps) => {
+}: StakingComponentProps) => {
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState<"low" | "high">("low");
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null);

@@ -12,12 +12,12 @@ import {
   StakingActionSelector,
 } from "@/components/SigConstructors/InputsAndModules";
 
-import { GoldenStakingComponentProps } from "@/types";
+import { StakingComponentProps } from "@/types";
 
 export const GoldenStakingComponent = ({
   stakingAddress,
   coreAddress
-}: GoldenStakingComponentProps) => {
+}: StakingComponentProps) => {
   const [isStaking, setIsStaking] = React.useState(true);
   const [priority, setPriority] = React.useState<"low" | "high">("low");
   const [dataToGet, setDataToGet] = React.useState<ISerializableSignedAction<IGoldenStakingData> | null>(

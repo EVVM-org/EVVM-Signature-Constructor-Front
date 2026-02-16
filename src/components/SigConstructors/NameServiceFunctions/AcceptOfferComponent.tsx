@@ -19,19 +19,17 @@ import {
   Core,
   type ISerializableSignedAction,
 } from "@evvm/evvm-js";
+import { NameServiceComponentProps } from "@/types";
 
 type InfoData = {
   IPayData: ISerializableSignedAction<IPayData>;
   IAcceptOfferData: ISerializableSignedAction<IAcceptOfferData>;
 };
 
-interface AcceptOfferComponentProps {
-  nameServiceAddress: string;
-}
-
 export const AcceptOfferComponent = ({
   nameServiceAddress,
-}: AcceptOfferComponentProps) => {
+  coreAddress,
+}: NameServiceComponentProps) => {
   const [priority, setPriority] = React.useState("low");
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
 
@@ -40,7 +38,6 @@ export const AcceptOfferComponent = ({
       (document.getElementById(id) as HTMLInputElement).value;
 
     const formData = {
-      addressNameService: nameServiceAddress,
       username: getValue("usernameInput_acceptOffer"),
       offerId: getValue("offerIdInput_acceptOffer"),
       nonce: getValue("nonceInput_acceptOffer"),
@@ -52,29 +49,29 @@ export const AcceptOfferComponent = ({
     try {
       const signer = await getEvvmSigner();
       
-      // Create Croe service for payment
+      // Create Core service for payment
       const coreService = new Core({
         signer,
-        address: formData.addressNameService as `0x${string}`,
+        address: coreAddress as `0x${string}`,
         chainId: getCurrentChainId(),
       });
       
       // Create NameService service
       const nameServiceService = new NameService({
         signer,
-        address: formData.addressNameService as `0x${string}`,
+        address: nameServiceAddress as `0x${string}`,
         chainId: getCurrentChainId(),
       });
 
       // Sign EVVM payment first
       const payAction = await coreService.pay({
-        toAddress: formData.addressNameService as `0x${string}`,
+        toAddress: nameServiceAddress as `0x${string}`,
         tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
         amount: BigInt(0),
         priorityFee: BigInt(formData.priorityFeePay),
         nonce: BigInt(formData.noncePay),
         isAsyncExec: formData.isAsyncExecPay,
-        senderExecutor: formData.addressNameService as `0x${string}`,
+        senderExecutor: nameServiceAddress as `0x${string}`,
       });
 
       // Sign accept offer action

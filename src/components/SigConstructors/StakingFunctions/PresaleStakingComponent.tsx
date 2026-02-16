@@ -19,7 +19,7 @@ import {
   StakingActionSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 
-import { PresaleStakingComponentProps } from "@/types";
+import { StakingComponentProps } from "@/types";
 
 type InputData = {
   IPresaleStakingData: ISerializableSignedAction<IPresaleStakingData>
@@ -29,7 +29,7 @@ type InputData = {
 export const PresaleStakingComponent = ({
   stakingAddress,
   coreAddress,
-}: PresaleStakingComponentProps) => {
+}: StakingComponentProps) => {
   const [isStaking, setIsStaking] = React.useState(true)
   const [priority, setPriority] = React.useState<'low' | 'high'>('low')
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null)

@@ -1,14 +1,10 @@
-export interface PublicStakingComponentProps {
+export interface StakingComponentProps {
   stakingAddress: string;
   coreAddress: string;
 }
 
-export interface PresaleStakingComponentProps {
-  stakingAddress: string,
-  coreAddress: string,
-}
 
-export interface GoldenStakingComponentProps {
-  stakingAddress: string;
+export interface NameServiceComponentProps {
+  nameServiceAddress: string;
   coreAddress: string;
 }

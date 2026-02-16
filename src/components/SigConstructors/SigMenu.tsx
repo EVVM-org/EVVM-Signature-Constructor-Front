@@ -158,10 +158,10 @@ export const SigMenu = () => {
         typeof rawEvvmId === 'string'
           ? parseInt(rawEvvmId)
           : typeof rawEvvmId === 'bigint'
-          ? Number(rawEvvmId)
-          : typeof rawEvvmId === 'number'
-          ? rawEvvmId
-          : 0
+            ? Number(rawEvvmId)
+            : typeof rawEvvmId === 'number'
+              ? rawEvvmId
+              : 0
       setEvvmId(evvmIdValue)
     } catch (err) {
       setStakingAddress('')
@@ -178,51 +178,73 @@ export const SigMenu = () => {
   ]
 
   const stakingComponents = [
-    <GoldenStakingComponent key="golden" stakingAddress={stakingAddress} coreAddress={coreAddress} />,
-    <PresaleStakingComponent key="presale" stakingAddress={stakingAddress} coreAddress={coreAddress} />,
-    <PublicStakingComponent key="public" stakingAddress={stakingAddress} coreAddress={coreAddress} />,
+    <GoldenStakingComponent
+      key="golden"
+      stakingAddress={stakingAddress}
+      coreAddress={coreAddress}
+    />,
+    <PresaleStakingComponent
+      key="presale"
+      stakingAddress={stakingAddress}
+      coreAddress={coreAddress}
+    />,
+    <PublicStakingComponent
+      key="public"
+      stakingAddress={stakingAddress}
+      coreAddress={coreAddress}
+    />,
   ]
 
   const mnsComponents = [
     <PreRegistrationUsernameComponent
       key="preReg"
       nameServiceAddress={nameserviceAddress}
+      coreAddress={coreAddress}
     />,
     <RegistrationUsernameComponent
       key="reg"
       nameServiceAddress={nameserviceAddress}
+      coreAddress={coreAddress}
     />,
     <MakeOfferComponent
       key="makeOffer"
       nameServiceAddress={nameserviceAddress}
+      coreAddress={coreAddress}
     />,
     <WithdrawOfferComponent
       key="withdrawOffer"
       nameServiceAddress={nameserviceAddress}
+      coreAddress={coreAddress}
     />,
     <AcceptOfferComponent
       key="acceptOffer"
       nameServiceAddress={nameserviceAddress}
+      coreAddress={coreAddress}
     />,
     <RenewUsernameComponent
       key="renewUsername"
       nameServiceAddress={nameserviceAddress}
+      coreAddress={coreAddress}
     />,
     <AddCustomMetadataComponent
       key="addCustomMetadata"
       nameServiceAddress={nameserviceAddress}
+      coreAddress={coreAddress}
     />,
     <RemoveCustomMetadataComponent
       key="removeCustomMetadata"
       nameServiceAddress={nameserviceAddress}
+      coreAddress={coreAddress}
     />,
     <FlushCustomMetadataComponent
       key="flushCustomMetadata"
       nameServiceAddress={nameserviceAddress}
+      coreAddress={coreAddress}
     />,
     <FlushUsernameComponent
       key="flushUsername"
       nameServiceAddress={nameserviceAddress}
+      coreAddress={coreAddress}
     />,
   ]
 

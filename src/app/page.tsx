@@ -2,6 +2,7 @@
 import { ConnectButton } from "@/components/ConnectButton";
 import { SigMenu } from "@/components/SigConstructors/SigMenu";
 import Image from "next/image";
+import { Button } from '@mantine/core';
 
 export default function Home() {
   return (
@@ -51,46 +52,46 @@ export default function Home() {
             alignItems: "center",
           }}
         >
-          <a
+          <Button
+            component="a"
             href="https://www.evvm.info/docs/intro"
             target="_blank"
             rel="noopener noreferrer"
+            style={{
+              padding: "0.45rem 1.1rem",
+              borderRadius: 999,
+              border: "1.5px solid #00EE96",
+              background: "#00EE96",
+              color: "#03221E",
+              fontWeight: 600,
+              fontSize: 15,
+              height: "45px",
+              width: "100px",
+              cursor: "pointer",
+            }}
           >
-            <button
-              style={{
-                padding: "0.45rem 1.1rem",
-                borderRadius: 999,
-                border: "1.5px solid #00EE96",
-                background: "#00EE96",
-                color: "#03221E",
-                fontWeight: 600,
-                fontSize: 15,
-                height: "45px",
-                width: "100px",
-                cursor: "pointer",
-              }}
-            >
-              Docs
-            </button>
-          </a>
-          <a href="https://evvm.org" target="_blank" rel="noopener noreferrer">
-            <button
-              style={{
-                padding: "0.45rem 1.1rem",
-                borderRadius: 999,
-                border: "1.5px solid #00EE96",
-                background: "#00EE96",
-                color: "#03221E",
-                fontWeight: 600,
-                fontSize: 15,
-                height: "45px",
-                width: "100px",
-                cursor: "pointer",
-              }}
-            >
-              Website
-            </button>
-          </a>
+            Docs
+          </Button>
+          <Button
+            component="a"
+            href="https://evvm.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              padding: "0.45rem 1.1rem",
+              borderRadius: 999,
+              border: "1.5px solid #00EE96",
+              background: "#00EE96",
+              color: "#03221E",
+              fontWeight: 600,
+              fontSize: 15,
+              height: "45px",
+              width: "100px",
+              cursor: "pointer",
+            }}
+          >
+            Website
+          </Button>
           <div
             style={{
               marginLeft: 10,

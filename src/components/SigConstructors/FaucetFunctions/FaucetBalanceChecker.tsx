@@ -6,6 +6,7 @@ import { CoreABI } from "@evvm/evvm-js";
 
 import { AddressInputField } from "../InputsAndModules/AddressInputField";
 import { HelperInfo } from "../InputsAndModules/HelperInfo";
+import { Button } from '@mantine/core';
 
 interface FaucetBalanceCheckerProps {
   coreAddress: string;
@@ -71,9 +72,9 @@ export const FaucetBalanceChecker: React.FC<FaucetBalanceCheckerProps> = ({
         </HelperInfo>
       </div>
 
-      <button onClick={checkBalance} disabled={loading}>
+      <Button onClick={checkBalance} disabled={loading} loading={loading}>
         {loading ? "Checking..." : "Check Balance"}
-      </button>
+      </Button>
 
       {balance !== null && (
         <div style={{ marginTop: "0.5rem" }}>

@@ -1,6 +1,14 @@
 'use client'
-import { useState } from 'react'
-import { Button, Fieldset, Group, Select, Tabs, TextInput } from '@mantine/core'
+import { useState, ReactNode } from 'react'
+import {
+  Accordion,
+  Button,
+  Fieldset,
+  Group,
+  Select,
+  Tabs,
+  TextInput,
+} from '@mantine/core'
 import { switchChain } from '@wagmi/core'
 import { readContracts } from '@wagmi/core'
 import { config, networks } from '@/config/index'
@@ -66,6 +74,13 @@ export const SigMenu = () => {
   const [evvmId, setEvvmId] = useState(0)
   const [p2pswapAddress, setP2pswapAddress] = useState('')
   const [loading, setLoading] = useState(false)
+
+  type MenuItem = {
+    id: string
+    title: string
+    description?: string
+    element: ReactNode
+  }
 
   const networkOptions = [
     { value: 'sepolia', label: 'Sepolia' },
@@ -183,118 +198,247 @@ export const SigMenu = () => {
     }
   }
 
-  const payComponents = [
-    <PaySignaturesComponent key="pay" coreAddress={coreAddress} />,
-    <DispersePayComponent key="disperse" coreAddress={coreAddress} />,
+  const payComponents: MenuItem[] = [
+    {
+      id: 'pay',
+      title: 'Pay Signatures',
+      description: 'Create and sign payments',
+      element: <PaySignaturesComponent coreAddress={coreAddress} />,
+    },
+    {
+      id: 'disperse',
+      title: 'Disperse Pay',
+      description: 'Disperse payments to multiple recipients',
+      element: <DispersePayComponent coreAddress={coreAddress} />,
+    },
   ]
 
-  const stakingComponents = [
-    <GoldenStakingComponent
-      key="golden"
-      stakingAddress={stakingAddress}
-      coreAddress={coreAddress}
-    />,
-    <PresaleStakingComponent
-      key="presale"
-      stakingAddress={stakingAddress}
-      coreAddress={coreAddress}
-    />,
-    <PublicStakingComponent
-      key="public"
-      stakingAddress={stakingAddress}
-      coreAddress={coreAddress}
-    />,
+  const stakingComponents: MenuItem[] = [
+    {
+      id: 'golden',
+      title: 'Golden Staking',
+      description: 'Golden staking utilities',
+      element: (
+        <GoldenStakingComponent
+          stakingAddress={stakingAddress}
+          coreAddress={coreAddress}
+        />
+      ),
+    },
+    {
+      id: 'presale',
+      title: 'Presale Staking',
+      description: 'Presale staking utilities',
+      element: (
+        <PresaleStakingComponent
+          stakingAddress={stakingAddress}
+          coreAddress={coreAddress}
+        />
+      ),
+    },
+    {
+      id: 'public',
+      title: 'Public Staking',
+      description: 'Public staking interactions',
+      element: (
+        <PublicStakingComponent
+          stakingAddress={stakingAddress}
+          coreAddress={coreAddress}
+        />
+      ),
+    },
   ]
 
-  const mnsComponents = [
-    <PreRegistrationUsernameComponent
-      key="preReg"
-      nameServiceAddress={nameserviceAddress}
-      coreAddress={coreAddress}
-    />,
-    <RegistrationUsernameComponent
-      key="reg"
-      nameServiceAddress={nameserviceAddress}
-      coreAddress={coreAddress}
-    />,
-    <MakeOfferComponent
-      key="makeOffer"
-      nameServiceAddress={nameserviceAddress}
-      coreAddress={coreAddress}
-    />,
-    <WithdrawOfferComponent
-      key="withdrawOffer"
-      nameServiceAddress={nameserviceAddress}
-      coreAddress={coreAddress}
-    />,
-    <AcceptOfferComponent
-      key="acceptOffer"
-      nameServiceAddress={nameserviceAddress}
-      coreAddress={coreAddress}
-    />,
-    <RenewUsernameComponent
-      key="renewUsername"
-      nameServiceAddress={nameserviceAddress}
-      coreAddress={coreAddress}
-    />,
-    <AddCustomMetadataComponent
-      key="addCustomMetadata"
-      nameServiceAddress={nameserviceAddress}
-      coreAddress={coreAddress}
-    />,
-    <RemoveCustomMetadataComponent
-      key="removeCustomMetadata"
-      nameServiceAddress={nameserviceAddress}
-      coreAddress={coreAddress}
-    />,
-    <FlushCustomMetadataComponent
-      key="flushCustomMetadata"
-      nameServiceAddress={nameserviceAddress}
-      coreAddress={coreAddress}
-    />,
-    <FlushUsernameComponent
-      key="flushUsername"
-      nameServiceAddress={nameserviceAddress}
-      coreAddress={coreAddress}
-    />,
+  const mnsComponents: MenuItem[] = [
+    {
+      id: 'preReg',
+      title: 'Pre-registration',
+      description: 'Pre-register a username',
+      element: (
+        <PreRegistrationUsernameComponent
+          nameServiceAddress={nameserviceAddress}
+          coreAddress={coreAddress}
+        />
+      ),
+    },
+    {
+      id: 'reg',
+      title: 'Register Username',
+      description: 'Register a username',
+      element: (
+        <RegistrationUsernameComponent
+          nameServiceAddress={nameserviceAddress}
+          coreAddress={coreAddress}
+        />
+      ),
+    },
+    {
+      id: 'makeOffer',
+      title: 'Make Offer',
+      description: 'Create an offer',
+      element: (
+        <MakeOfferComponent
+          nameServiceAddress={nameserviceAddress}
+          coreAddress={coreAddress}
+        />
+      ),
+    },
+    {
+      id: 'withdrawOffer',
+      title: 'Withdraw Offer',
+      description: 'Withdraw an existing offer',
+      element: (
+        <WithdrawOfferComponent
+          nameServiceAddress={nameserviceAddress}
+          coreAddress={coreAddress}
+        />
+      ),
+    },
+    {
+      id: 'acceptOffer',
+      title: 'Accept Offer',
+      description: 'Accept an offer',
+      element: (
+        <AcceptOfferComponent
+          nameServiceAddress={nameserviceAddress}
+          coreAddress={coreAddress}
+        />
+      ),
+    },
+    {
+      id: 'renewUsername',
+      title: 'Renew Username',
+      description: 'Renew a username registration',
+      element: (
+        <RenewUsernameComponent
+          nameServiceAddress={nameserviceAddress}
+          coreAddress={coreAddress}
+        />
+      ),
+    },
+    {
+      id: 'addCustomMetadata',
+      title: 'Add Metadata',
+      description: 'Add custom metadata to a name',
+      element: (
+        <AddCustomMetadataComponent
+          nameServiceAddress={nameserviceAddress}
+          coreAddress={coreAddress}
+        />
+      ),
+    },
+    {
+      id: 'removeCustomMetadata',
+      title: 'Remove Metadata',
+      description: 'Remove custom metadata',
+      element: (
+        <RemoveCustomMetadataComponent
+          nameServiceAddress={nameserviceAddress}
+          coreAddress={coreAddress}
+        />
+      ),
+    },
+    {
+      id: 'flushCustomMetadata',
+      title: 'Flush Metadata',
+      description: 'Flush all custom metadata',
+      element: (
+        <FlushCustomMetadataComponent
+          nameServiceAddress={nameserviceAddress}
+          coreAddress={coreAddress}
+        />
+      ),
+    },
+    {
+      id: 'flushUsername',
+      title: 'Flush Username',
+      description: 'Flush username registration data',
+      element: (
+        <FlushUsernameComponent
+          nameServiceAddress={nameserviceAddress}
+          coreAddress={coreAddress}
+        />
+      ),
+    },
   ]
 
-  const p2pComponents = [
-    <MakeOrderComponent
-      key="makeOrder"
-      p2pSwapAddress={p2pswapAddress}
-      coreAddress={coreAddress}
-    />,
-    <CancelOrderComponent
-      key="cancelOrder"
-      p2pSwapAddress={p2pswapAddress}
-      coreAddress={coreAddress}
-    />,
-    <DispatchOrderFillPropotionalFeeComponent
-      key="dispatchOrder_fillPropotionalFee"
-      p2pSwapAddress={p2pswapAddress}
-      coreAddress={coreAddress}
-    />,
-    <DispatchOrderFillFixedFeeComponent
-      key="dispatchOrder_fillFixedFee"
-      p2pSwapAddress={p2pswapAddress}
-      coreAddress={coreAddress}
-    />,
+  const p2pComponents: MenuItem[] = [
+    {
+      id: 'makeOrder',
+      title: 'Make Order',
+      description: 'Create a P2P order',
+      element: (
+        <MakeOrderComponent
+          p2pSwapAddress={p2pswapAddress}
+          coreAddress={coreAddress}
+        />
+      ),
+    },
+    {
+      id: 'cancelOrder',
+      title: 'Cancel Order',
+      description: 'Cancel an order',
+      element: (
+        <CancelOrderComponent
+          p2pSwapAddress={p2pswapAddress}
+          coreAddress={coreAddress}
+        />
+      ),
+    },
+    {
+      id: 'dispatchOrder_fillPropotionalFee',
+      title: 'Dispatch (Proportional Fee)',
+      description: 'Dispatch order (proportional fee)',
+      element: (
+        <DispatchOrderFillPropotionalFeeComponent
+          p2pSwapAddress={p2pswapAddress}
+          coreAddress={coreAddress}
+        />
+      ),
+    },
+    {
+      id: 'dispatchOrder_fillFixedFee',
+      title: 'Dispatch (Fixed Fee)',
+      description: 'Dispatch order (fixed fee)',
+      element: (
+        <DispatchOrderFillFixedFeeComponent
+          p2pSwapAddress={p2pswapAddress}
+          coreAddress={coreAddress}
+        />
+      ),
+    },
   ]
 
-  const registryComponents = [
-    <RegisterEvvmComponent key="registerEvvm" />,
-    <SetEvvmIdComponent key="setEvvmId" coreAddress={coreAddress} />,
+  const registryComponents: MenuItem[] = [
+    {
+      id: 'registerEvvm',
+      title: 'Register EVVM',
+      description: 'Register EVVM instance',
+      element: <RegisterEvvmComponent />,
+    },
+    {
+      id: 'setEvvmId',
+      title: 'Set EVVM ID',
+      description: 'Set EVVM ID on core',
+      element: <SetEvvmIdComponent coreAddress={coreAddress} />,
+    },
   ]
 
-  const components =
+  const components: MenuItem[] =
     menu === 'faucet'
       ? [
-          <FaucetFunctionsComponent key="faucet" coreAddress={coreAddress} />,
-          <FaucetBalanceChecker
-            key="faucetBalance"
-            coreAddress={coreAddress}
-          />,
+          {
+            id: 'faucet',
+            title: 'Faucet Functions',
+            description: 'Faucet utilities',
+            element: <FaucetFunctionsComponent coreAddress={coreAddress} />,
+          },
+          {
+            id: 'faucetBalance',
+            title: 'Faucet Balance',
+            description: 'Check faucet balance',
+            element: <FaucetBalanceChecker coreAddress={coreAddress} />,
+          },
         ]
       : menu === 'pay'
         ? payComponents
@@ -431,20 +575,21 @@ export const SigMenu = () => {
         </Tabs.List>
       </Tabs>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-        {components.map((Component, index) => (
-          <div
-            key={index}
-            style={{
-              ...boxStyle,
-              background: '#f9fafb',
-              boxShadow: '0 1px 4px 0 rgba(0,0,0,0.03)',
-            }}
-          >
-            {Component}
-          </div>
+      <div>
+        <Accordion variant="contained" radius="md" chevronPosition="right" style={{ marginTop: '1rem' }}>
+        {components.map((item) => (
+          <Accordion.Item key={item.id} value={item.id}>
+            <Accordion.Control>{item.title}</Accordion.Control>
+            <Accordion.Panel >
+              
+              {item.element}
+            </Accordion.Panel>
+          </Accordion.Item>
         ))}
+      </Accordion>
       </div>
+
+      
     </div>
   )
 }

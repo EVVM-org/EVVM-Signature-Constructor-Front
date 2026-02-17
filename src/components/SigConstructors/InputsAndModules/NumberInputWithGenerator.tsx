@@ -1,6 +1,7 @@
 import React from "react";
 import mersenneTwister from "@/utils/mersenneTwister";
 import styles from "@/components/SigConstructors/SignatureConstructor.module.css";
+import { Button } from '@mantine/core';
 
 interface NumberInputWithGeneratorProps {
   label: string;
@@ -33,12 +34,12 @@ export const NumberInputWithGenerator: React.FC<
         {label}:{" "}
             
         {showRandomBtn && (
-          <button
+          <Button
             className={styles.numberWithGeneratorButton}
             onClick={generateRandomNumber}
           >
             {buttonText}
-          </button>
+          </Button>
         )}
         <input
             type="number"

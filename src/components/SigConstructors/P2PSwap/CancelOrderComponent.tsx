@@ -19,6 +19,7 @@ import {
 } from '@evvm/evvm-js'
 import { MATE_TOKEN_ADDRESS } from '@/utils/constants'
 import { P2PSwapComponentProps } from '@/types'
+import { Button } from '@mantine/core'
 
 export const CancelOrderComponent = ({
   p2pSwapAddress,
@@ -187,7 +188,7 @@ export const CancelOrderComponent = ({
       </div>
 
       {/* Create signature button */}
-      <button
+      <Button
         onClick={makeSig}
         style={{
           padding: '0.5rem',
@@ -195,7 +196,7 @@ export const CancelOrderComponent = ({
         }}
       >
         Create signature
-      </button>
+      </Button>
 
       {/* Results section */}
       <DataDisplayWithClear

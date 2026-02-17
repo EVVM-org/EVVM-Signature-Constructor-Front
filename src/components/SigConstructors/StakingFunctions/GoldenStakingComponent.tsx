@@ -13,6 +13,7 @@ import {
 } from "@/components/SigConstructors/InputsAndModules";
 
 import { StakingComponentProps } from "@/types";
+import { Button } from "@mantine/core";
 
 export const GoldenStakingComponent = ({
   stakingAddress,
@@ -117,9 +118,10 @@ export const GoldenStakingComponent = ({
         )}
       </div>
 
-      <button
+      <Button
         onClick={makeSig}
         disabled={loading}
+        loading={loading}
         style={{
           padding: "0.5rem",
           marginTop: "1rem",
@@ -127,7 +129,7 @@ export const GoldenStakingComponent = ({
         }}
       >
         {loading ? "Creating..." : "Create signature"}
-      </button>
+      </Button>
 
       <DataDisplayWithClear
         dataToGet={dataToGet}

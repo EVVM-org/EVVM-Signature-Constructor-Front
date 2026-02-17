@@ -10,6 +10,7 @@ import {
 } from "@/components/SigConstructors/InputsAndModules";
 
 import RegistryCoreABI from "@/abi/RegistryEvvm.json";
+import { Button } from "@mantine/core";
 
 const REGISTRY_ADDRESS = "0x389dC8fb09211bbDA841D59f4a51160dA2377832" as const;
 
@@ -108,8 +109,10 @@ export const RegisterEvvmComponent = () => {
       />
 
       {/* Register button */}
-      <button
+      <Button
         onClick={makeRegister}
+        disabled={isLoading}
+        loading={isLoading}
         style={{ 
           padding: "0.75rem 1.5rem", 
           marginTop: "1.5rem",
@@ -120,10 +123,9 @@ export const RegisterEvvmComponent = () => {
           cursor: isLoading ? "not-allowed" : "pointer",
           fontWeight: 600,
         }}
-        disabled={isLoading}
       >
         {isLoading ? "Registering..." : "Register EVVM"}
-      </button>
+      </Button>
 
       {/* Display EVVM ID if available */}
       {resultEvvmId && (

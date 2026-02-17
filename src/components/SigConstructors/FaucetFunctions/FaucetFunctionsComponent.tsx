@@ -7,6 +7,7 @@ import { NumberInputField } from "../InputsAndModules/NumberInputField";
 import { CoreABI } from "@evvm/evvm-js";
 
 import { HelperInfo } from "../InputsAndModules/HelperInfo";
+import { Button } from "@mantine/core";
 
 interface FaucetFunctionsComponentProps {
   coreAddress: string;
@@ -81,7 +82,7 @@ export const FaucetFunctionsComponent = ({
         placeholder="Enter amount"
       />
 
-      <button
+      <Button
         onClick={executeFaucet}
         style={{
           padding: "0.5rem",
@@ -89,7 +90,7 @@ export const FaucetFunctionsComponent = ({
         }}
       >
         Get Tokens
-      </button>
+      </Button>
     </div>
   );
 };

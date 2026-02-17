@@ -11,6 +11,7 @@ import {
   NumberInputField,
   TextInputField,
 } from '@/components/SigConstructors/InputsAndModules'
+import { Button } from '@mantine/core'
 import { execute } from '@evvm/evvm-js'
 import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
 import { NameServiceABI, CoreABI } from '@evvm/evvm-js'
@@ -243,7 +244,7 @@ export const RegistrationUsernameComponent = ({
       <div style={{ marginTop: 8, marginBottom: 8 }}>
         <strong>Calculated registration price:</strong>{' '}
         {registrationPrice !== null ? registrationPrice.toString() : '—'}
-        <button
+        <Button
           onClick={async () => {
             const el = document.getElementById('usernameInput_registrationUsername') as HTMLInputElement | null
             if (!el) return
@@ -252,7 +253,7 @@ export const RegistrationUsernameComponent = ({
           style={{ marginLeft: 12, padding: '4px 8px', fontSize: 12 }}
         >
           Refresh price
-        </button>
+        </Button>
       </div>
 
       <NumberInputField
@@ -283,7 +284,7 @@ export const RegistrationUsernameComponent = ({
       </div>
 
       {/* Create signature button */}
-      <button
+      <Button
         onClick={makeSig}
         style={{
           padding: '0.5rem',
@@ -291,7 +292,7 @@ export const RegistrationUsernameComponent = ({
         }}
       >
         Create signature
-      </button>
+      </Button>
 
       <DataDisplayWithClear
         dataToGet={dataToGet}

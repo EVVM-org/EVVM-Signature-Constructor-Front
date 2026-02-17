@@ -13,6 +13,7 @@ import {
   HelperInfo,
   NumberInputField,
 } from "@/components/SigConstructors/InputsAndModules";
+import { Button } from '@mantine/core';
 
 interface DispersePayComponentProps {
   coreAddress: string;
@@ -258,9 +259,10 @@ export const DispersePayComponent = ({
         )}
       </div>
 
-      <button
+      <Button
         onClick={makeSig}
         disabled={loading}
+        loading={loading}
         style={{
           padding: "0.5rem",
           marginTop: "1rem",
@@ -268,7 +270,7 @@ export const DispersePayComponent = ({
         }}
       >
         {loading ? "Creating..." : "Create signature"}
-      </button>
+      </Button>
 
       <DataDisplayWithClear
         dataToGet={dataToGet}

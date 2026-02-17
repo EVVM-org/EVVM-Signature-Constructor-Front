@@ -18,6 +18,7 @@ import {
   NumberInputField,
   StakingActionSelector,
 } from '@/components/SigConstructors/InputsAndModules'
+import { Button } from '@mantine/core'
 
 import { StakingComponentProps } from "@/types";
 
@@ -157,9 +158,10 @@ export const PresaleStakingComponent = ({
         )}
       </div>
 
-      <button
+      <Button
         onClick={makeSig}
         disabled={loading}
+        loading={loading}
         style={{
           padding: '0.5rem',
           marginTop: '1rem',
@@ -167,7 +169,7 @@ export const PresaleStakingComponent = ({
         }}
       >
         {loading ? 'Creating...' : 'Create Signature'}
-      </button>
+      </Button>
 
       <DataDisplayWithClear
         dataToGet={dataToGet}

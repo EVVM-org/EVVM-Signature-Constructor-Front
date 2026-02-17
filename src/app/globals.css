@@ -51,7 +51,7 @@ section {
   text-align: center;
 }
 
-button {
+button:not([class*="mantine-"]) {
   padding: 10px 15px;
   background-color: white;
   color: black;
@@ -64,14 +64,14 @@ button {
   margin: 15px; /* Space between buttons */
 }
 
-button:hover {
+button:not([class*="mantine-"]):hover {
   background-color: black;
-    color: white;
+  color: white;
 }
 
-button:active {
+button:not([class*="mantine-"]):active {
   background-color: #333; /* Dark gray on click */
-    color: white;
+  color: white;
 }
 
 h1 {

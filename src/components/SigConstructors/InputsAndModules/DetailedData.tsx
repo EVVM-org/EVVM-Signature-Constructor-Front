@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Button } from '@mantine/core';
 
 export const DetailedData = ({
   dataToGet,
@@ -10,7 +11,7 @@ export const DetailedData = ({
     <div>
       <h2>Ready</h2>
 
-      <button
+      <Button
         style={{
           margin: "0.5rem",
           borderRadius: "5px",
@@ -18,7 +19,7 @@ export const DetailedData = ({
         onClick={() => setShowData(!showData)}
       >
         {showData ? "Hide data" : "Show data"}
-      </button>
+      </Button>
 
       {/* Detailed data */}
       {showData && (
@@ -51,7 +52,7 @@ export const DetailedData = ({
 
       {/* Action buttons */}
       <div style={{ marginTop: "1rem" }}>
-        <button
+        <Button
           style={{
             padding: "0.5rem",
             margin: "0.5rem",
@@ -62,7 +63,7 @@ export const DetailedData = ({
           }
         >
           Copy for JSON
-        </button>
+        </Button>
       </div>
     </div>
   );

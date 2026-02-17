@@ -18,6 +18,7 @@ import {
   type ISerializableSignedAction,
 } from '@evvm/evvm-js'
 import { P2PSwapComponentProps } from '@/types'
+import { Button } from '@mantine/core'
 
 export const DispatchOrderFillPropotionalFeeComponent = ({
   p2pSwapAddress,
@@ -221,7 +222,7 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
       </div>
 
       {/* Create signature button */}
-      <button
+      <Button
         onClick={makeSig}
         style={{
           padding: '0.5rem',
@@ -229,7 +230,7 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
         }}
       >
         Create signature
-      </button>
+      </Button>
 
       {/* Results section */}
       <DataDisplayWithClear

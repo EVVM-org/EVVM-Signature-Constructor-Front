@@ -7,6 +7,7 @@ import {
   AddressInputField,
   NumberInputField,
 } from "@/components/SigConstructors/InputsAndModules";
+import { Button } from '@mantine/core';
 
 import { CoreABI } from "@evvm/evvm-js";
 
@@ -99,8 +100,10 @@ export const SetEvvmIdComponent = ({
       />
 
       {/* Set button */}
-      <button
+      <Button
         onClick={handleSetEvvmId}
+        disabled={isLoading}
+        loading={isLoading}
         style={{ 
           padding: "0.75rem 1.5rem", 
           marginTop: "1.5rem",
@@ -111,10 +114,9 @@ export const SetEvvmIdComponent = ({
           cursor: isLoading ? "not-allowed" : "pointer",
           fontWeight: 600,
         }}
-        disabled={isLoading}
       >
         {isLoading ? "Setting..." : "Set EVVM ID"}
-      </button>
+      </Button>
 
       {/* Display transaction hash */}
       {txHash && (

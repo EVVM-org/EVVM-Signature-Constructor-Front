@@ -13,6 +13,7 @@ import {
   StakingActionSelector,
 } from "@/components/SigConstructors/InputsAndModules";
 import { StakingComponentProps } from "@/types";
+import { Button } from "@mantine/core";
 
 type InputData = {
   IPublicStakingData: ISerializableSignedAction<IPublicStakingData>;
@@ -160,17 +161,18 @@ export const PublicStakingComponent = ({
         )}
       </div>
 
-      <button
+      <Button
         onClick={makeSig}
         disabled={loading}
+        loading={loading}
         style={{
-          padding: "0.5rem",
-          marginTop: "1rem",
+          padding: '0.5rem',
+          marginTop: '1rem',
           opacity: loading ? 0.6 : 1,
         }}
       >
-        {loading ? "Creating..." : "Create Signature"}
-      </button>
+        {loading ? 'Creating...' : 'Create signature'}
+      </Button>
 
       <DataDisplayWithClear
         dataToGet={dataToGet}

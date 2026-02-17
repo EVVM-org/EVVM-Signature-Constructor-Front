@@ -16,6 +16,7 @@ import {
   DataDisplayWithClear,
   HelperInfo,
 } from '@/components/SigConstructors/InputsAndModules'
+import { Button } from '@mantine/core'
 
 interface PaySignaturesComponentProps {
   coreAddress: string
@@ -200,9 +201,10 @@ export const PaySignaturesComponent = ({
         )}
       </div>
 
-      <button
+      <Button
         onClick={makeSig}
         disabled={loading}
+        loading={loading}
         style={{
           padding: '0.5rem',
           marginTop: '1rem',
@@ -210,7 +212,7 @@ export const PaySignaturesComponent = ({
         }}
       >
         {loading ? 'Creating...' : 'Create signature'}
-      </button>
+      </Button>
 
       <DataDisplayWithClear
         dataToGet={dataToGet}

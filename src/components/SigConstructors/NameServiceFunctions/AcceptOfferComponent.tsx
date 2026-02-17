@@ -10,6 +10,7 @@ import {
   NumberInputField,
   TextInputField,
 } from "@/components/SigConstructors/InputsAndModules";
+import { Button } from '@mantine/core';
 import { execute } from "@evvm/evvm-js";
 import { getEvvmSigner, getCurrentChainId } from "@/utils/evvm-signer";
 import {
@@ -163,7 +164,7 @@ export const AcceptOfferComponent = ({
       </div>
 
       {/* Create signature button */}
-      <button
+      <Button
         onClick={makeSig}
         style={{
           padding: "0.5rem",
@@ -171,7 +172,7 @@ export const AcceptOfferComponent = ({
         }}
       >
         Create signature
-      </button>
+      </Button>
 
       <DataDisplayWithClear
         dataToGet={dataToGet}

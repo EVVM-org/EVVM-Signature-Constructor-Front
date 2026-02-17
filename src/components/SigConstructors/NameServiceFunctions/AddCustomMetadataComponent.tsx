@@ -22,6 +22,7 @@ import {
   type ISerializableSignedAction,
 } from "@evvm/evvm-js";
 import { NameServiceComponentProps } from "@/types";
+import { Button } from "@mantine/core";
 
 type InfoData = {
   IPayData: ISerializableSignedAction<IPayData>;
@@ -218,7 +219,7 @@ export const AddCustomMetadataComponent = ({
       </div>
 
       {/* Create signature button */}
-      <button
+      <Button
         onClick={makeSig}
         style={{
           padding: "0.5rem",
@@ -226,7 +227,7 @@ export const AddCustomMetadataComponent = ({
         }}
       >
         Create signature
-      </button>
+      </Button>
 
       <DataDisplayWithClear
         dataToGet={dataToGet}

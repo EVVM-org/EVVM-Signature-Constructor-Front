@@ -1,6 +1,7 @@
 import React from "react";
 import { DetailedData } from "@/components/SigConstructors/InputsAndModules/DetailedData";
 import styles from "@/components/SigConstructors/SignatureConstructor.module.css";
+import { Button } from '@mantine/core';
 
 interface DataDisplayWithClearProps {
   dataToGet: any;
@@ -23,12 +24,13 @@ export const DataDisplayWithClear: React.FC<DataDisplayWithClearProps> = ({
 
       {/* Action buttons */}
       <div style={{ marginTop: "1rem" }}>
-        <button className={styles.clearButton} onClick={onClear}>
+        <Button color="red" variant="filled" className={styles.clearButton} onClick={onClear}>
           Clear
-        </button>
+        </Button>
 
         {onExecute && (
-          <button
+          <Button
+            color="blue"
             style={{
               backgroundColor: "#4c5cafff",
               color: "white",
@@ -41,7 +43,7 @@ export const DataDisplayWithClear: React.FC<DataDisplayWithClearProps> = ({
             onClick={onExecute}
           >
             Execute
-          </button>
+          </Button>
         )}
       </div>
     </div>

@@ -455,9 +455,10 @@ export const SigMenu = () => {
   return (
     <div
       style={{
-        maxWidth: 900,
+        maxWidth: 1000,
+        width: '90%',
         margin: '0rem auto',
-        padding: '2rem 1.5rem',
+        padding: '1rem',
         background: '#fff',
         borderRadius: 16,
         boxShadow: '0 4px 24px 0 rgba(0,0,0,0.08)',
@@ -468,7 +469,15 @@ export const SigMenu = () => {
       }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        <h1>EVVM Signature Constructor</h1>
+        <h1
+          style={{
+            fontSize: 24,
+            fontWeight: 700,
+            color: '#111',
+            textAlign: 'center',
+            margin: 0,
+          }}
+        >EVVM Signature Constructor</h1>
         {stakingAddress && nameserviceAddress ? (
           <div
             style={{
@@ -564,6 +573,7 @@ export const SigMenu = () => {
         variant="pills"
         value={menu}
         onChange={(value) => setMenu(value || 'pay')}
+        style={{ marginBottom: '-1.5rem' }}
       >
         <Tabs.List>
           <Tabs.Tab value="pay">Payment</Tabs.Tab>
@@ -576,20 +586,20 @@ export const SigMenu = () => {
       </Tabs>
 
       <div>
-        <Accordion variant="contained" radius="md" chevronPosition="right" style={{ marginTop: '1rem' }}>
-        {components.map((item) => (
-          <Accordion.Item key={item.id} value={item.id}>
-            <Accordion.Control>{item.title}</Accordion.Control>
-            <Accordion.Panel >
-              
-              {item.element}
-            </Accordion.Panel>
-          </Accordion.Item>
-        ))}
-      </Accordion>
+        <Accordion
+          variant="contained"
+          radius="md"
+          chevronPosition="right"
+          style={{ marginTop: '0rem' }}
+        >
+          {components.map((item) => (
+            <Accordion.Item key={item.id} value={item.id}>
+              <Accordion.Control>{item.title}</Accordion.Control>
+              <Accordion.Panel>{item.element}</Accordion.Panel>
+            </Accordion.Item>
+          ))}
+        </Accordion>
       </div>
-
-      
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import React from "react";
+import { Input, SegmentedControl } from "@mantine/core";
 
 interface PrioritySelectorProps {
   onPriorityChange: (priority: "low" | "high") => void;
@@ -14,19 +15,18 @@ export const PrioritySelector: React.FC<PrioritySelectorProps> = ({
 }) => {
   return (
     <div style={{ marginTop }}>
-      <p>EVVM Nonce Type</p>
-      <select
-        style={{
-          color: "black",
-          backgroundColor: "white",
-          height: "2rem",
-          width: "12rem",
-        }}
-        onChange={(e) => onPriorityChange(e.target.value as "low" | "high")}
-      >
-        <option value="low">synchronous nonce</option>
-        <option value="high">asynchronous nonce</option>
-      </select>
+      <Input.Wrapper label="EVVM Nonce Type">
+      <br/>
+      <SegmentedControl
+        size="sm"
+        defaultValue="low"
+        onChange={(value) => onPriorityChange(value as "low" | "high")}
+        data={[
+          { label: "sync", value: "low" },
+          { label: "async", value: "high" },
+        ]}
+      />
+      </Input.Wrapper>
     </div>
   );
 };

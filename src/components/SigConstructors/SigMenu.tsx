@@ -456,7 +456,7 @@ export const SigMenu = () => {
     <div
       style={{
         maxWidth: 1000,
-        width: '90%',
+        width: '50%',
         margin: '0rem auto',
         padding: '1rem',
         background: '#fff',

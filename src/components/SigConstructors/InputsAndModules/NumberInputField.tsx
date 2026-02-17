@@ -1,29 +1,40 @@
-import React from "react";
-import styles from "@/components/SigConstructors/SignatureConstructor.module.css";
+import React from 'react'
+import styles from '@/components/SigConstructors/SignatureConstructor.module.css'
+import { Divider, Input } from '@mantine/core'
 
 interface NumberInputFieldProps {
-  label: string;
-  inputId: string;
-  placeholder?: string;
-  defaultValue?: string;
+  label: string
+  inputId: string
+  placeholder?: string
+  defaultValue?: string
 }
 
 export const NumberInputField: React.FC<NumberInputFieldProps> = ({
   label,
   inputId,
-  placeholder = "Enter number",
+  placeholder = 'Enter number',
   defaultValue,
 }) => {
   return (
-    <div style={{ marginBottom: "1rem" }}>
+    <>
       <p>{label}</p>
-      <input
-        type="number"
-        placeholder={placeholder}
-        id={inputId}
-        className={styles.numberInput}
-        defaultValue={defaultValue}
-      />
-    </div>
-  );
-};
+      <div
+        style={{
+          marginBottom: '1rem',
+          marginTop: '0.5rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+        }}
+      >
+        <Input
+          type="number"
+          size="compact-md"
+          placeholder={placeholder}
+          id={inputId}
+          defaultValue={defaultValue}
+        />
+      </div>
+    </>
+  )
+}

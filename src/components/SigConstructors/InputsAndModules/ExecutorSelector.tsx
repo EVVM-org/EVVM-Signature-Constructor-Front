@@ -1,48 +1,57 @@
-import React from "react";
+import React from 'react'
+import { Input, NativeSelect } from '@mantine/core'
 
 interface ExecutorSelectorProps {
-  label?: string;
-  inputId: string;
-  placeholder?: string;
-  onExecutorToggle: (isUsing: boolean) => void;
-  isUsingExecutor: boolean;
+  label?: string
+  inputId: string
+  placeholder?: string
+  onExecutorToggle: (isUsing: boolean) => void
+  isUsingExecutor: boolean
 }
 
 export const ExecutorSelector: React.FC<ExecutorSelectorProps> = ({
-  label = "Are you using an senderExecutor?",
+  label = 'Are you using an senderExecutor?',
   inputId,
-  placeholder = "Enter senderExecutor",
+  placeholder = 'Enter senderExecutor',
   onExecutorToggle,
   isUsingExecutor,
 }) => {
   return (
-    <div style={{ marginBottom: "1rem" }}>
+    <>
       <p>{label}</p>
-      <select
+      <div
         style={{
-          color: "black",
-          backgroundColor: "white",
-          height: "2rem",
-          width: "5rem",
+          marginBottom: '1rem',
+          marginTop: '0.5rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
         }}
-        onChange={(e) => onExecutorToggle(e.target.value === "true")}
       >
-        <option value="false">No</option>
-        <option value="true">Yes</option>
-      </select>
-      {isUsingExecutor && (
-        <input
-          type="text"
-          placeholder={placeholder}
-          id={inputId}
+        <NativeSelect
+          value={isUsingExecutor ? 'true' : 'false'}
+          onChange={(e) => onExecutorToggle(e.currentTarget.value === 'true')}
+          data={[
+            { label: 'No', value: 'false' },
+            { label: 'Yes', value: 'true' },
+          ]}
           style={{
-            color: "black",
-            backgroundColor: "white",
-            height: "2rem",
-            width: "25rem",
+            width: '5rem',
           }}
+          size="xs"
         />
-      )}
-    </div>
-  );
-};
+        {isUsingExecutor && (
+          <Input
+            type="text"
+            size="compact-md"
+            placeholder={placeholder}
+            id={inputId}
+            style={{
+              width: '25rem',
+            }}
+          />
+        )}
+      </div>
+    </>
+  )
+}

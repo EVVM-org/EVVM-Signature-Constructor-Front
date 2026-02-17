@@ -16,7 +16,7 @@ import {
   DataDisplayWithClear,
   HelperInfo,
 } from '@/components/SigConstructors/InputsAndModules'
-import { Button } from '@mantine/core'
+import { Button, Input, NativeSelect } from '@mantine/core'
 
 interface PaySignaturesComponentProps {
   coreAddress: string
@@ -119,33 +119,40 @@ export const PaySignaturesComponent = ({
       <br />
 
       <div style={{ marginBottom: '1rem' }}>
-        <p>
+        <div
+          style={{
+            marginBottom: '1rem',
+            marginTop: '0.5rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+          }}
+        >
           To:{' '}
-          <select
+          <NativeSelect
+            value={isUsingUsernames ? 'true' : 'false'}
+            onChange={(e) =>
+              setIsUsingUsernames(e.currentTarget.value === 'true')
+            }
+            data={[
+              { label: 'Address', value: 'false' },
+              { label: 'Username', value: 'true' },
+            ]}
             style={{
-              color: 'black',
-              backgroundColor: 'white',
-              height: '2rem',
-              width: '6rem',
+              width: '7rem',
             }}
-            onChange={(e) => setIsUsingUsernames(e.target.value === 'true')}
-          >
-            <option value="false">Address</option>
-            <option value="true">Username</option>
-          </select>
-          <input
+            size="xs"
+          />
+          <Input
+            size="compact-md"
             type="text"
             placeholder={isUsingUsernames ? 'Enter username' : 'Enter address'}
             id={isUsingUsernames ? 'toUsername' : 'toAddress'}
             style={{
-              color: 'black',
-              backgroundColor: 'white',
-              height: '2rem',
               width: '25rem',
-              marginLeft: '0.5rem',
             }}
           />
-        </p>
+        </div>
       </div>
 
       <AddressInputField
@@ -160,15 +167,13 @@ export const PaySignaturesComponent = ({
       ].map(({ label, id, type }) => (
         <div key={id} style={{ marginBottom: '1rem' }}>
           <p>{label}</p>
-          <input
+          <Input
+            size="compact-md"
             type={type}
             placeholder={`Enter ${label.toLowerCase()}`}
             id={id}
             style={{
-              color: 'black',
-              backgroundColor: 'white',
-              height: '2rem',
-              width: '25rem',
+              maxWidth: '20vw',
             }}
           />
         </div>

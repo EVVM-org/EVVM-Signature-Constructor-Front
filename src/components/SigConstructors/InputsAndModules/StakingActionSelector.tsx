@@ -1,8 +1,9 @@
-import React from "react";
+import { Input, SegmentedControl } from '@mantine/core'
+import React from 'react'
 
 interface StakingActionSelectorProps {
-  onChange: (isStaking: boolean) => void;
-  defaultValue?: boolean;
+  onChange: (isStaking: boolean) => void
+  defaultValue?: boolean
 }
 
 export const StakingActionSelector: React.FC<StakingActionSelectorProps> = ({
@@ -10,23 +11,16 @@ export const StakingActionSelector: React.FC<StakingActionSelectorProps> = ({
   defaultValue = true,
 }) => {
   return (
-    <div style={{ marginBottom: "1rem" }}>
-      <label>
-        Action:{" "}
-        <select
-          onChange={(e) => onChange(e.target.value === "true")}
-          defaultValue={defaultValue.toString()}
-          style={{
-            color: "black",
-            backgroundColor: "white",
-            height: "2rem",
-            width: "5rem",
-          }}
-        >
-          <option value="true">Staking</option>
-          <option value="false">Unstaking</option>
-        </select>
-      </label>
+    <div style={{ marginBottom: '1rem' }}>
+      <SegmentedControl
+        size="sm"
+        defaultValue={defaultValue.toString()}
+        onChange={(value) => onChange(value === 'true')}
+        data={[
+          { label: 'Staking', value: 'true' },
+          { label: 'Unstaking', value: 'false' },
+        ]}
+      />
     </div>
-  );
-};
+  )
+}

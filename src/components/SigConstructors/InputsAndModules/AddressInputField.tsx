@@ -1,29 +1,40 @@
-import React from "react";
-import styles from "@/components/SigConstructors/SignatureConstructor.module.css";
+import React from 'react'
+import styles from '@/components/SigConstructors/SignatureConstructor.module.css'
+import { Input } from '@mantine/core'
 
 interface AddressInputFieldProps {
-  label: string;
-  inputId: string;
-  placeholder?: string;
-  defaultValue?: string;
+  label: string
+  inputId: string
+  placeholder?: string
+  defaultValue?: string
 }
 
 export const AddressInputField: React.FC<AddressInputFieldProps> = ({
   label,
   inputId,
-  placeholder = "Enter address",
+  placeholder = 'Enter address',
   defaultValue,
 }) => {
   return (
-    <div style={{ marginBottom: "1rem" }}>
+    <>
       <p>{label}</p>
-      <input
-        type="text"
-        placeholder={placeholder}
-        id={inputId}
-        className={styles.addressInput}
-        defaultValue={defaultValue}
-      />
-    </div>
-  );
-};
+      <div
+        style={{
+          marginBottom: '1rem',
+          marginTop: '0.5rem',
+        }}
+      >
+        <Input
+          size="compact-md"
+          type="text"
+          placeholder={placeholder}
+          id={inputId}
+          defaultValue={defaultValue}
+          style={{
+            maxWidth: '30vw',
+          }}
+        />
+      </div>
+    </>
+  )
+}

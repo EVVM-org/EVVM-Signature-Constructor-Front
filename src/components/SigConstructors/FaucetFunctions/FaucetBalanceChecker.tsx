@@ -43,7 +43,7 @@ export const FaucetBalanceChecker: React.FC<FaucetBalanceCheckerProps> = ({
 
   return (
     <div className="flex flex-col items-center mt-4">
-      <h2>Balance</h2>
+    
       <p>Check the balance of a user for a specific token.</p>
       <br />
       <AddressInputField

@@ -45,7 +45,7 @@ export const FaucetFunctionsComponent = ({
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
-      <h1>Faucet</h1>
+      
       <p>This faucet allows you to get tokens to a specified address.</p>
       <br />
 

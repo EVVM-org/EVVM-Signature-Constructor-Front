@@ -83,8 +83,7 @@ export const GoldenStakingComponent = ({
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
-      <h1>Golden staking</h1>
-      <br />
+    
 
       <StakingActionSelector onChange={setIsStaking} />
 

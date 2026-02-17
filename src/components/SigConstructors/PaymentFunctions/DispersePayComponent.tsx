@@ -13,7 +13,7 @@ import {
   HelperInfo,
   NumberInputField,
 } from "@/components/SigConstructors/InputsAndModules";
-import { Button } from '@mantine/core';
+import { Button, Input, Select, Slider } from '@mantine/core';
 
 interface DispersePayComponentProps {
   coreAddress: string;
@@ -162,23 +162,25 @@ export const DispersePayComponent = ({
         isUsingExecutor={isUsingExecutorDisperse}
       />
 
-      <div style={{ marginBottom: "1rem" }}>
+      <div style={{ marginBottom: "1rem", width: "20rem" }}>
         <p>Number of accounts to split the payment</p>
-        <select
-          style={{
-            color: "black",
-            backgroundColor: "white",
-            height: "2rem",
-            width: "5rem",
-          }}
-          onChange={(e) => setNumberOfUsersToDisperse(Number(e.target.value))}
-        >
-          {[1, 2, 3, 4, 5].map((num) => (
-            <option key={num} value={num}>
-              {num}
-            </option>
-          ))}
-        </select>
+        <Slider
+          min={1}
+          max={5}
+          step={1}
+          value={numberOfUsersToDisperse}
+          onChange={setNumberOfUsersToDisperse}
+          marks={[
+            { value: 1, label: '1' },
+            { value: 2, label: '2' },
+            { value: 3, label: '3' },
+            { value: 4, label: '4' },
+            { value: 5, label: '5' },
+          ]}
+          showLabelOnHover={false}
+          
+          label={value => `${value}`}
+        />
       </div>
 
       {Array.from({ length: numberOfUsersToDisperse }).map((_, index) => (
@@ -187,26 +189,28 @@ export const DispersePayComponent = ({
             index + 1
           }`}</h4>
           <p>To:</p>
-          <select
+          <Select
             style={{
               color: "black",
               backgroundColor: "white",
-              height: "2rem",
-              width: "5.5rem",
+              width: "8rem",
             }}
-            onChange={(e) => {
+            value={isUsingUsernameOnDisperse[index] ? "true" : "false"}
+            onChange={(value) => {
               setIsUsingUsernameOnDisperse((prev) => {
                 const newPrev = [...prev];
-                newPrev[index] = e.target.value === "true";
+                newPrev[index] = value === "true";
                 return newPrev;
               });
             }}
-          >
-            <option value="false">Address</option>
-            <option value="true">Username</option>
-          </select>
-          <input
+            data={[
+              { value: "false", label: "Address" },
+              { value: "true", label: "Username" },
+            ]}
+          />
+          <Input
             type="text"
+            size="compact-md"
             placeholder={
               isUsingUsernameOnDisperse[index]
                 ? "Enter username"
@@ -218,21 +222,16 @@ export const DispersePayComponent = ({
                 : `toAddressSplitUserNumber${index}`
             }
             style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
               width: "25rem",
             }}
           />
           <p>Amount</p>
-          <input
+          <Input
             type="number"
+            size="compact-md"
             placeholder="Enter amount"
             id={`amountTokenToGiveUser${index}`}
             style={{
-              color: "black",
-              backgroundColor: "white",
-              height: "2rem",
               width: "25rem",
             }}
           />

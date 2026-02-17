@@ -11,6 +11,7 @@ import {
 } from '@/components/SigConstructors/InputsAndModules'
 import { execute } from '@evvm/evvm-js'
 import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
+import { keccak256 } from 'viem'
 import {
   IPayData,
   IPreRegistrationUsernameData,
@@ -61,7 +62,7 @@ export const PreRegistrationUsernameComponent = ({
       throw new Error('NameService nonce is required')
     }
     if (!formData.lockNumber) {
-      throw new Error('Clow number is required')
+      throw new Error('Lock number is required')
     }
     if (!formData.noncePay) {
       throw new Error('EVVM nonce is required')
@@ -99,10 +100,10 @@ export const PreRegistrationUsernameComponent = ({
         senderExecutor: formData.addressNameService as `0x${string}`,
       })
 
-      // Hash the username for pre-registration
-      const hashUsername =
-        '0x' +
-        Buffer.from(formData.username + formData.lockNumber).toString('hex')
+      // Hash the username + lockNumber for pre-registration (keccak256 -> bytes32)
+      const hashUsername = keccak256(
+        new TextEncoder().encode(`${formData.username}${formData.lockNumber}`)
+      )
 
       // Sign pre-registration action
       const preRegistrationAction =
@@ -154,7 +155,7 @@ export const PreRegistrationUsernameComponent = ({
       {/* Nonce section with automatic generator */}
 
       <NumberInputWithGenerator
-        label="Clow Number"
+        label="Lock Number"
         inputId="lockNumberInput_preRegistration"
         placeholder="Enter clow number"
       />

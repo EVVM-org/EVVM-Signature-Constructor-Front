@@ -65,7 +65,7 @@ export const RegistrationUsernameComponent = ({
       throw new Error('NameService nonce is required')
     }
     if (!formData.lockNumber) {
-      throw new Error('Clow number is required')
+      throw new Error('Lock number is required')
     }
     if (!formData.nonceEVVM) {
       throw new Error('EVVM nonce is required')
@@ -200,7 +200,7 @@ export const RegistrationUsernameComponent = ({
       />
 
       <NumberInputField
-        label="Clow Number"
+        label="Lock Number"
         inputId="lockNumberInput_registrationUsername"
         placeholder="Enter clow number"
       />

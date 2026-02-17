@@ -361,95 +361,75 @@ export const SigMenu = () => {
             </div>
           </div>
         ) : (
-          
-            <Fieldset legend="Evvm Contract Details" radius="md">
-              <TextInput
-                label="Core contract address"
-                placeholder="0x..."
-                value={coreAddress}
-                onChange={(e) => setEvvmAddress(e.target.value)}
-              />
-              <Select
-                label="Host Chain"
-                value={network}
-                onChange={(val) => handleNetworkChange(val)}
-                data={networkOptions}
-              />
+          <Fieldset legend="Evvm Contract Details" radius="md">
+            <TextInput
+              label="Core contract address"
+              placeholder="0x..."
+              value={coreAddress}
+              onChange={(e) => setEvvmAddress(e.target.value)}
+            />
+            <Select
+              label="Host Chain"
+              value={network}
+              onChange={(val) => handleNetworkChange(val)}
+              data={networkOptions}
+            />
 
-              <Group justify="flex-end" mt="md">
-                <Button onClick={fetchContracts}>Load instance</Button>
-              </Group>
-            </Fieldset>
-
-            
-
+            <Group justify="flex-end" mt="md">
+              <Button onClick={fetchContracts}>Load instance</Button>
+            </Group>
+          </Fieldset>
         )}
       </div>
 
-      <div
+      <input
+        type="text"
+        placeholder="P2P Swap Contract Address (optional)"
+        value={p2pswapAddress}
+        onChange={(e) => setP2pswapAddress(e.target.value)}
         style={{
-          display: 'flex',
-          flexDirection: 'row',
-          gap: '1rem',
-          alignItems: 'center',
+          padding: '0.75rem 1rem',
+          margin: '0 auto',
+          borderRadius: 8,
+          background: '#f9fafb',
+          color: '#222',
+          border: '1.5px solid #d1d5db',
+          width: 420,
+          fontFamily: 'monospace',
+          fontSize: 16,
+          boxSizing: 'border-box',
+          outline: 'none',
+          transition: 'border 0.2s',
         }}
-      >
-        <input
-          type="text"
-          placeholder="P2P Swap Contract Address (optional)"
-          value={p2pswapAddress}
-          onChange={(e) => setP2pswapAddress(e.target.value)}
-          style={{
-            padding: '0.75rem 1rem',
-            margin: '0 auto',
-            borderRadius: 8,
-            background: '#f9fafb',
-            color: '#222',
-            border: '1.5px solid #d1d5db',
-            width: 420,
-            fontFamily: 'monospace',
-            fontSize: 16,
-            boxSizing: 'border-box',
-            outline: 'none',
-            transition: 'border 0.2s',
-          }}
-        />
-      </div>
+      />
 
-      <div
+      <label
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '1rem',
+          fontWeight: 600,
+          fontSize: 16,
+          color: '#333',
+          textAlign: 'center',
           width: '100%',
         }}
       >
-        <label
-          htmlFor="sig-menu-select"
-          style={{
-            fontWeight: 600,
-            fontSize: 16,
-            color: '#333',
-            marginBottom: 4,
-            textAlign: 'center',
-            width: '100%',
-          }}
-        >
-          Select a function:
-        </label>
+        Select a function:
+      </label>
 
-        <Tabs value={menu} onChange={(value) => setMenu(value || 'pay')}>
-          <Tabs.List>
-            <Tabs.Tab value="pay">Payment</Tabs.Tab>
-            <Tabs.Tab value="staking">Staking</Tabs.Tab>
-            <Tabs.Tab value="mns">Name Service</Tabs.Tab>
-            <Tabs.Tab value="p2pswap">P2P Swap</Tabs.Tab>
-            <Tabs.Tab value="registry">EVVM Registry</Tabs.Tab>
-            <Tabs.Tab value="faucet">Faucet</Tabs.Tab>
-          </Tabs.List>
-        </Tabs>
-      </div>
+      <Tabs
+        color="green"
+        variant="pills"
+        value={menu}
+        onChange={(value) => setMenu(value || 'pay')}
+      >
+        <Tabs.List>
+          <Tabs.Tab value="pay">Payment</Tabs.Tab>
+          <Tabs.Tab value="staking">Staking</Tabs.Tab>
+          <Tabs.Tab value="mns">Name Service</Tabs.Tab>
+          <Tabs.Tab value="p2pswap">P2P Swap</Tabs.Tab>
+          <Tabs.Tab value="registry">EVVM Registry</Tabs.Tab>
+          <Tabs.Tab value="faucet">Faucet</Tabs.Tab>
+        </Tabs.List>
+      </Tabs>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
         {components.map((Component, index) => (

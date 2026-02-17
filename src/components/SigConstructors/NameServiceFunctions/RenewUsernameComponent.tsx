@@ -33,7 +33,7 @@ export const RenewUsernameComponent = ({
   nameServiceAddress,
   coreAddress,
 }: NameServiceComponentProps) => {
-  const [priority, setPriority] = React.useState('low')
+  const [priority, setPriority] = React.useState('high')
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
   const [amountToRenew, setAmountToRenew] = React.useState<bigint | null>(null)
 
@@ -180,25 +180,12 @@ export const RenewUsernameComponent = ({
         placeholder="Enter priority fee"
       />
 
-      <PrioritySelector onPriorityChange={setPriority} />
-
       <NumberInputWithGenerator
-        label="EVVM Nonce"
+        label="Core (pay) Async Nonce"
         inputId="nonceEVVMInput_renewUsername"
         placeholder="Enter nonce"
-        showRandomBtn={priority !== 'low'}
+        showRandomBtn={true}
       />
-
-      <div>
-        {priority === 'low' && (
-          <HelperInfo label="How to find my sync nonce?">
-            <div>
-              You can retrieve your next sync nonce from the EVVM contract using
-              the <code>getNextCurrentSyncNonce</code> function.
-            </div>
-          </HelperInfo>
-        )}
-      </div>
 
       <Button
         onClick={makeSig}

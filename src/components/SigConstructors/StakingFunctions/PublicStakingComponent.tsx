@@ -25,7 +25,7 @@ export const PublicStakingComponent = ({
   coreAddress,
 }: StakingComponentProps) => {
   const [isStaking, setIsStaking] = React.useState(true);
-  const [priority, setPriority] = React.useState<"low" | "high">("low");
+  const [priority, setPriority] = React.useState<"low" | "high">("high");
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null);
   const [loading, setLoading] = React.useState(false);
 
@@ -71,7 +71,7 @@ export const PublicStakingComponent = ({
         amount: amountOfToken,
         priorityFee: BigInt(priorityFee),
         nonce: BigInt(nonceEVVM),
-        isAsyncExec: priority === "high",
+        isAsyncExec: true,
         senderExecutor: stakingAddress as `0x${string}`,
       });
 
@@ -141,25 +141,14 @@ export const PublicStakingComponent = ({
         placeholder="Enter priority fee"
       />
 
-      <PrioritySelector onPriorityChange={setPriority} />
-
       <NumberInputWithGenerator
-        label="EVVM Nonce"
+        label="Core (pay) Async Nonce"
         inputId="nonceEVVMInput_PublicStaking"
         placeholder="Enter nonce"
-        showRandomBtn={priority !== "low"}
+        showRandomBtn={true}
       />
 
-      <div>
-        {priority === "low" && (
-          <HelperInfo label="How to find my sync nonce?">
-            <div>
-              You can retrieve your next sync nonce from the EVVM contract using
-              the <code>getNextCurrentSyncNonce</code> function.
-            </div>
-          </HelperInfo>
-        )}
-      </div>
+    
 
       <Button
         onClick={makeSig}

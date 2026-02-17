@@ -1,7 +1,7 @@
-"use client";
-import React from "react";
-import { config } from "@/config/index";
-import { readContract } from "@wagmi/core";
+'use client'
+import React from 'react'
+import { config } from '@/config/index'
+import { readContract } from '@wagmi/core'
 import {
   TitleAndLink,
   NumberInputWithGenerator,
@@ -10,147 +10,149 @@ import {
   HelperInfo,
   NumberInputField,
   TextInputField,
-} from "@/components/SigConstructors/InputsAndModules";
-import { execute } from "@evvm/evvm-js";
-import { getEvvmSigner, getCurrentChainId } from "@/utils/evvm-signer";
-import { NameServiceABI } from "@evvm/evvm-js";
+} from '@/components/SigConstructors/InputsAndModules'
+import { execute } from '@evvm/evvm-js'
+import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
+import { NameServiceABI } from '@evvm/evvm-js'
 import {
   IAddCustomMetadataData,
   IPayData,
   NameService,
   Core,
   type ISerializableSignedAction,
-} from "@evvm/evvm-js";
-import { NameServiceComponentProps } from "@/types";
-import { Button } from "@mantine/core";
+} from '@evvm/evvm-js'
+import { NameServiceComponentProps } from '@/types'
+import { Button } from '@mantine/core'
 
 type InfoData = {
-  IPayData: ISerializableSignedAction<IPayData>;
-  IAddCustomMetadataData: ISerializableSignedAction<IAddCustomMetadataData>;
-};
+  IPayData: ISerializableSignedAction<IPayData>
+  IAddCustomMetadataData: ISerializableSignedAction<IAddCustomMetadataData>
+}
 
 export const AddCustomMetadataComponent = ({
   nameServiceAddress,
   coreAddress,
 }: NameServiceComponentProps) => {
-  const [priority, setPriority] = React.useState("low");
-  const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
+  const [priority, setPriority] = React.useState('high')
+  const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
   const [amountToAddCustomMetadata, setAmountToAddCustomMetadata] =
-    React.useState<bigint | null>(null);
+    React.useState<bigint | null>(null)
 
   const getValue = (id: string) => {
-    const el = document.getElementById(id) as HTMLInputElement | null;
+    const el = document.getElementById(id) as HTMLInputElement | null
     if (!el) {
       throw new Error(
         `Input element with id '${id}' not found. Ensure the input is rendered and the id is correct.`
-      );
+      )
     }
-    return el.value;
-  };
+    return el.value
+  }
 
   const makeSig = async () => {
     const formData = {
       addressNameService: nameServiceAddress,
-      nonceNameService: getValue("nonceNameServiceInput_addCustomMetadata"),
-      identity: getValue("identityInput_addCustomMetadata"),
-      schema: getValue("schemaInput_addCustomMetadata"),
-      subschema: getValue("subschemaInput_addCustomMetadata"),
-      value: getValue("valueInput_addCustomMetadata"),
-      priorityFeePay: getValue("priorityFeeInput_addCustomMetadata"),
-      nonceEVVM: getValue("nonceEVVMInput_addCustomMetadata"),
-      isAsyncExec: priority === "high",
-    };
+      nonceNameService: getValue('nonceNameServiceInput_addCustomMetadata'),
+      identity: getValue('identityInput_addCustomMetadata'),
+      schema: getValue('schemaInput_addCustomMetadata'),
+      subschema: getValue('subschemaInput_addCustomMetadata'),
+      value: getValue('valueInput_addCustomMetadata'),
+      priorityFeePay: true,
+      nonceEVVM: getValue('nonceEVVMInput_addCustomMetadata'),
+      isAsyncExec: priority === 'high',
+    }
 
-    const valueCustomMetadata = `${formData.schema}:${formData.subschema}>${formData.value}`;
+    const valueCustomMetadata = `${formData.schema}:${formData.subschema}>${formData.value}`
 
     try {
-      const signer = await getEvvmSigner();
-      
+      const signer = await getEvvmSigner()
+
       // Create EVVM service for payment
       const coreService = new Core({
         signer,
         address: coreAddress as `0x${string}`,
         chainId: getCurrentChainId(),
-      });
-      
+      })
+
       // Create NameService service
       const nameServiceService = new NameService({
         signer,
         address: formData.addressNameService as `0x${string}`,
         chainId: getCurrentChainId(),
-      });
+      })
 
-      await getPriceToAddCustomMetadata();
+      await getPriceToAddCustomMetadata()
 
       const amount = amountToAddCustomMetadata
         ? BigInt(amountToAddCustomMetadata)
-        : BigInt(5000000000000000000 * 10);
+        : BigInt(5000000000000000000 * 10)
 
       // Sign EVVM payment first
       const payAction = await coreService.pay({
         toAddress: formData.addressNameService as `0x${string}`,
-        tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+        tokenAddress:
+          '0x0000000000000000000000000000000000000001' as `0x${string}`,
         amount: amount,
         priorityFee: BigInt(formData.priorityFeePay),
         nonce: BigInt(formData.nonceEVVM),
         isAsyncExec: formData.isAsyncExec,
         senderExecutor: formData.addressNameService as `0x${string}`,
-      });
+      })
 
       // Sign add custom metadata action
-      const addCustomMetadataAction = await nameServiceService.addCustomMetadata({
-        identity: formData.identity,
-        value: valueCustomMetadata,
-        nonce: BigInt(formData.nonceNameService),
-        evvmSignedAction: payAction,
-      });
+      const addCustomMetadataAction =
+        await nameServiceService.addCustomMetadata({
+          identity: formData.identity,
+          value: valueCustomMetadata,
+          nonce: BigInt(formData.nonceNameService),
+          evvmSignedAction: payAction,
+        })
 
       setDataToGet({
         IPayData: payAction.toJSON(),
         IAddCustomMetadataData: addCustomMetadataAction.toJSON(),
-      });
+      })
     } catch (error) {
-      console.error("Error creating signature:", error);
+      console.error('Error creating signature:', error)
     }
-  };
+  }
 
   const getPriceToAddCustomMetadata = async () => {
     // Use nameServiceAddress from props, not input
     if (!nameServiceAddress) {
-      setAmountToAddCustomMetadata(null);
+      setAmountToAddCustomMetadata(null)
     } else {
       await readContract(config, {
         abi: NameServiceABI,
         address: nameServiceAddress as `0x${string}`,
-        functionName: "getPriceToAddCustomMetadata",
+        functionName: 'getPriceToAddCustomMetadata',
         args: [],
       })
         .then((price) => {
-          console.log("Price to add custom metadata:", price);
-          setAmountToAddCustomMetadata(price ? BigInt(price.toString()) : null);
+          console.log('Price to add custom metadata:', price)
+          setAmountToAddCustomMetadata(price ? BigInt(price.toString()) : null)
         })
         .catch((error) => {
-          console.error("Error reading price to add custom metadata:", error);
-          setAmountToAddCustomMetadata(null);
-        });
+          console.error('Error reading price to add custom metadata:', error)
+          setAmountToAddCustomMetadata(null)
+        })
     }
-  };
+  }
 
   const executeAction = async () => {
     if (!dataToGet) {
-      console.error("No data to execute payment");
-      return;
+      console.error('No data to execute payment')
+      return
     }
 
     try {
-      const signer = await getEvvmSigner();
-      await execute(signer, dataToGet.IAddCustomMetadataData);
-      console.log("Add custom metadata executed successfully");
-      setDataToGet(null);
+      const signer = await getEvvmSigner()
+      await execute(signer, dataToGet.IAddCustomMetadataData)
+      console.log('Add custom metadata executed successfully')
+      setDataToGet(null)
     } catch (error) {
-      console.error("Error executing add custom metadata:", error);
+      console.error('Error executing add custom metadata:', error)
     }
-  };
+  }
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
@@ -197,33 +199,19 @@ export const AddCustomMetadataComponent = ({
         placeholder="Enter priority fee"
       />
 
-      {/* Priority configuration */}
-      <PrioritySelector onPriorityChange={setPriority} />
-
       <NumberInputWithGenerator
-        label="EVVM Nonce"
+        label="Core (pay) Async Nonce"
         inputId="nonceEVVMInput_addCustomMetadata"
         placeholder="Enter nonce"
-        showRandomBtn={priority !== "low"}
+        showRandomBtn={true}
       />
-
-      <div>
-        {priority === "low" && (
-          <HelperInfo label="How to find my sync nonce?">
-            <div>
-              You can retrieve your next sync nonce from the EVVM contract using
-              the <code>getNextCurrentSyncNonce</code> function.
-            </div>
-          </HelperInfo>
-        )}
-      </div>
 
       {/* Create signature button */}
       <Button
         onClick={makeSig}
         style={{
-          padding: "0.5rem",
-          marginTop: "1rem",
+          padding: '0.5rem',
+          marginTop: '1rem',
         }}
       >
         Create signature
@@ -235,5 +223,5 @@ export const AddCustomMetadataComponent = ({
         onExecute={executeAction}
       />
     </div>
-  );
-};
+  )
+}

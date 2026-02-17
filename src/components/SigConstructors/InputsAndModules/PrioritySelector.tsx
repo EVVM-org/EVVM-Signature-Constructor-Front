@@ -15,7 +15,7 @@ export const PrioritySelector: React.FC<PrioritySelectorProps> = ({
 }) => {
   return (
     <div style={{ marginTop }}>
-      <Input.Wrapper label="EVVM Nonce Type">
+      <Input.Wrapper label="Core Nonce Type">
       <br/>
       <SegmentedControl
         size="sm"

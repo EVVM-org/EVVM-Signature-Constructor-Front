@@ -24,7 +24,7 @@ export const DispatchOrderFillFixedFeeComponent = ({
   p2pSwapAddress,
   coreAddress,
 }: P2PSwapComponentProps) => {
-  const [priority, setPriority] = React.useState('low')
+  const [priority, setPriority] = React.useState('high')
   const [amountB, setAmountB] = React.useState(0n)
   const [amountOut, setAmountOut] = React.useState(1000000000000000000n)
   const [dataToGet, setDataToGet] =
@@ -86,7 +86,7 @@ export const DispatchOrderFillFixedFeeComponent = ({
         amount: amountOfTokenBToFill,
         priorityFee: priorityFee,
         nonce: noncePay,
-        isAsyncExec: priority === 'high',
+        isAsyncExec: true,
         senderExecutor: p2pSwapAddress as `0x${string}`,
       })
 
@@ -216,8 +216,6 @@ export const DispatchOrderFillFixedFeeComponent = ({
         </div>
       </div>
 
-      <PrioritySelector onPriorityChange={setPriority} />
-
       {/* Nonce section with automatic generator */}
 
       <NumberInputWithGenerator
@@ -228,22 +226,11 @@ export const DispatchOrderFillFixedFeeComponent = ({
       />
 
       <NumberInputWithGenerator
-        label="Nonce for EVVM contract interaction"
+        label="Core (pay) Async Nonce"
         inputId="noncePay_DispatchOrderFillFixedFee"
         placeholder="Enter nonce"
-        showRandomBtn={priority !== 'low'}
+        showRandomBtn={true}
       />
-
-      <div>
-        {priority === 'low' && (
-          <HelperInfo label="How to find my sync nonce?">
-            <div>
-              You can retrieve your next sync nonce from the EVVM contract using
-              the <code>getNextCurrentSyncNonce</code> function.
-            </div>
-          </HelperInfo>
-        )}
-      </div>
 
       {/* Create signature button */}
       <Button

@@ -20,7 +20,7 @@ import {
 } from '@/components/SigConstructors/InputsAndModules'
 import { Button } from '@mantine/core'
 
-import { StakingComponentProps } from "@/types";
+import { StakingComponentProps } from '@/types'
 
 type InputData = {
   IPresaleStakingData: ISerializableSignedAction<IPresaleStakingData>
@@ -32,7 +32,7 @@ export const PresaleStakingComponent = ({
   coreAddress,
 }: StakingComponentProps) => {
   const [isStaking, setIsStaking] = React.useState(true)
-  const [priority, setPriority] = React.useState<'low' | 'high'>('low')
+  const [priority, setPriority] = React.useState<'low' | 'high'>('high')
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null)
   const [loading, setLoading] = React.useState(false)
 
@@ -77,7 +77,7 @@ export const PresaleStakingComponent = ({
         amount: amountOfToken,
         priorityFee: BigInt(priorityFeePay),
         nonce: BigInt(noncePay),
-        isAsyncExec: priority === 'high',
+        isAsyncExec: true,
         senderExecutor: stakingAddress as `0x${string}`,
       })
 
@@ -138,25 +138,12 @@ export const PresaleStakingComponent = ({
         placeholder="Enter priority fee"
       />
 
-      <PrioritySelector onPriorityChange={setPriority} />
-
       <NumberInputWithGenerator
-        label="EVVM Nonce"
+        label="Core (pay) Async Nonce"
         inputId="nonceEVVMInput_presaleStaking"
         placeholder="Enter nonce"
-        showRandomBtn={priority !== 'low'}
+        showRandomBtn={true}
       />
-
-      <div>
-        {priority === 'low' && (
-          <HelperInfo label="How to find my sync nonce?">
-            <div>
-              You can retrieve your next sync nonce from the EVVM contract using
-              the <code>getNextCurrentSyncNonce</code> function.
-            </div>
-          </HelperInfo>
-        )}
-      </div>
 
       <Button
         onClick={makeSig}

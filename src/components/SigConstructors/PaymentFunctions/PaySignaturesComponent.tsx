@@ -199,7 +199,7 @@ export const PaySignaturesComponent = ({
         {priority === 'low' && (
           <HelperInfo label="How to find my sync nonce?">
             <div>
-              You can retrieve your next sync nonce from the EVVM contract using
+              You can retrieve your next sync nonce from the Core contract using
               the <code>getNextCurrentSyncNonce</code> function.
             </div>
           </HelperInfo>

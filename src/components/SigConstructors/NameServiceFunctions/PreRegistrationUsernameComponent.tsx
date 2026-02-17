@@ -31,7 +31,7 @@ export const PreRegistrationUsernameComponent = ({
   nameServiceAddress,
   coreAddress,
 }: NameServiceComponentProps) => {
-  const [priority, setPriority] = React.useState('low')
+  const [priority, setPriority] = React.useState('high')
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
 
   const makeSig = async () => {
@@ -97,14 +97,17 @@ export const PreRegistrationUsernameComponent = ({
         amount: BigInt(0),
         priorityFee: BigInt(formData.priorityFeePay),
         nonce: BigInt(formData.noncePay),
-        isAsyncExec: formData.isAsyncExecPay,
+        isAsyncExec: true,
         senderExecutor: formData.addressNameService as `0x${string}`,
       })
 
       // Hash the username + lockNumber for pre-registration using
       // keccak256(abi.encodePacked(username, uint256(lockNumber)))
       const hashUsername = keccak256(
-        encodePacked(['string', 'uint256'], [formData.username, BigInt(formData.lockNumber)])
+        encodePacked(
+          ['string', 'uint256'],
+          [formData.username, BigInt(formData.lockNumber)]
+        )
       )
 
       // Sign pre-registration action
@@ -182,26 +185,12 @@ export const PreRegistrationUsernameComponent = ({
         placeholder="Enter nonce"
       />
 
-      {/* Priority configuration */}
-      <PrioritySelector onPriorityChange={setPriority} />
-
       <NumberInputWithGenerator
-        label="EVVM Nonce"
+        label="Core (pay) Async Nonce"
         inputId="nonceEVVMInput_preRegistration"
         placeholder="Enter nonce"
-        showRandomBtn={priority !== 'low'}
+        showRandomBtn={true}
       />
-
-      <div>
-        {priority === 'low' && (
-          <HelperInfo label="How to find my sync nonce?">
-            <div>
-              You can retrieve your next sync nonce from the EVVM contract using
-              the <code>getNextCurrentSyncNonce</code> function.
-            </div>
-          </HelperInfo>
-        )}
-      </div>
 
       {/* Create signature button */}
       <Button

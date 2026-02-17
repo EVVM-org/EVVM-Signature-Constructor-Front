@@ -33,10 +33,12 @@ export const RegistrationUsernameComponent = ({
   nameServiceAddress,
   coreAddress,
 }: NameServiceComponentProps) => {
-  const [priority, setPriority] = React.useState('low')
+  const [priority, setPriority] = React.useState('high')
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
   const [rewardAmount, setRewardAmount] = React.useState<bigint | null>(null)
-  const [registrationPrice, setRegistrationPrice] = React.useState<bigint | null>(null)
+  const [registrationPrice, setRegistrationPrice] = React.useState<
+    bigint | null
+  >(null)
 
   const getValue = (id: string) => {
     const el = document.getElementById(id) as HTMLInputElement | null
@@ -98,7 +100,9 @@ export const RegistrationUsernameComponent = ({
       const priceFromContract = await readRegistrationPrice(formData.username)
 
       // Sign EVVM payment first — use getPriceOfRegistration result when available
-      const payAmount = priceFromContract ?? (rewardAmount ? rewardAmount * BigInt(100) : BigInt(0))
+      const payAmount =
+        priceFromContract ??
+        (rewardAmount ? rewardAmount * BigInt(100) : BigInt(0))
 
       const payAction = await coreService.pay({
         toAddress: formData.addressNameService as `0x${string}`,
@@ -246,7 +250,9 @@ export const RegistrationUsernameComponent = ({
         {registrationPrice !== null ? registrationPrice.toString() : '—'}
         <Button
           onClick={async () => {
-            const el = document.getElementById('usernameInput_registrationUsername') as HTMLInputElement | null
+            const el = document.getElementById(
+              'usernameInput_registrationUsername'
+            ) as HTMLInputElement | null
             if (!el) return
             await readRegistrationPrice(el.value)
           }}
@@ -261,27 +267,12 @@ export const RegistrationUsernameComponent = ({
         inputId="priorityFeeInput_registrationUsername"
         placeholder="Enter priority fee"
       />
-
-      {/* Priority configuration */}
-      <PrioritySelector onPriorityChange={setPriority} />
-
       <NumberInputWithGenerator
-        label="EVVM Nonce"
+        label="Core (pay) Async Nonce"
         inputId="nonceEVVMInput_registrationUsername"
         placeholder="Enter nonce"
-        showRandomBtn={priority !== 'low'}
+        showRandomBtn={true}
       />
-
-      <div>
-        {priority === 'low' && (
-          <HelperInfo label="How to find my sync nonce?">
-            <div>
-              You can retrieve your next sync nonce from the EVVM contract using
-              the <code>getNextCurrentSyncNonce</code> function.
-            </div>
-          </HelperInfo>
-        )}
-      </div>
 
       {/* Create signature button */}
       <Button

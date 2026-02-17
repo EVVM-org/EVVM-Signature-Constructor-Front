@@ -1,6 +1,6 @@
-"use client";
-import React from "react";
-import { config } from "@/config/index";
+'use client'
+import React from 'react'
+import { config } from '@/config/index'
 import {
   TitleAndLink,
   NumberInputWithGenerator,
@@ -9,71 +9,72 @@ import {
   HelperInfo,
   NumberInputField,
   TextInputField,
-} from "@/components/SigConstructors/InputsAndModules";
-import { Button } from '@mantine/core';
-import { execute } from "@evvm/evvm-js";
-import { getEvvmSigner, getCurrentChainId } from "@/utils/evvm-signer";
+} from '@/components/SigConstructors/InputsAndModules'
+import { Button } from '@mantine/core'
+import { execute } from '@evvm/evvm-js'
+import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
 import {
   IPayData,
   IAcceptOfferData,
   NameService,
   Core,
   type ISerializableSignedAction,
-} from "@evvm/evvm-js";
-import { NameServiceComponentProps } from "@/types";
+} from '@evvm/evvm-js'
+import { NameServiceComponentProps } from '@/types'
 
 type InfoData = {
-  IPayData: ISerializableSignedAction<IPayData>;
-  IAcceptOfferData: ISerializableSignedAction<IAcceptOfferData>;
-};
+  IPayData: ISerializableSignedAction<IPayData>
+  IAcceptOfferData: ISerializableSignedAction<IAcceptOfferData>
+}
 
 export const AcceptOfferComponent = ({
   nameServiceAddress,
   coreAddress,
 }: NameServiceComponentProps) => {
-  const [priority, setPriority] = React.useState("low");
-  const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null);
+  const [priority, setPriority] = React.useState('high')
+  const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
 
   const makeSig = async () => {
     const getValue = (id: string) =>
-      (document.getElementById(id) as HTMLInputElement).value;
+      (document.getElementById(id) as HTMLInputElement).value
 
     const formData = {
-      username: getValue("usernameInput_acceptOffer"),
-      offerId: getValue("offerIdInput_acceptOffer"),
-      nonce: getValue("nonceInput_acceptOffer"),
-      priorityFeePay: getValue("priorityFeePayInput_acceptOffer"),
-      isAsyncExecPay: priority === "high",
-      noncePay: getValue("noncePayInput_acceptOffer"),
-    };
+      username: getValue('usernameInput_acceptOffer'),
+      offerId: getValue('offerIdInput_acceptOffer'),
+      nonce: getValue('nonceInput_acceptOffer'),
+      priorityFeePay: getValue('priorityFeePayInput_acceptOffer'),
+      isAsyncExecPay: priority === 'high',
+      noncePay: getValue('noncePayInput_acceptOffer'),
+    }
 
     try {
-      const signer = await getEvvmSigner();
-      
+      const signer = await getEvvmSigner()
+
       // Create Core service for payment
       const coreService = new Core({
         signer,
         address: coreAddress as `0x${string}`,
         chainId: getCurrentChainId(),
-      });
-      
+      })
+
       // Create NameService service
       const nameServiceService = new NameService({
         signer,
         address: nameServiceAddress as `0x${string}`,
         chainId: getCurrentChainId(),
-      });
+      })
 
       // Sign EVVM payment first
       const payAction = await coreService.pay({
         toAddress: nameServiceAddress as `0x${string}`,
-        tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+        tokenAddress:
+          '0x0000000000000000000000000000000000000001' as `0x${string}`,
         amount: BigInt(0),
         priorityFee: BigInt(formData.priorityFeePay),
         nonce: BigInt(formData.noncePay),
-        isAsyncExec: formData.isAsyncExecPay,
+        isAsyncExec: true,
         senderExecutor: nameServiceAddress as `0x${string}`,
-      });
+      })
 
       // Sign accept offer action
       const acceptOfferAction = await nameServiceService.acceptOffer({
@@ -81,32 +82,32 @@ export const AcceptOfferComponent = ({
         offerID: BigInt(formData.offerId),
         nonce: BigInt(formData.nonce),
         evvmSignedAction: payAction,
-      });
+      })
 
       setDataToGet({
         IPayData: payAction.toJSON(),
         IAcceptOfferData: acceptOfferAction.toJSON(),
-      });
+      })
     } catch (error) {
-      console.error("Error signing accept offer:", error);
+      console.error('Error signing accept offer:', error)
     }
-  };
+  }
 
   const executeAction = async () => {
     if (!dataToGet) {
-      console.error("No data to execute payment");
-      return;
+      console.error('No data to execute payment')
+      return
     }
 
     try {
-      const signer = await getEvvmSigner();
-      await execute(signer, dataToGet.IAcceptOfferData);
-      console.log("Accept offer executed successfully");
-      setDataToGet(null);
+      const signer = await getEvvmSigner()
+      await execute(signer, dataToGet.IAcceptOfferData)
+      console.log('Accept offer executed successfully')
+      setDataToGet(null)
     } catch (error) {
-      console.error("Error executing accept offer:", error);
+      console.error('Error executing accept offer:', error)
     }
-  };
+  }
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
@@ -115,7 +116,6 @@ export const AcceptOfferComponent = ({
         link="https://www.evvm.info/docs/SignatureStructures/NameService/acceptOfferStructure"
       />
 
-      
       <br />
 
       <NumberInputWithGenerator
@@ -142,33 +142,19 @@ export const AcceptOfferComponent = ({
         placeholder="Enter priority fee"
       />
 
-      {/* Priority configuration */}
-      <PrioritySelector onPriorityChange={setPriority} />
-
       <NumberInputWithGenerator
-        label="EVVM Nonce"
+        label="Core (pay) Async Nonce"
         inputId="noncePayInput_acceptOffer"
         placeholder="Enter nonce"
-        showRandomBtn={priority !== "low"}
+        showRandomBtn={true}
       />
-
-      <div>
-        {priority === "low" && (
-          <HelperInfo label="How to find my sync nonce?">
-            <div>
-              You can retrieve your next sync nonce from the Core contract using
-              the <code>getNextCurrentSyncNonce</code> function.
-            </div>
-          </HelperInfo>
-        )}
-      </div>
 
       {/* Create signature button */}
       <Button
         onClick={makeSig}
         style={{
-          padding: "0.5rem",
-          marginTop: "1rem",
+          padding: '0.5rem',
+          marginTop: '1rem',
         }}
       >
         Create signature
@@ -180,5 +166,5 @@ export const AcceptOfferComponent = ({
         onExecute={executeAction}
       />
     </div>
-  );
-};
+  )
+}

@@ -20,7 +20,6 @@ export const GoldenStakingComponent = ({
   coreAddress
 }: StakingComponentProps) => {
   const [isStaking, setIsStaking] = React.useState(true);
-  const [priority, setPriority] = React.useState<"low" | "high">("low");
   const [dataToGet, setDataToGet] = React.useState<ISerializableSignedAction<IGoldenStakingData> | null>(
     null
   );
@@ -97,24 +96,21 @@ export const GoldenStakingComponent = ({
         placeholder="Enter amount"
       />
 
-      <PrioritySelector onPriorityChange={setPriority} />
-
+    
       <NumberInputWithGenerator
         label="Nonce"
         inputId="nonceInput_GoldenStaking"
         placeholder="Enter nonce"
-        showRandomBtn={priority !== "low"}
+        showRandomBtn={false}
       />
 
       <div>
-        {priority === "low" && (
           <HelperInfo label="How to find my sync nonce?">
             <div>
-              You can retrieve your next sync nonce from the EVVM contract using
+              You can retrieve your next sync nonce from the Core contract using
               the <code>getNextCurrentSyncNonce</code> function.
             </div>
           </HelperInfo>
-        )}
       </div>
 
       <Button

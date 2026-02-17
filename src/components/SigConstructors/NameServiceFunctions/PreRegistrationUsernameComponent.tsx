@@ -11,7 +11,7 @@ import {
 } from '@/components/SigConstructors/InputsAndModules'
 import { execute } from '@evvm/evvm-js'
 import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
-import { keccak256 } from 'viem'
+import { keccak256, encodePacked } from 'viem'
 import {
   IPayData,
   IPreRegistrationUsernameData,
@@ -100,9 +100,10 @@ export const PreRegistrationUsernameComponent = ({
         senderExecutor: formData.addressNameService as `0x${string}`,
       })
 
-      // Hash the username + lockNumber for pre-registration (keccak256 -> bytes32)
+      // Hash the username + lockNumber for pre-registration using
+      // keccak256(abi.encodePacked(username, uint256(lockNumber)))
       const hashUsername = keccak256(
-        new TextEncoder().encode(`${formData.username}${formData.lockNumber}`)
+        encodePacked(['string', 'uint256'], [formData.username, BigInt(formData.lockNumber)])
       )
 
       // Sign pre-registration action

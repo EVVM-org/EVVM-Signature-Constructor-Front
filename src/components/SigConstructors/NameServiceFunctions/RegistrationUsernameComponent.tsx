@@ -35,6 +35,7 @@ export const RegistrationUsernameComponent = ({
   const [priority, setPriority] = React.useState('low')
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
   const [rewardAmount, setRewardAmount] = React.useState<bigint | null>(null)
+  const [registrationPrice, setRegistrationPrice] = React.useState<bigint | null>(null)
 
   const getValue = (id: string) => {
     const el = document.getElementById(id) as HTMLInputElement | null
@@ -91,14 +92,18 @@ export const RegistrationUsernameComponent = ({
         chainId: getCurrentChainId(),
       })
 
+      // Ensure we have latest rewardAmount (fallback) and read price for the username
       await readRewardAmount()
+      const priceFromContract = await readRegistrationPrice(formData.username)
 
-      // Sign EVVM payment first
+      // Sign EVVM payment first — use getPriceOfRegistration result when available
+      const payAmount = priceFromContract ?? (rewardAmount ? rewardAmount * BigInt(100) : BigInt(0))
+
       const payAction = await coreService.pay({
         toAddress: formData.addressNameService as `0x${string}`,
         tokenAddress:
           '0x0000000000000000000000000000000000000001' as `0x${string}`,
-        amount: rewardAmount ? rewardAmount * BigInt(100) : BigInt(0),
+        amount: payAmount,
         priorityFee: BigInt(formData.priorityFeePay),
         nonce: BigInt(formData.nonceEVVM),
         isAsyncExec: formData.isAsyncExec,
@@ -130,7 +135,7 @@ export const RegistrationUsernameComponent = ({
       await readContract(config, {
         abi: NameServiceABI,
         address: nameServiceAddress as `0x${string}`,
-        functionName: 'getEvvmAddress',
+        functionName: 'getCoreAddress',
         args: [],
       })
         .then((coreAddress) => {
@@ -157,6 +162,30 @@ export const RegistrationUsernameComponent = ({
           console.error('Error reading NameService address:', error)
           setRewardAmount(null)
         })
+    }
+  }
+
+  const readRegistrationPrice = async (username: string) => {
+    if (!nameServiceAddress || !username) {
+      setRegistrationPrice(null)
+      return null
+    }
+
+    try {
+      const price = await readContract(config, {
+        abi: NameServiceABI,
+        address: nameServiceAddress as `0x${string}`,
+        functionName: 'getPriceOfRegistration',
+        args: [username],
+      })
+      const val = price ? BigInt(price.toString()) : null
+      console.log('getPriceOfRegistration ->', username, val)
+      setRegistrationPrice(val)
+      return val
+    } catch (err) {
+      console.error('Error reading getPriceOfRegistration:', err)
+      setRegistrationPrice(null)
+      return null
     }
   }
 
@@ -210,6 +239,21 @@ export const RegistrationUsernameComponent = ({
         inputId="usernameInput_registrationUsername"
         placeholder="Enter username"
       />
+
+      <div style={{ marginTop: 8, marginBottom: 8 }}>
+        <strong>Calculated registration price:</strong>{' '}
+        {registrationPrice !== null ? registrationPrice.toString() : '—'}
+        <button
+          onClick={async () => {
+            const el = document.getElementById('usernameInput_registrationUsername') as HTMLInputElement | null
+            if (!el) return
+            await readRegistrationPrice(el.value)
+          }}
+          style={{ marginLeft: 12, padding: '4px 8px', fontSize: 12 }}
+        >
+          Refresh price
+        </button>
+      </div>
 
       <NumberInputField
         label="Priority fee"

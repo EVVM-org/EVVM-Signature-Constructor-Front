@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 
 import { headers } from 'next/headers' // added
 import './globals.css';
+import '@mantine/core/styles.css';
 import ContextProvider from '@/context'
 
 export const metadata: Metadata = {

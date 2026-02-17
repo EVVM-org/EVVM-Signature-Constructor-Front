@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { Button, Fieldset, Group, Select, Tabs, TextInput } from '@mantine/core'
 import { switchChain } from '@wagmi/core'
 import { readContracts } from '@wagmi/core'
 import { config, networks } from '@/config/index'
@@ -85,9 +86,11 @@ export const SigMenu = () => {
   const [network, setNetwork] = useState('sepolia')
 
   const handleNetworkChange = async (
-    e: React.ChangeEvent<HTMLSelectElement>
+    e: React.ChangeEvent<HTMLSelectElement> | string | null
   ) => {
-    const value = e.target.value
+    // support both native <select> (event) and Mantine <Select> (value:string|null)
+    const value =
+      typeof e === 'string' || e === null ? (e ?? network) : e.target.value
     setNetwork(value)
 
     const networkMap: { [key: string]: number } = {
@@ -322,7 +325,6 @@ export const SigMenu = () => {
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         <h1>EVVM Signature Constructor</h1>
-        <h3>Enter your EVVM contract address:</h3>
         {stakingAddress && nameserviceAddress ? (
           <div
             style={{
@@ -359,77 +361,28 @@ export const SigMenu = () => {
             </div>
           </div>
         ) : (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              gap: '1rem',
-              alignItems: 'center',
-            }}
-          >
-            <input
-              type="text"
-              placeholder="EVVM Contract Address"
-              value={coreAddress}
-              onChange={(e) => setEvvmAddress(e.target.value)}
-              style={{
-                padding: '0.75rem 1rem',
-                borderRadius: 8,
-                background: '#f9fafb',
-                color: '#222',
-                border: '1.5px solid #d1d5db',
-                width: 420,
-                fontFamily: 'monospace',
-                fontSize: 16,
-                boxSizing: 'border-box',
-                outline: 'none',
-                transition: 'border 0.2s',
-              }}
-            />
-            <select
-              style={{
-                padding: '0.7rem 1.2rem',
-                borderRadius: 8,
-                border: '1.5px solid #d1d5db',
-                background: '#f9fafb',
-                color: '#222',
-                fontWeight: 500,
-                fontSize: 15,
-                minWidth: 180,
-                marginRight: 8,
-                boxShadow: '0 1px 4px 0 rgba(0,0,0,0.03)',
-                outline: 'none',
-                transition: 'border 0.2s',
-                cursor: 'pointer',
-              }}
-              value={network}
-              onChange={handleNetworkChange}
-            >
-              {networkOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={fetchContracts}
-              disabled={loading}
-              style={{
-                padding: '0.7rem 1.5rem',
-                borderRadius: 8,
-                border: '1.5px solid #d1d5db',
-                background: loading ? '#e5e7eb' : '#f3f4f6',
-                color: '#222',
-                fontWeight: 600,
-                fontSize: 15,
-                cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'background 0.2s',
-                minWidth: 140,
-              }}
-            >
-              {loading ? 'Loading...' : 'Load Contracts'}
-            </button>
-          </div>
+          
+            <Fieldset legend="Evvm Contract Details" radius="md">
+              <TextInput
+                label="Core contract address"
+                placeholder="0x..."
+                value={coreAddress}
+                onChange={(e) => setEvvmAddress(e.target.value)}
+              />
+              <Select
+                label="Host Chain"
+                value={network}
+                onChange={(val) => handleNetworkChange(val)}
+                data={networkOptions}
+              />
+
+              <Group justify="flex-end" mt="md">
+                <Button onClick={fetchContracts}>Load instance</Button>
+              </Group>
+            </Fieldset>
+
+            
+
         )}
       </div>
 
@@ -485,32 +438,17 @@ export const SigMenu = () => {
         >
           Select a function:
         </label>
-        <select
-          id="sig-menu-select"
-          onChange={(e) => setMenu(e.target.value)}
-          style={{
-            ...selectStyle,
-            fontSize: 16,
-            fontWeight: 500,
-            border: '1.5px solid #d1d5db',
-            background: '#f9fafb',
-            color: '#222',
-            maxWidth: 400,
-            minWidth: 260,
-            margin: '0 auto',
-            textAlign: 'center',
-            boxShadow: '0 1px 4px 0 rgba(0,0,0,0.02)',
-            display: 'block',
-          }}
-          value={menu}
-        >
-          <option value="pay">Payment signatures</option>
-          <option value="staking">Staking signatures</option>
-          <option value="mns">Name Service signatures</option>
-          <option value="p2pswap">P2P Swap signatures</option>
-          <option value="registry">EVVM Registry</option>
-          <option value="faucet">Faucet functions</option>
-        </select>
+
+        <Tabs value={menu} onChange={(value) => setMenu(value || 'pay')}>
+          <Tabs.List>
+            <Tabs.Tab value="pay">Payment</Tabs.Tab>
+            <Tabs.Tab value="staking">Staking</Tabs.Tab>
+            <Tabs.Tab value="mns">Name Service</Tabs.Tab>
+            <Tabs.Tab value="p2pswap">P2P Swap</Tabs.Tab>
+            <Tabs.Tab value="registry">EVVM Registry</Tabs.Tab>
+            <Tabs.Tab value="faucet">Faucet</Tabs.Tab>
+          </Tabs.List>
+        </Tabs>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>

@@ -114,6 +114,7 @@ export const AcceptOfferComponent = ({
         link="https://www.evvm.info/docs/SignatureStructures/NameService/acceptOfferStructure"
       />
 
+      
       <br />
 
       <NumberInputWithGenerator

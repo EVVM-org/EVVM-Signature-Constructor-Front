@@ -498,6 +498,7 @@ export const SigMenu = () => {
           padding: '1rem 1.5rem',
           minWidth: 0,
           boxShadow: '0 2px 8px 0 rgba(0,0,0,0.04)',
+          marginTop: '-1.5rem',
         }}
       >
         <p style={{ fontSize: 14, marginBottom: '-0.5vw' }}>

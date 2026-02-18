@@ -5,6 +5,7 @@ import {
   Button,
   Fieldset,
   Group,
+  Input,
   Select,
   Tabs,
   TextInput,
@@ -404,7 +405,7 @@ export const SigMenu = () => {
   return (
     <div
       style={{
-      maxWidth: '80vw',
+        maxWidth: '80vw',
         width: '100%',
         margin: '0rem auto',
         padding: '1rem',
@@ -426,7 +427,9 @@ export const SigMenu = () => {
             textAlign: 'center',
             margin: 0,
           }}
-        >EVVM Signature Constructor</h1>
+        >
+          EVVM Signature Constructor
+        </h1>
         {stakingAddress && nameserviceAddress ? (
           <div
             style={{
@@ -484,26 +487,30 @@ export const SigMenu = () => {
         )}
       </div>
 
-      <input
-        type="text"
-        placeholder="P2P Swap Contract Address (optional)"
-        value={p2pswapAddress}
-        onChange={(e) => setP2pswapAddress(e.target.value)}
+      <div
         style={{
-          padding: '0.75rem 1rem',
-          margin: '0 auto',
-          borderRadius: 8,
-          background: '#f9fafb',
-          color: '#222',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.5rem',
+          background: '#f8fafc',
           border: '1.5px solid #d1d5db',
-          width: 420,
-          fontFamily: 'monospace',
-          fontSize: 16,
-          boxSizing: 'border-box',
-          outline: 'none',
-          transition: 'border 0.2s',
+          borderRadius: 10,
+          padding: '1rem 1.5rem',
+          minWidth: 0,
+          boxShadow: '0 2px 8px 0 rgba(0,0,0,0.04)',
         }}
-      />
+      >
+        <p style={{ fontSize: 14, marginBottom: '-0.5vw' }}>
+          P2P Swap Contract Address (optional)
+        </p>
+        <Input
+          size="compact-md"
+          type="text"
+          placeholder="0x..."
+          value={p2pswapAddress}
+          onChange={(e) => setP2pswapAddress(e.target.value)}
+        />
+      </div>
 
       <label
         style={{

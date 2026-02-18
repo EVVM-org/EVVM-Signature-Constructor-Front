@@ -12,6 +12,7 @@ import {
 import { switchChain } from '@wagmi/core'
 import { readContracts } from '@wagmi/core'
 import { config, networks } from '@/config/index'
+import { networkOptions, networkMap } from '@/utils/networks'
 import { CoreABI } from '@evvm/evvm-js'
 import {
   PreRegistrationUsernameComponent,
@@ -45,27 +46,6 @@ import {
 } from './P2PSwap'
 import { RegisterEvvmComponent, SetEvvmIdComponent } from './EvvmRegistery'
 
-const boxStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1rem',
-  padding: '1rem',
-  border: '1px solid #ccc',
-  borderRadius: '8px',
-  width: '100%',
-  marginBottom: '1rem',
-} as const
-
-const selectStyle = {
-  padding: '1rem',
-  border: '1px solid #ccc',
-  borderRadius: '8px',
-  width: '100%',
-  backgroundColor: '#f9f9f9',
-  color: '#333',
-  marginBottom: '1rem',
-} as const
-
 export const SigMenu = () => {
   const [menu, setMenu] = useState('pay')
   const [coreAddress, setEvvmAddress] = useState('')
@@ -82,22 +62,6 @@ export const SigMenu = () => {
     element: ReactNode
   }
 
-  const networkOptions = [
-    { value: 'sepolia', label: 'Sepolia' },
-    { value: 'arbitrumSepolia', label: 'Arbitrum Sepolia' },
-    { value: 'hederaTestnet', label: 'Hedera Testnet' },
-    { value: 'baseSepolia', label: 'Base Sepolia' },
-    { value: 'mantleSepoliaTestnet', label: 'Mantle Sepolia Testnet' },
-    { value: 'monadTestnet', label: 'Monad Testnet' },
-    { value: 'zksyncSepoliaTestnet', label: 'zkSync Sepolia Testnet' },
-    { value: 'celoSepolia', label: 'Celo Sepolia' },
-    { value: 'opBNBTestnet', label: 'opBNB Testnet' },
-    { value: 'scrollSepolia', label: 'Scroll Sepolia' },
-    { value: 'zircuitGarfieldTestnet', label: 'Zircuit Garfield Testnet' },
-    { value: 'optimismSepolia', label: 'Optimism Sepolia' },
-    { value: 'avalancheFuji', label: 'Avalanche Fuji' },
-    { value: 'flareTestnet', label: 'Flare Testnet' },
-  ]
   const [network, setNetwork] = useState('sepolia')
 
   const handleNetworkChange = async (
@@ -108,22 +72,7 @@ export const SigMenu = () => {
       typeof e === 'string' || e === null ? (e ?? network) : e.target.value
     setNetwork(value)
 
-    const networkMap: { [key: string]: number } = {
-      sepolia: 0,
-      arbitrumSepolia: 1,
-      hederaTestnet: 2,
-      baseSepolia: 3,
-      mantleSepoliaTestnet: 4,
-      monadTestnet: 5,
-      zksyncSepoliaTestnet: 6,
-      celoSepolia: 7,
-      opBNBTestnet: 8,
-      scrollSepolia: 9,
-      zircuitGarfieldTestnet: 10,
-      optimismSepolia: 11,
-      avalancheFuji: 12,
-      flareTestnet: 13,
-    }
+    // networkMap is now imported from utils/networks
 
     const networkIndex = networkMap[value]
     if (networkIndex !== undefined && networks[networkIndex]) {

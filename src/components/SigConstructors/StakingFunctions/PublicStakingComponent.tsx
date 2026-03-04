@@ -3,6 +3,7 @@ import React from "react";
 import { Core, Staking, type IPublicStakingData, type IPayData, type ISerializableSignedAction } from "@evvm/evvm-js";
 import { execute } from "@evvm/evvm-js";
 import { getEvvmSigner, getCurrentChainId } from "@/utils/evvm-signer";
+import { MATE_TOKEN_ADDRESS } from "@/utils/constants";
 import {
   TitleAndLink,
   NumberInputWithGenerator,
@@ -67,7 +68,7 @@ export const PublicStakingComponent = ({
 
       const payAction = await evvm.pay({
         toAddress: stakingAddress as `0x${string}`,
-        tokenAddress: "0x0000000000000000000000000000000000000001" as `0x${string}`,
+        tokenAddress: MATE_TOKEN_ADDRESS as `0x${string}`,
         amount: amountOfToken,
         priorityFee: BigInt(priorityFee),
         nonce: BigInt(nonceEVVM),

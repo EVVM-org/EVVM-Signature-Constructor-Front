@@ -14,6 +14,7 @@ import {
 import { execute } from '@evvm/evvm-js'
 import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
 import { dateToUnixTimestamp } from '@/utils/dateToUnixTimestamp'
+import { MATE_TOKEN_ADDRESS, DOCS_URLS } from '@/utils/constants'
 import {
   IPayData,
   IMakeOfferData,
@@ -73,8 +74,7 @@ export const MakeOfferComponent = ({
       // Sign EVVM payment first
       const payAction = await coreService.pay({
         toAddress: formData.addressNameService as `0x${string}`,
-        tokenAddress:
-          '0x0000000000000000000000000000000000000001' as `0x${string}`,
+        tokenAddress: MATE_TOKEN_ADDRESS as `0x${string}`,
         amount: BigInt(formData.amount),
         priorityFee: BigInt(formData.priorityFeePay),
         nonce: BigInt(formData.nonceEVVM),
@@ -120,7 +120,7 @@ export const MakeOfferComponent = ({
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Make offer of username"
-        link="https://www.evvm.info/docs/SignatureStructures/NameService/makeOfferStructure"
+        link={DOCS_URLS.nameService.makeOffer}
       />
 
       <br />

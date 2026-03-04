@@ -6,7 +6,7 @@ interface StakingActionSelectorProps {
   defaultValue?: boolean
 }
 
-export const StakingActionSelector: React.FC<StakingActionSelectorProps> = ({
+export const StakingActionSelector = React.memo<StakingActionSelectorProps>(({
   onChange,
   defaultValue = true,
 }) => {
@@ -23,4 +23,6 @@ export const StakingActionSelector: React.FC<StakingActionSelectorProps> = ({
       />
     </div>
   )
-}
+})
+
+StakingActionSelector.displayName = 'StakingActionSelector'

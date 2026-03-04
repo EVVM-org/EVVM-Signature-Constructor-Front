@@ -11,6 +11,7 @@ import {
 } from '@/components/SigConstructors/InputsAndModules'
 import { execute } from '@evvm/evvm-js'
 import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
+import { MATE_TOKEN_ADDRESS, DOCS_URLS } from '@/utils/constants'
 import {
   IPayData,
   IWithdrawOfferData,
@@ -67,8 +68,7 @@ export const WithdrawOfferComponent = ({
       // Sign EVVM payment first
       const payAction = await coreService.pay({
         toAddress: formData.addressNameService as `0x${string}`,
-        tokenAddress:
-          '0x0000000000000000000000000000000000000001' as `0x${string}`,
+        tokenAddress: MATE_TOKEN_ADDRESS as `0x${string}`,
         amount: BigInt(0),
         priorityFee: BigInt(formData.priorityFeePay),
         nonce: BigInt(formData.noncePay),

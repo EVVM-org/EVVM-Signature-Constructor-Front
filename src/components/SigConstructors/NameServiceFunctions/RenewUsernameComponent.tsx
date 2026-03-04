@@ -14,6 +14,7 @@ import {
 import { execute } from '@evvm/evvm-js'
 import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
 import { NameServiceABI } from '@evvm/evvm-js'
+import { MATE_TOKEN_ADDRESS, DOCS_URLS } from '@/utils/constants'
 import {
   IPayData,
   IRenewUsernameData,
@@ -78,8 +79,7 @@ export const RenewUsernameComponent = ({
       // Sign EVVM payment first
       const payAction = await coreService.pay({
         toAddress: formData.addressNameService as `0x${string}`,
-        tokenAddress:
-          '0x0000000000000000000000000000000000000001' as `0x${string}`,
+        tokenAddress: MATE_TOKEN_ADDRESS as `0x${string}`,
         amount: formData.amountToRenew,
         priorityFee: BigInt(0),
         nonce: formData.nonceEVVM,

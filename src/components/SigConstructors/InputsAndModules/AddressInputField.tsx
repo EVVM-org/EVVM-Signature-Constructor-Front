@@ -1,6 +1,5 @@
 import React from 'react'
-import styles from '@/components/SigConstructors/SignatureConstructor.module.css'
-import { Input } from '@mantine/core'
+import { GenericInputField } from './GenericInputField'
 
 interface AddressInputFieldProps {
   label: string
@@ -16,25 +15,13 @@ export const AddressInputField: React.FC<AddressInputFieldProps> = ({
   defaultValue,
 }) => {
   return (
-    <>
-      <p>{label}</p>
-      <div
-        style={{
-          marginBottom: '1rem',
-          marginTop: '0.5rem',
-        }}
-      >
-        <Input
-          size="compact-md"
-          type="text"
-          placeholder={placeholder}
-          id={inputId}
-          defaultValue={defaultValue}
-          style={{
-            maxWidth: '30vw',
-          }}
-        />
-      </div>
-    </>
+    <GenericInputField
+      label={label}
+      inputId={inputId}
+      type="text"
+      placeholder={placeholder}
+      defaultValue={defaultValue}
+      maxWidth="30vw"
+    />
   )
 }

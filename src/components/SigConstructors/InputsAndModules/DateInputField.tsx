@@ -1,6 +1,5 @@
 import React from "react";
-import styles from "@/components/SigConstructors/SignatureConstructor.module.css";
-import { Input } from "@mantine/core";
+import { GenericInputField } from './GenericInputField'
 
 interface DateInputFieldProps {
   label: string;
@@ -16,18 +15,13 @@ export const DateInputField: React.FC<DateInputFieldProps> = ({
   defaultValue,
 }) => {
   return (
-    <div style={{ marginBottom: "1rem" }}>
-      <p>{label}</p>
-      <Input
-      size="compact-md"
-        type="datetime-local"
-        style={{
-            maxWidth: '20vw',
-          }}
-        placeholder={placeholder}
-        id={inputId}
-        defaultValue={defaultValue}
-      />
-    </div>
+    <GenericInputField
+      label={label}
+      inputId={inputId}
+      type="datetime-local"
+      placeholder={placeholder}
+      defaultValue={defaultValue}
+      maxWidth="20vw"
+    />
   );
 };

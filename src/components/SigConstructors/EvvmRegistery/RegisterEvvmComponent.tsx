@@ -13,11 +13,10 @@ import {
   AddressInputField,
   NumberInputField,
 } from '@/components/SigConstructors/InputsAndModules'
+import { REGISTRY_ADDRESS } from '@/utils/constants'
 
 import RegistryCoreABI from '@/abi/RegistryEvvm.json'
 import { Button } from '@mantine/core'
-
-const REGISTRY_ADDRESS = '0x389dC8fb09211bbDA841D59f4a51160dA2377832' as const
 
 export const RegisterEvvmComponent = () => {
   const [isLoading, setIsLoading] = React.useState(false)

@@ -15,6 +15,7 @@ import { Button } from '@mantine/core'
 import { execute } from '@evvm/evvm-js'
 import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
 import { NameServiceABI, CoreABI } from '@evvm/evvm-js'
+import { MATE_TOKEN_ADDRESS, DOCS_URLS } from '@/utils/constants'
 import {
   IPayData,
   IRegistrationUsernameData,
@@ -106,8 +107,7 @@ export const RegistrationUsernameComponent = ({
 
       const payAction = await coreService.pay({
         toAddress: formData.addressNameService as `0x${string}`,
-        tokenAddress:
-          '0x0000000000000000000000000000000000000001' as `0x${string}`,
+        tokenAddress: MATE_TOKEN_ADDRESS as `0x${string}`,
         amount: payAmount,
         priorityFee: BigInt(formData.priorityFeePay),
         nonce: BigInt(formData.nonceEVVM),
@@ -214,7 +214,7 @@ export const RegistrationUsernameComponent = ({
     <div className="flex flex-1 flex-col justify-center items-center">
       <TitleAndLink
         title="Registration of username"
-        link="https://www.evvm.info/docs/SignatureStructures/NameService/registrationUsernameStructure"
+        link={DOCS_URLS.nameService.registration}
       />
 
       <br />

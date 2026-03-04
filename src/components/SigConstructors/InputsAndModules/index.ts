@@ -4,6 +4,7 @@ export { DataDisplayWithClear } from "./DataDisplayWithClear";
 export { DateInputField } from "./DateInputField";
 export { DetailedData } from "./DetailedData";
 export { ExecutorSelector } from "./ExecutorSelector";
+export { GenericInputField } from "./GenericInputField";
 export { NumberInputField } from "./NumberInputField";
 export { NumberInputWithGenerator } from "./NumberInputWithGenerator";
 export { PrioritySelector } from "./PrioritySelector";

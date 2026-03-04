@@ -1,6 +1,5 @@
 import React from 'react'
 import mersenneTwister from '@/utils/mersenneTwister'
-import styles from '@/components/SigConstructors/SignatureConstructor.module.css'
 import { Button, Divider, Input, Tooltip } from '@mantine/core'
 
 interface NumberInputWithGeneratorProps {

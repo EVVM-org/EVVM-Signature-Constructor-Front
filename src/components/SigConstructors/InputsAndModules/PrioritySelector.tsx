@@ -9,7 +9,7 @@ interface PrioritySelectorProps {
 /**
 	* Offers two priority types of execution: sync (low) and async (high)
 */
-export const PrioritySelector: React.FC<PrioritySelectorProps> = ({
+export const PrioritySelector = React.memo<PrioritySelectorProps>(({
   onPriorityChange,
   marginTop = "1rem",
 }) => {
@@ -29,4 +29,6 @@ export const PrioritySelector: React.FC<PrioritySelectorProps> = ({
       </Input.Wrapper>
     </div>
   );
-};
+});
+
+PrioritySelector.displayName = 'PrioritySelector';

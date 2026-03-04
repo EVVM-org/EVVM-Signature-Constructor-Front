@@ -13,6 +13,7 @@ import {
 import { Button } from '@mantine/core'
 import { execute } from '@evvm/evvm-js'
 import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
+import { MATE_TOKEN_ADDRESS, DOCS_URLS } from '@/utils/constants'
 import {
   IPayData,
   IAcceptOfferData,
@@ -67,8 +68,7 @@ export const AcceptOfferComponent = ({
       // Sign EVVM payment first
       const payAction = await coreService.pay({
         toAddress: nameServiceAddress as `0x${string}`,
-        tokenAddress:
-          '0x0000000000000000000000000000000000000001' as `0x${string}`,
+        tokenAddress: MATE_TOKEN_ADDRESS as `0x${string}`,
         amount: BigInt(0),
         priorityFee: BigInt(formData.priorityFeePay),
         nonce: BigInt(formData.noncePay),

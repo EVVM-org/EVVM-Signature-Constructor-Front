@@ -9,7 +9,7 @@ interface ExecutorSelectorProps {
   isUsingExecutor: boolean
 }
 
-export const ExecutorSelector: React.FC<ExecutorSelectorProps> = ({
+export const ExecutorSelector = React.memo<ExecutorSelectorProps>(({
   label = 'Are you using an senderExecutor?',
   inputId,
   placeholder = 'Enter senderExecutor',
@@ -54,4 +54,6 @@ export const ExecutorSelector: React.FC<ExecutorSelectorProps> = ({
       </div>
     </>
   )
-}
+})
+
+ExecutorSelector.displayName = 'ExecutorSelector'

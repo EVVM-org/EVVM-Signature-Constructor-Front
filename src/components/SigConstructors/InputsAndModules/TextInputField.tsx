@@ -1,6 +1,5 @@
 import React from 'react'
-import styles from '@/components/SigConstructors/SignatureConstructor.module.css'
-import { Input } from '@mantine/core'
+import { GenericInputField } from './GenericInputField'
 
 interface TextInputFieldProps {
   label: string
@@ -18,24 +17,13 @@ export const TextInputField: React.FC<TextInputFieldProps> = ({
   onChange,
 }) => {
   return (
-    <>
-      <p>{label}</p>
-      <div style={{
-          marginBottom: '1rem',
-          marginTop: '0.5rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-        }}>
-        <Input
-          type="text"
-          size="compact-md"
-          placeholder={placeholder}
-          id={inputId}
-          defaultValue={defaultValue}
-          onChange={onChange}
-        />
-      </div>
-    </>
+    <GenericInputField
+      label={label}
+      inputId={inputId}
+      type="text"
+      placeholder={placeholder}
+      defaultValue={defaultValue}
+      onChange={onChange}
+    />
   )
 }

@@ -24,6 +24,8 @@ export const DispersePayComponent = ({
 }: DispersePayComponentProps) => {
   const [isUsingExecutorDisperse, setIsUsingExecutorDisperse] =
     React.useState(false);
+  const [isUsingOriginExecutorDisperse, setIsUsingOriginExecutorDisperse] =
+    React.useState(false);
   const [priorityDisperse, setPriorityDisperse] = React.useState<"low" | "high">("low");
   const [isUsingUsernameOnDisperse, setIsUsingUsernameOnDisperse] =
     React.useState<Array<boolean>>([false, false, false, false, false]);
@@ -49,6 +51,9 @@ export const DispersePayComponent = ({
     const nonce = getValue("nonceInputDispersePay");
     const senderExecutor = isUsingExecutorDisperse
       ? getValue("senderExecutorInputSplit")
+      : "0x0000000000000000000000000000000000000000";
+    const originExecutor = isUsingOriginExecutorDisperse
+      ? getValue("originExecutorInputSplit")
       : "0x0000000000000000000000000000000000000000";
 
     if (!tokenAddress || !amount || !priorityFee || !nonce) {
@@ -103,6 +108,7 @@ export const DispersePayComponent = ({
         nonce: BigInt(nonce),
         isAsyncExec: priorityDisperse === "high",
         senderExecutor: senderExecutor as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
       });
 
       setDataToGet(signedAction.toJSON());
@@ -160,6 +166,13 @@ export const DispersePayComponent = ({
         placeholder="Enter senderExecutor"
         onExecutorToggle={setIsUsingExecutorDisperse}
         isUsingExecutor={isUsingExecutorDisperse}
+      />
+
+      <ExecutorSelector
+        inputId="originExecutorInputSplit"
+        placeholder="Enter originExecutor"
+        onExecutorToggle={setIsUsingOriginExecutorDisperse}
+        isUsingExecutor={isUsingOriginExecutorDisperse}
       />
 
       <div style={{ marginBottom: "1rem", width: "20rem" }}>

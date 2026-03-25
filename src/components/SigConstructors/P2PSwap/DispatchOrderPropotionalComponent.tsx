@@ -7,6 +7,7 @@ import {
   PrioritySelector,
   DataDisplayWithClear,
   HelperInfo,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 
 import { execute } from '@evvm/evvm-js'
@@ -25,6 +26,7 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
   coreAddress,
 }: P2PSwapComponentProps) => {
   const [priority, setPriority] = React.useState('high')
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [amountB, setAmountB] = React.useState(0n)
   const [dataToGet, setDataToGet] =
     React.useState<ISerializableSignedAction<IDispatchOrderData> | null>(null)
@@ -55,6 +57,9 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
     const noncePay = BigInt(
       getValue('noncePay_DispatchOrderFillPropotionalFee')
     )
+    const originExecutor = isUsingOriginExecutor
+      ? getValue('originExecutorInput_DispatchOrderFillPropotionalFee')
+      : '0x0000000000000000000000000000000000000000'
 
     const amountOfTokenBToFill = amountB + fee
 
@@ -84,6 +89,7 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
         nonce: noncePay,
         isAsyncExec: true,
         senderExecutor: p2pSwapAddress as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
       })
 
       // create p2pswap dispatchOrderFillPropotionalFee() signature
@@ -94,6 +100,8 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
           tokenB: tokenB,
           orderId: orderId,
           amountOfTokenBToFill: amountOfTokenBToFill,
+          senderExecutor: p2pSwapAddress as `0x${string}`,
+          originExecutor: originExecutor as `0x${string}`,
           evvmSignedAction: payAction,
         })
       if (!fee) throw new Error('Error calculating fee')
@@ -193,6 +201,13 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
       </div>
 
       {/* Nonce section with automatic generator */}
+
+      <ExecutorSelector
+        inputId="originExecutorInput_DispatchOrderFillPropotionalFee"
+        placeholder="Enter originExecutor address"
+        onToggle={setIsUsingOriginExecutor}
+        value={isUsingOriginExecutor}
+      />
 
       <NumberInputWithGenerator
         label="Nonce for P2PSwap"

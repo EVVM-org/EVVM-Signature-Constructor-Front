@@ -10,6 +10,7 @@ import {
   HelperInfo,
   NumberInputField,
   TextInputField,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 import { Button } from '@mantine/core'
 import { execute } from '@evvm/evvm-js'
@@ -35,6 +36,7 @@ export const RegistrationUsernameComponent = ({
   coreAddress,
 }: NameServiceComponentProps) => {
   const [priority, setPriority] = React.useState('high')
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
   const [rewardAmount, setRewardAmount] = React.useState<bigint | null>(null)
   const [registrationPrice, setRegistrationPrice] = React.useState<
@@ -61,6 +63,9 @@ export const RegistrationUsernameComponent = ({
       nonceEVVM: getValue('nonceEVVMInput_registrationUsername'),
       isAsyncExec: priority === 'high',
     }
+    const originExecutor = isUsingOriginExecutor
+      ? getValue('originExecutorInput_registrationUsername')
+      : '0x0000000000000000000000000000000000000000'
 
     // Validate that required fields are not empty
     if (!formData.username) {
@@ -113,12 +118,15 @@ export const RegistrationUsernameComponent = ({
         nonce: BigInt(formData.nonceEVVM),
         isAsyncExec: formData.isAsyncExec,
         senderExecutor: formData.addressNameService as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
       })
 
       // Sign registration username action
       const registrationAction = await nameServiceService.registrationUsername({
         username: formData.username,
         lockNumber: BigInt(formData.lockNumber),
+        senderExecutor: formData.addressNameService as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
         nonce: BigInt(formData.nonceNameService),
         evvmSignedAction: payAction,
       })
@@ -267,6 +275,14 @@ export const RegistrationUsernameComponent = ({
         inputId="priorityFeeInput_registrationUsername"
         placeholder="Enter priority fee"
       />
+
+      <ExecutorSelector
+        inputId="originExecutorInput_registrationUsername"
+        placeholder="Enter originExecutor address"
+        onToggle={setIsUsingOriginExecutor}
+        value={isUsingOriginExecutor}
+      />
+
       <NumberInputWithGenerator
         label="Core (pay) Async Nonce"
         inputId="nonceEVVMInput_registrationUsername"

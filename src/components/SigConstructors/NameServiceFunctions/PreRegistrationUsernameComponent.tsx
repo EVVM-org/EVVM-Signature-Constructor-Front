@@ -8,6 +8,7 @@ import {
   HelperInfo,
   NumberInputField,
   TextInputField,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 import { execute } from '@evvm/evvm-js'
 import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
@@ -33,6 +34,7 @@ export const PreRegistrationUsernameComponent = ({
   coreAddress,
 }: NameServiceComponentProps) => {
   const [priority, setPriority] = React.useState('high')
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
 
   const makeSig = async () => {
@@ -55,6 +57,9 @@ export const PreRegistrationUsernameComponent = ({
       priorityFeePay: getValue('priorityFeeInput_preRegistration'),
       isAsyncExecPay: priority === 'high',
     }
+    const originExecutor = isUsingOriginExecutor
+      ? getValue('originExecutorInput_preRegistration')
+      : '0x0000000000000000000000000000000000000000'
 
     // Validate that required fields are not empty
     if (!formData.username) {
@@ -99,6 +104,7 @@ export const PreRegistrationUsernameComponent = ({
         nonce: BigInt(formData.noncePay),
         isAsyncExec: true,
         senderExecutor: formData.addressNameService as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
       })
 
       // Hash the username + lockNumber for pre-registration using
@@ -114,6 +120,8 @@ export const PreRegistrationUsernameComponent = ({
       const preRegistrationAction =
         await nameServiceService.preRegistrationUsername({
           hashPreRegisteredUsername: hashUsername,
+          senderExecutor: formData.addressNameService as `0x${string}`,
+          originExecutor: originExecutor as `0x${string}`,
           nonce: BigInt(formData.nonce),
           evvmSignedAction: payAction,
         })
@@ -177,6 +185,13 @@ export const PreRegistrationUsernameComponent = ({
         label="Priority fee"
         inputId="priorityFeeInput_preRegistration"
         placeholder="Enter priority fee"
+      />
+
+      <ExecutorSelector
+        inputId="originExecutorInput_preRegistration"
+        placeholder="Enter originExecutor address"
+        onToggle={setIsUsingOriginExecutor}
+        value={isUsingOriginExecutor}
       />
 
       <NumberInputWithGenerator

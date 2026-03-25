@@ -10,6 +10,7 @@ import {
   HelperInfo,
   NumberInputField,
   TextInputField,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 import { execute } from '@evvm/evvm-js'
 import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
@@ -35,6 +36,7 @@ export const FlushCustomMetadataComponent = ({
   coreAddress,
 }: NameServiceComponentProps) => {
   const [priority, setPriority] = React.useState('high')
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
 
   const getValue = (id: string) =>
@@ -49,6 +51,9 @@ export const FlushCustomMetadataComponent = ({
       noncePay: getValue('nonceEVVMInput_flushCustomMetadata'),
       isAsyncExecPay: priority === 'high',
     }
+    const originExecutor = isUsingOriginExecutor
+      ? getValue('originExecutorInput_flushCustomMetadata')
+      : '0x0000000000000000000000000000000000000000'
 
     try {
       const signer = await getEvvmSigner()
@@ -83,12 +88,15 @@ export const FlushCustomMetadataComponent = ({
         nonce: BigInt(formData.noncePay),
         isAsyncExec: true,
         senderExecutor: formData.addressNameService as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
       })
 
       // Sign flush custom metadata action
       const flushCustomMetadataAction =
         await nameServiceService.flushCustomMetadata({
           identity: formData.identity,
+          senderExecutor: formData.addressNameService as `0x${string}`,
+          originExecutor: originExecutor as `0x${string}`,
           nonce: BigInt(formData.nonceNameService),
           evvmSignedAction: payAction,
         })
@@ -145,6 +153,13 @@ export const FlushCustomMetadataComponent = ({
         label="Priority fee"
         inputId="priorityFeeInput_flushCustomMetadata"
         placeholder="Enter priority fee"
+      />
+
+      <ExecutorSelector
+        inputId="originExecutorInput_flushCustomMetadata"
+        placeholder="Enter originExecutor address"
+        onToggle={setIsUsingOriginExecutor}
+        value={isUsingOriginExecutor}
       />
 
       <NumberInputWithGenerator

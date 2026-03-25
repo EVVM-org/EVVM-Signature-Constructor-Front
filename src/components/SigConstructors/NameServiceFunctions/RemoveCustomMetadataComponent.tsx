@@ -10,6 +10,7 @@ import {
   HelperInfo,
   NumberInputField,
   TextInputField,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 import { execute } from '@evvm/evvm-js'
 import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
@@ -35,6 +36,7 @@ export const RemoveCustomMetadataComponent = ({
   coreAddress,
 }: NameServiceComponentProps) => {
   const [priority, setPriority] = React.useState('high')
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
 
   const getValue = (id: string) =>
@@ -50,6 +52,9 @@ export const RemoveCustomMetadataComponent = ({
       nonceEVVM: getValue('nonceEVVMInput_removeCustomMetadata'),
       isAsyncExec: priority === 'high',
     }
+    const originExecutor = isUsingOriginExecutor
+      ? getValue('originExecutorInput_removeCustomMetadata')
+      : '0x0000000000000000000000000000000000000000'
 
     try {
       const signer = await getEvvmSigner()
@@ -88,6 +93,7 @@ export const RemoveCustomMetadataComponent = ({
         nonce: BigInt(formData.nonceEVVM),
         isAsyncExec: formData.isAsyncExec,
         senderExecutor: formData.addressNameService as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
       })
 
       // Sign remove custom metadata action
@@ -95,6 +101,8 @@ export const RemoveCustomMetadataComponent = ({
         await nameServiceService.removeCustomMetadata({
           identity: formData.identity,
           key: BigInt(formData.key),
+          senderExecutor: formData.addressNameService as `0x${string}`,
+          originExecutor: originExecutor as `0x${string}`,
           nonce: BigInt(formData.nonceNameService),
           evvmSignedAction: payAction,
         })
@@ -158,8 +166,14 @@ export const RemoveCustomMetadataComponent = ({
         inputId="priorityFeeInput_removeCustomMetadata"
         placeholder="Enter priority fee"
       />
-
       
+      <ExecutorSelector
+        inputId="originExecutorInput_removeCustomMetadata"
+        placeholder="Enter originExecutor address"
+        onToggle={setIsUsingOriginExecutor}
+        value={isUsingOriginExecutor}
+      />
+
       <NumberInputWithGenerator
         label="Core (pay) Async Nonce"
         inputId="nonceEVVMInput_removeCustomMetadata"

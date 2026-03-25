@@ -10,6 +10,7 @@ import {
   HelperInfo,
   NumberInputField,
   TextInputField,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 import { execute } from '@evvm/evvm-js'
 import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
@@ -35,6 +36,7 @@ export const FlushUsernameComponent = ({
   coreAddress,
 }: NameServiceComponentProps) => {
   const [priority, setPriority] = React.useState('high')
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
 
   const getValue = (id: string) =>
@@ -49,6 +51,9 @@ export const FlushUsernameComponent = ({
       noncePay: getValue('nonceEVVMInput_flushUsername'),
       isAsyncExecPay: priority === 'high',
     }
+    const originExecutor = isUsingOriginExecutor
+      ? getValue('originExecutorInput_flushUsername')
+      : '0x0000000000000000000000000000000000000000'
 
     try {
       const signer = await getEvvmSigner()
@@ -87,11 +92,14 @@ export const FlushUsernameComponent = ({
         nonce: BigInt(formData.noncePay),
         isAsyncExec: true,
         senderExecutor: formData.addressNameService as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
       })
 
       // Sign flush username action
       const flushUsernameAction = await nameServiceService.flushUsername({
         username: formData.username,
+        senderExecutor: formData.addressNameService as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
         nonce: BigInt(formData.nonceNameService),
         evvmSignedAction: payAction,
       })
@@ -152,6 +160,13 @@ export const FlushUsernameComponent = ({
         label="Priority fee"
         inputId="priorityFeeInput_flushUsername"
         placeholder="Enter priority fee"
+      />
+
+      <ExecutorSelector
+        inputId="originExecutorInput_flushUsername"
+        placeholder="Enter originExecutor address"
+        onToggle={setIsUsingOriginExecutor}
+        value={isUsingOriginExecutor}
       />
 
       <NumberInputWithGenerator

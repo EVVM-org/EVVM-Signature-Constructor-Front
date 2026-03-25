@@ -10,6 +10,7 @@ import {
   HelperInfo,
   NumberInputField,
   TextInputField,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 import { execute } from '@evvm/evvm-js'
 import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
@@ -35,6 +36,7 @@ export const RenewUsernameComponent = ({
   coreAddress,
 }: NameServiceComponentProps) => {
   const [priority, setPriority] = React.useState('high')
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
   const [amountToRenew, setAmountToRenew] = React.useState<bigint | null>(null)
 
@@ -58,6 +60,9 @@ export const RenewUsernameComponent = ({
       nonceEVVM: BigInt(getValue('nonceEVVMInput_renewUsername')),
       isAsyncExec: priority === 'high',
     }
+    const originExecutor = isUsingOriginExecutor
+      ? getValue('originExecutorInput_renewUsername')
+      : '0x0000000000000000000000000000000000000000'
 
     try {
       const signer = await getEvvmSigner()
@@ -85,11 +90,14 @@ export const RenewUsernameComponent = ({
         nonce: formData.nonceEVVM,
         isAsyncExec: formData.isAsyncExec,
         senderExecutor: formData.addressNameService as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
       })
 
       // Sign renew username action
       const renewUsernameAction = await nameServiceService.renewUsername({
         username: formData.username,
+        senderExecutor: formData.addressNameService as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
         nonce: formData.nonceNameService,
         evvmSignedAction: payAction,
       })
@@ -178,6 +186,13 @@ export const RenewUsernameComponent = ({
         label="Priority fee"
         inputId="priorityFeeInput_renewUsername"
         placeholder="Enter priority fee"
+      />
+
+      <ExecutorSelector
+        inputId="originExecutorInput_renewUsername"
+        placeholder="Enter originExecutor address"
+        onToggle={setIsUsingOriginExecutor}
+        value={isUsingOriginExecutor}
       />
 
       <NumberInputWithGenerator

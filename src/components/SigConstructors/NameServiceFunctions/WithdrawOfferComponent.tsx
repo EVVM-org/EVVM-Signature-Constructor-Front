@@ -8,6 +8,7 @@ import {
   HelperInfo,
   NumberInputField,
   TextInputField,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 import { execute } from '@evvm/evvm-js'
 import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
@@ -32,6 +33,7 @@ export const WithdrawOfferComponent = ({
   coreAddress,
 }: NameServiceComponentProps) => {
   const [priority, setPriority] = React.useState('high')
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
 
   const makeSig = async () => {
@@ -47,6 +49,9 @@ export const WithdrawOfferComponent = ({
       noncePay: getValue('nonceEVVMInput_withdrawOffer'),
       isAsyncExecPay: priority === 'high',
     }
+    const originExecutor = isUsingOriginExecutor
+      ? getValue('originExecutorInput_withdrawOffer')
+      : '0x0000000000000000000000000000000000000000'
 
     try {
       const signer = await getEvvmSigner()
@@ -74,12 +79,15 @@ export const WithdrawOfferComponent = ({
         nonce: BigInt(formData.noncePay),
         isAsyncExec: true,
         senderExecutor: formData.addressNameService as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
       })
 
       // Sign withdraw offer action
       const withdrawOfferAction = await nameServiceService.withdrawOffer({
         username: formData.username,
         offerID: BigInt(formData.offerId),
+        senderExecutor: formData.addressNameService as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
         nonce: BigInt(formData.nonceNameService),
         evvmSignedAction: payAction,
       })
@@ -140,6 +148,13 @@ export const WithdrawOfferComponent = ({
         label="Priority fee"
         inputId="priorityFeeInput_withdrawOffer"
         placeholder="Enter priority fee"
+      />
+
+      <ExecutorSelector
+        inputId="originExecutorInput_withdrawOffer"
+        placeholder="Enter originExecutor address"
+        onToggle={setIsUsingOriginExecutor}
+        value={isUsingOriginExecutor}
       />
 
       <NumberInputWithGenerator

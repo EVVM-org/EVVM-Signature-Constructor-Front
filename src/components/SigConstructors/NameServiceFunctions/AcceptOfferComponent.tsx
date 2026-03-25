@@ -9,6 +9,7 @@ import {
   HelperInfo,
   NumberInputField,
   TextInputField,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 import { Button } from '@mantine/core'
 import { execute } from '@evvm/evvm-js'
@@ -33,6 +34,7 @@ export const AcceptOfferComponent = ({
   coreAddress,
 }: NameServiceComponentProps) => {
   const [priority, setPriority] = React.useState('high')
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
 
   const makeSig = async () => {
@@ -47,6 +49,9 @@ export const AcceptOfferComponent = ({
       isAsyncExecPay: priority === 'high',
       noncePay: getValue('noncePayInput_acceptOffer'),
     }
+    const originExecutor = isUsingOriginExecutor
+      ? getValue('originExecutorInput_acceptOffer')
+      : '0x0000000000000000000000000000000000000000'
 
     try {
       const signer = await getEvvmSigner()
@@ -74,12 +79,15 @@ export const AcceptOfferComponent = ({
         nonce: BigInt(formData.noncePay),
         isAsyncExec: true,
         senderExecutor: nameServiceAddress as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
       })
 
       // Sign accept offer action
       const acceptOfferAction = await nameServiceService.acceptOffer({
         username: formData.username,
         offerID: BigInt(formData.offerId),
+        senderExecutor: nameServiceAddress as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
         nonce: BigInt(formData.nonce),
         evvmSignedAction: payAction,
       })
@@ -140,6 +148,13 @@ export const AcceptOfferComponent = ({
         label="Priority fee"
         inputId="priorityFeePayInput_acceptOffer"
         placeholder="Enter priority fee"
+      />
+
+      <ExecutorSelector
+        inputId="originExecutorInput_acceptOffer"
+        placeholder="Enter originExecutor address"
+        onToggle={setIsUsingOriginExecutor}
+        value={isUsingOriginExecutor}
       />
 
       <NumberInputWithGenerator

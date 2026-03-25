@@ -7,6 +7,7 @@ import {
   PrioritySelector,
   DataDisplayWithClear,
   HelperInfo,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 
 import { execute } from '@evvm/evvm-js'
@@ -26,6 +27,7 @@ export const CancelOrderComponent = ({
   coreAddress,
 }: P2PSwapComponentProps) => {
   const [priority, setPriority] = React.useState('high')
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [dataToGet, setDataToGet] =
     React.useState<ISerializableSignedAction<ICancelOrderData> | null>(null)
 
@@ -44,6 +46,9 @@ export const CancelOrderComponent = ({
     const orderId = BigInt(getValue('orderId_CancelOrder'))
     const priorityFee = BigInt(getValue('priorityFee_CancelOrder'))
     const noncePay = BigInt(getValue('noncePay_CancelOrder'))
+    const originExecutor = isUsingOriginExecutor
+      ? getValue('originExecutorInput_CancelOrder')
+      : '0x0000000000000000000000000000000000000000'
 
     try {
       const signer = await getEvvmSigner()
@@ -71,6 +76,7 @@ export const CancelOrderComponent = ({
         nonce: noncePay,
         isAsyncExec: true,
         senderExecutor: p2pSwapAddress as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
       })
 
       // create p2pswap cancelOrder() signature
@@ -79,6 +85,8 @@ export const CancelOrderComponent = ({
         tokenA: tokenA,
         tokenB: tokenB,
         orderId: orderId,
+        senderExecutor: p2pSwapAddress as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
         evvmSignedAction: payAction,
       })
 
@@ -159,6 +167,13 @@ export const CancelOrderComponent = ({
       ))}
 
       {/* Nonce section with automatic generator */}
+
+      <ExecutorSelector
+        inputId="originExecutorInput_CancelOrder"
+        placeholder="Enter originExecutor address"
+        onToggle={setIsUsingOriginExecutor}
+        value={isUsingOriginExecutor}
+      />
 
       <NumberInputWithGenerator
         label="Nonce for P2PSwap"

@@ -10,6 +10,7 @@ import {
   HelperInfo,
   NumberInputField,
   TextInputField,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 import { execute } from '@evvm/evvm-js'
 import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
@@ -35,6 +36,7 @@ export const AddCustomMetadataComponent = ({
   coreAddress,
 }: NameServiceComponentProps) => {
   const [priority, setPriority] = React.useState('high')
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
   const [amountToAddCustomMetadata, setAmountToAddCustomMetadata] =
     React.useState<bigint | null>(null)
@@ -61,6 +63,9 @@ export const AddCustomMetadataComponent = ({
       nonceEVVM: getValue('nonceEVVMInput_addCustomMetadata'),
       isAsyncExec: priority === 'high',
     }
+    const originExecutor = isUsingOriginExecutor
+      ? getValue('originExecutorInput_addCustomMetadata')
+      : '0x0000000000000000000000000000000000000000'
 
     const valueCustomMetadata = `${formData.schema}:${formData.subschema}>${formData.value}`
 
@@ -96,6 +101,7 @@ export const AddCustomMetadataComponent = ({
         nonce: BigInt(formData.nonceEVVM),
         isAsyncExec: formData.isAsyncExec,
         senderExecutor: formData.addressNameService as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
       })
 
       // Sign add custom metadata action
@@ -103,6 +109,8 @@ export const AddCustomMetadataComponent = ({
         await nameServiceService.addCustomMetadata({
           identity: formData.identity,
           value: valueCustomMetadata,
+          senderExecutor: formData.addressNameService as `0x${string}`,
+          originExecutor: originExecutor as `0x${string}`,
           nonce: BigInt(formData.nonceNameService),
           evvmSignedAction: payAction,
         })
@@ -197,6 +205,13 @@ export const AddCustomMetadataComponent = ({
         label="Priority fee"
         inputId="priorityFeeInput_addCustomMetadata"
         placeholder="Enter priority fee"
+      />
+
+      <ExecutorSelector
+        inputId="originExecutorInput_addCustomMetadata"
+        placeholder="Enter originExecutor address"
+        onToggle={setIsUsingOriginExecutor}
+        value={isUsingOriginExecutor}
       />
 
       <NumberInputWithGenerator

@@ -7,6 +7,7 @@ import {
   PrioritySelector,
   DataDisplayWithClear,
   HelperInfo,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 
 import { execute } from '@evvm/evvm-js'
@@ -25,6 +26,7 @@ export const MakeOrderComponent = ({
   coreAddress,
 }: P2PSwapComponentProps) => {
   const [priority, setPriority] = React.useState('high')
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [dataToGet, setDataToGet] =
     React.useState<ISerializableSignedAction<IMakeOrderData> | null>(null)
 
@@ -44,6 +46,9 @@ export const MakeOrderComponent = ({
     const amountB = BigInt(getValue('amountB_MakeOrder'))
     const priorityFee = BigInt(getValue('priorityFee_MakeOrder'))
     const noncePay = BigInt(getValue('noncePay_MakeOrder'))
+    const originExecutor = isUsingOriginExecutor
+      ? getValue('originExecutorInput_MakeOrder')
+      : '0x0000000000000000000000000000000000000000'
 
     try {
       const signer = await getEvvmSigner()
@@ -71,6 +76,7 @@ export const MakeOrderComponent = ({
         nonce: noncePay,
         isAsyncExec: true,
         senderExecutor: p2pSwapAddress as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
       })
 
       // create p2pswap makeOrder() signature
@@ -80,6 +86,8 @@ export const MakeOrderComponent = ({
         tokenB: tokenB,
         amountA: amountA,
         amountB: amountB,
+        senderExecutor: p2pSwapAddress as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
         evvmSignedAction: payAction,
       })
 
@@ -158,6 +166,13 @@ export const MakeOrderComponent = ({
       ))}
 
       {/* Nonce section with automatic generator */}
+
+      <ExecutorSelector
+        inputId="originExecutorInput_MakeOrder"
+        placeholder="Enter originExecutor address"
+        onToggle={setIsUsingOriginExecutor}
+        value={isUsingOriginExecutor}
+      />
 
       <NumberInputWithGenerator
         label="Nonce for P2PSwap"

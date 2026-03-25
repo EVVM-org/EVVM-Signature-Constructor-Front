@@ -164,15 +164,15 @@ export const DispersePayComponent = ({
       <ExecutorSelector
         inputId="senderExecutorInputSplit"
         placeholder="Enter senderExecutor"
-        onExecutorToggle={setIsUsingExecutorDisperse}
-        isUsingExecutor={isUsingExecutorDisperse}
+        onToggle={setIsUsingExecutorDisperse}
+        value={isUsingExecutorDisperse}
       />
 
       <ExecutorSelector
         inputId="originExecutorInputSplit"
         placeholder="Enter originExecutor"
-        onExecutorToggle={setIsUsingOriginExecutorDisperse}
-        isUsingExecutor={isUsingOriginExecutorDisperse}
+        onToggle={setIsUsingOriginExecutorDisperse}
+        value={isUsingOriginExecutorDisperse}
       />
 
       <div style={{ marginBottom: "1rem", width: "20rem" }}>

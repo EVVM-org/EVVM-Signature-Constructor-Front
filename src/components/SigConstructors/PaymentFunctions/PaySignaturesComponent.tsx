@@ -26,7 +26,7 @@ export const PaySignaturesComponent = ({
   coreAddress,
 }: PaySignaturesComponentProps) => {
   const [isUsingUsernames, setIsUsingUsernames] = React.useState(false)
-  const [isUsingExecutor, setIsUsingExecutor] = React.useState(false)
+  const [isUsingSenderExecutor, setisUsingSenderExecutor] = React.useState(false)
   const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [priority, setPriority] = React.useState<'low' | 'high'>('low')
   const [dataToGet, setDataToGet] =
@@ -46,7 +46,7 @@ export const PaySignaturesComponent = ({
     const amount = getValue('amountTokenInput_Pay')
     const priorityFee = getValue('priorityFeeInput_Pay')
     const nonce = getValue('nonceInput_Pay')
-    const senderExecutor = isUsingExecutor
+    const senderExecutor = isUsingSenderExecutor
       ? getValue('senderExecutorInput_Pay')
       : '0x0000000000000000000000000000000000000000'
     const originExecutor = isUsingOriginExecutor
@@ -188,15 +188,15 @@ export const PaySignaturesComponent = ({
       <ExecutorSelector
         inputId="senderExecutorInput_Pay"
         placeholder="Enter senderExecutor address"
-        onExecutorToggle={setIsUsingExecutor}
-        isUsingExecutor={isUsingExecutor}
+        onToggle={setisUsingSenderExecutor}
+        value={isUsingSenderExecutor}
       />
 
       <ExecutorSelector
         inputId="originExecutorInput_Pay"
         placeholder="Enter originExecutor address"
-        onExecutorToggle={setIsUsingOriginExecutor}
-        isUsingExecutor={isUsingOriginExecutor}
+        onToggle={setIsUsingOriginExecutor}
+        value={isUsingOriginExecutor}
       />
 
       <PrioritySelector onPriorityChange={setPriority} />

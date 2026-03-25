@@ -5,16 +5,16 @@ interface ExecutorSelectorProps {
   label?: string
   inputId: string
   placeholder?: string
-  onExecutorToggle: (isUsing: boolean) => void
-  isUsingExecutor: boolean
+  onToggle: (isEnabled: boolean) => void
+  value: boolean
 }
 
 export const ExecutorSelector = React.memo<ExecutorSelectorProps>(({
   label = 'Are you using an senderExecutor?',
   inputId,
   placeholder = 'Enter senderExecutor',
-  onExecutorToggle,
-  isUsingExecutor,
+  onToggle,
+  value,
 }) => {
   return (
     <>
@@ -29,8 +29,8 @@ export const ExecutorSelector = React.memo<ExecutorSelectorProps>(({
         }}
       >
         <NativeSelect
-          value={isUsingExecutor ? 'true' : 'false'}
-          onChange={(e) => onExecutorToggle(e.currentTarget.value === 'true')}
+          value={value ? 'true' : 'false'}
+          onChange={(e) => onToggle(e.currentTarget.value === 'true')}
           data={[
             { label: 'No', value: 'false' },
             { label: 'Yes', value: 'true' },
@@ -40,7 +40,7 @@ export const ExecutorSelector = React.memo<ExecutorSelectorProps>(({
           }}
           size="xs"
         />
-        {isUsingExecutor && (
+        {value && (
           <Input
             type="text"
             size="compact-md"

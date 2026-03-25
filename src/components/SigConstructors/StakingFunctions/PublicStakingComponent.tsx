@@ -12,6 +12,7 @@ import {
   HelperInfo,
   NumberInputField,
   StakingActionSelector,
+  ExecutorSelector,
 } from "@/components/SigConstructors/InputsAndModules";
 import { StakingComponentProps } from "@/types";
 import { Button } from "@mantine/core";
@@ -29,6 +30,8 @@ export const PublicStakingComponent = ({
   const [priority, setPriority] = React.useState<"low" | "high">("high");
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null);
   const [loading, setLoading] = React.useState(false);
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] =
+    React.useState(false);
 
   const makeSig = async () => {
     const getValue = (id: string) =>
@@ -43,6 +46,9 @@ export const PublicStakingComponent = ({
     const nonceStaking = getValue("nonceStakingInput_PublicStaking");
     const amountOfStaking = getValue("amountOfStakingInput_PublicStaking");
     const priorityFee = getValue("priorityFeeInput_PublicStaking");
+    const originExecutor = isUsingOriginExecutor
+      ? getValue("originExecutorInput_PublicStaking")
+      : "0x0000000000000000000000000000000000000000";
 
     if (!nonceEVVM || !nonceStaking || !amountOfStaking || !priorityFee) {
       console.error("All fields are required");
@@ -74,11 +80,14 @@ export const PublicStakingComponent = ({
         nonce: BigInt(nonceEVVM),
         isAsyncExec: true,
         senderExecutor: stakingAddress as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
       });
 
       const stakingAction = await stakingService.publicStaking({
         isStaking,
         amountOfStaking: BigInt(amountOfStaking),
+        senderExecutor: stakingAddress as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
         nonce: BigInt(nonceStaking),
         evvmSignedAction: payAction,
       });
@@ -140,6 +149,13 @@ export const PublicStakingComponent = ({
         label="Priority fee"
         inputId="priorityFeeInput_PublicStaking"
         placeholder="Enter priority fee"
+      />
+
+      <ExecutorSelector
+        inputId="originExecutorInput_PublicStaking"
+        placeholder="Enter originExecutor address"
+        onToggle={setIsUsingOriginExecutor}
+        value={isUsingOriginExecutor}
       />
 
       <NumberInputWithGenerator

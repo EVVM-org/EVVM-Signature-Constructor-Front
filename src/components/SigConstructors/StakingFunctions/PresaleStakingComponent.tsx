@@ -18,6 +18,7 @@ import {
   HelperInfo,
   NumberInputField,
   StakingActionSelector,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 import { Button } from '@mantine/core'
 
@@ -33,9 +34,10 @@ export const PresaleStakingComponent = ({
   coreAddress,
 }: StakingComponentProps) => {
   const [isStaking, setIsStaking] = React.useState(true)
-  const [priority, setPriority] = React.useState<'low' | 'high'>('high')
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null)
   const [loading, setLoading] = React.useState(false)
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] =
+    React.useState(false)
 
   const makeSig = async () => {
     const getValue = (id: string) =>
@@ -49,6 +51,9 @@ export const PresaleStakingComponent = ({
     const priorityFeePay = getValue('priorityFeeInput_presaleStaking')
     const noncePay = getValue('nonceEVVMInput_presaleStaking')
     const nonce = getValue('nonceStakingInput_presaleStaking')
+    const originExecutor = isUsingOriginExecutor
+      ? getValue('originExecutorInput_presaleStaking')
+      : '0x0000000000000000000000000000000000000000'
 
     if (!priorityFeePay || !noncePay || !nonce) {
       console.error('All fields are required')
@@ -79,10 +84,13 @@ export const PresaleStakingComponent = ({
         nonce: BigInt(noncePay),
         isAsyncExec: true,
         senderExecutor: stakingAddress as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
       })
 
       const stakingAction = await stakingService.presaleStaking({
         isStaking,
+        senderExecutor: stakingAddress as `0x${string}`,
+        originExecutor: originExecutor as `0x${string}`,
         nonce: BigInt(nonce),
         evvmSignedAction: payAction,
       })
@@ -136,6 +144,13 @@ export const PresaleStakingComponent = ({
         label="Priority fee"
         inputId="priorityFeeInput_presaleStaking"
         placeholder="Enter priority fee"
+      />
+
+      <ExecutorSelector
+        inputId="originExecutorInput_presaleStaking"
+        placeholder="Enter originExecutor address"
+        onToggle={setIsUsingOriginExecutor}
+        value={isUsingOriginExecutor}
       />
 
       <NumberInputWithGenerator

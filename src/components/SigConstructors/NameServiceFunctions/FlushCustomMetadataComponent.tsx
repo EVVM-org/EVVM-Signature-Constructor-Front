@@ -10,6 +10,7 @@ import {
   HelperInfo,
   NumberInputField,
   TextInputField,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 import { execute } from '@evvm/evvm-js'
 import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
@@ -35,6 +36,7 @@ export const FlushCustomMetadataComponent = ({
   coreAddress,
 }: NameServiceComponentProps) => {
   const [priority, setPriority] = React.useState('high')
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
 
   const getValue = (id: string) =>
@@ -50,10 +52,13 @@ export const FlushCustomMetadataComponent = ({
       isAsyncExecPay: priority === 'high',
     }
 
+    const originExecutor = isUsingOriginExecutor
+      ? (getValue('originExecutorInput_flushCustomMetadata') as `0x${string}`)
+      : '0x0000000000000000000000000000000000000000'
+
     try {
       const signer = await getEvvmSigner()
 
-      // Create EVVM service for payment
       const coreService = new Core({
         signer,
         address: coreAddress as `0x${string}`,
@@ -83,6 +88,7 @@ export const FlushCustomMetadataComponent = ({
         nonce: BigInt(formData.noncePay),
         isAsyncExec: true,
         senderExecutor: formData.addressNameService as `0x${string}`,
+        originExecutor: originExecutor,
       })
 
       // Sign flush custom metadata action
@@ -152,6 +158,14 @@ export const FlushCustomMetadataComponent = ({
         inputId="nonceEVVMInput_flushCustomMetadata"
         placeholder="Enter nonce"
         showRandomBtn={true}
+      />
+
+      <ExecutorSelector
+        label="Are you using an originExecutor?"
+        inputId="originExecutorInput_flushCustomMetadata"
+        placeholder="Enter originExecutor address"
+        onExecutorToggle={setIsUsingOriginExecutor}
+        isUsingExecutor={isUsingOriginExecutor}
       />
 
       {/* Create signature button */}

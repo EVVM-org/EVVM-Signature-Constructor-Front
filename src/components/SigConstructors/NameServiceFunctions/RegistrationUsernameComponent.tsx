@@ -10,6 +10,7 @@ import {
   HelperInfo,
   NumberInputField,
   TextInputField,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 import { Button } from '@mantine/core'
 import { execute } from '@evvm/evvm-js'
@@ -35,6 +36,7 @@ export const RegistrationUsernameComponent = ({
   coreAddress,
 }: NameServiceComponentProps) => {
   const [priority, setPriority] = React.useState('high')
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
   const [rewardAmount, setRewardAmount] = React.useState<bigint | null>(null)
   const [registrationPrice, setRegistrationPrice] = React.useState<
@@ -79,10 +81,13 @@ export const RegistrationUsernameComponent = ({
       throw new Error('Priority fee is required')
     }
 
+    const originExecutor = isUsingOriginExecutor
+      ? (getValue('originExecutorInput_registrationUsername') as `0x${string}`)
+      : '0x0000000000000000000000000000000000000000'
+
     try {
       const signer = await getEvvmSigner()
 
-      // Create EVVM service for payment
       const coreService = new Core({
         signer,
         address: coreAddress as `0x${string}`,
@@ -113,6 +118,7 @@ export const RegistrationUsernameComponent = ({
         nonce: BigInt(formData.nonceEVVM),
         isAsyncExec: formData.isAsyncExec,
         senderExecutor: formData.addressNameService as `0x${string}`,
+        originExecutor: originExecutor,
       })
 
       // Sign registration username action
@@ -272,6 +278,14 @@ export const RegistrationUsernameComponent = ({
         inputId="nonceEVVMInput_registrationUsername"
         placeholder="Enter nonce"
         showRandomBtn={true}
+      />
+
+      <ExecutorSelector
+        label="Are you using an originExecutor?"
+        inputId="originExecutorInput_registrationUsername"
+        placeholder="Enter originExecutor address"
+        onExecutorToggle={setIsUsingOriginExecutor}
+        isUsingExecutor={isUsingOriginExecutor}
       />
 
       {/* Create signature button */}

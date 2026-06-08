@@ -7,6 +7,7 @@ import {
   PrioritySelector,
   DataDisplayWithClear,
   HelperInfo,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 
 import { execute } from '@evvm/evvm-js'
@@ -25,6 +26,7 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
   coreAddress,
 }: P2PSwapComponentProps) => {
   const [priority, setPriority] = React.useState('high')
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [amountB, setAmountB] = React.useState(0n)
   const [dataToGet, setDataToGet] =
     React.useState<ISerializableSignedAction<IDispatchOrderData> | null>(null)
@@ -55,6 +57,9 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
     const noncePay = BigInt(
       getValue('noncePay_DispatchOrderFillPropotionalFee')
     )
+    const originExecutor = isUsingOriginExecutor
+      ? (getValue('originExecutorInput_DispatchOrderPropotional') as `0x${string}`)
+      : '0x0000000000000000000000000000000000000000'
 
     const amountOfTokenBToFill = amountB + fee
 
@@ -84,6 +89,7 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
         nonce: noncePay,
         isAsyncExec: true,
         senderExecutor: p2pSwapAddress as `0x${string}`,
+        originExecutor: originExecutor,
       })
 
       // create p2pswap dispatchOrderFillPropotionalFee() signature
@@ -206,6 +212,14 @@ export const DispatchOrderFillPropotionalFeeComponent = ({
         inputId="noncePay_DispatchOrderFillPropotionalFee"
         placeholder="Enter nonce"
         showRandomBtn={true}
+      />
+
+      <ExecutorSelector
+        label="Are you using an originExecutor?"
+        inputId="originExecutorInput_DispatchOrderPropotional"
+        placeholder="Enter originExecutor address"
+        onExecutorToggle={setIsUsingOriginExecutor}
+        isUsingExecutor={isUsingOriginExecutor}
       />
 
       {/* Create signature button */}

@@ -12,6 +12,7 @@ import {
   HelperInfo,
   NumberInputField,
   StakingActionSelector,
+  ExecutorSelector,
 } from "@/components/SigConstructors/InputsAndModules";
 import { StakingComponentProps } from "@/types";
 import { Button } from "@mantine/core";
@@ -26,6 +27,7 @@ export const PublicStakingComponent = ({
   coreAddress,
 }: StakingComponentProps) => {
   const [isStaking, setIsStaking] = React.useState(true);
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false);
   const [priority, setPriority] = React.useState<"low" | "high">("high");
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null);
   const [loading, setLoading] = React.useState(false);
@@ -43,6 +45,9 @@ export const PublicStakingComponent = ({
     const nonceStaking = getValue("nonceStakingInput_PublicStaking");
     const amountOfStaking = getValue("amountOfStakingInput_PublicStaking");
     const priorityFee = getValue("priorityFeeInput_PublicStaking");
+    const originExecutor = isUsingOriginExecutor
+      ? (getValue("originExecutorInput_PublicStaking") as `0x${string}`)
+      : "0x0000000000000000000000000000000000000000";
 
     if (!nonceEVVM || !nonceStaking || !amountOfStaking || !priorityFee) {
       console.error("All fields are required");
@@ -74,6 +79,7 @@ export const PublicStakingComponent = ({
         nonce: BigInt(nonceEVVM),
         isAsyncExec: true,
         senderExecutor: stakingAddress as `0x${string}`,
+        originExecutor: originExecutor,
       });
 
       const stakingAction = await stakingService.publicStaking({
@@ -149,7 +155,13 @@ export const PublicStakingComponent = ({
         showRandomBtn={true}
       />
 
-    
+      <ExecutorSelector
+        label="Are you using an originExecutor?"
+        inputId="originExecutorInput_PublicStaking"
+        placeholder="Enter originExecutor address"
+        onExecutorToggle={setIsUsingOriginExecutor}
+        isUsingExecutor={isUsingOriginExecutor}
+      />
 
       <Button
         onClick={makeSig}

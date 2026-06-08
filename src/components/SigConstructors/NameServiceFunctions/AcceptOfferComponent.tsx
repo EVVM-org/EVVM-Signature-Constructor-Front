@@ -9,6 +9,7 @@ import {
   HelperInfo,
   NumberInputField,
   TextInputField,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 import { Button } from '@mantine/core'
 import { execute } from '@evvm/evvm-js'
@@ -33,6 +34,7 @@ export const AcceptOfferComponent = ({
   coreAddress,
 }: NameServiceComponentProps) => {
   const [priority, setPriority] = React.useState('high')
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
 
   const makeSig = async () => {
@@ -48,10 +50,13 @@ export const AcceptOfferComponent = ({
       noncePay: getValue('noncePayInput_acceptOffer'),
     }
 
+    const originExecutor = isUsingOriginExecutor
+      ? (getValue('originExecutorInput_acceptOffer') as `0x${string}`)
+      : '0x0000000000000000000000000000000000000000'
+
     try {
       const signer = await getEvvmSigner()
 
-      // Create Core service for payment
       const coreService = new Core({
         signer,
         address: coreAddress as `0x${string}`,
@@ -74,6 +79,7 @@ export const AcceptOfferComponent = ({
         nonce: BigInt(formData.noncePay),
         isAsyncExec: true,
         senderExecutor: nameServiceAddress as `0x${string}`,
+        originExecutor: originExecutor,
       })
 
       // Sign accept offer action
@@ -147,6 +153,14 @@ export const AcceptOfferComponent = ({
         inputId="noncePayInput_acceptOffer"
         placeholder="Enter nonce"
         showRandomBtn={true}
+      />
+
+      <ExecutorSelector
+        label="Are you using an originExecutor?"
+        inputId="originExecutorInput_acceptOffer"
+        placeholder="Enter originExecutor address"
+        onExecutorToggle={setIsUsingOriginExecutor}
+        isUsingExecutor={isUsingOriginExecutor}
       />
 
       {/* Create signature button */}

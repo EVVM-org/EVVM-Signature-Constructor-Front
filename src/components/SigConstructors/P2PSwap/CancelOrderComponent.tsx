@@ -7,6 +7,7 @@ import {
   PrioritySelector,
   DataDisplayWithClear,
   HelperInfo,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 
 import { execute } from '@evvm/evvm-js'
@@ -26,6 +27,7 @@ export const CancelOrderComponent = ({
   coreAddress,
 }: P2PSwapComponentProps) => {
   const [priority, setPriority] = React.useState('high')
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [dataToGet, setDataToGet] =
     React.useState<ISerializableSignedAction<ICancelOrderData> | null>(null)
 
@@ -44,6 +46,9 @@ export const CancelOrderComponent = ({
     const orderId = BigInt(getValue('orderId_CancelOrder'))
     const priorityFee = BigInt(getValue('priorityFee_CancelOrder'))
     const noncePay = BigInt(getValue('noncePay_CancelOrder'))
+    const originExecutor = isUsingOriginExecutor
+      ? (getValue('originExecutorInput_CancelOrder') as `0x${string}`)
+      : '0x0000000000000000000000000000000000000000'
 
     try {
       const signer = await getEvvmSigner()
@@ -71,6 +76,7 @@ export const CancelOrderComponent = ({
         nonce: noncePay,
         isAsyncExec: true,
         senderExecutor: p2pSwapAddress as `0x${string}`,
+        originExecutor: originExecutor,
       })
 
       // create p2pswap cancelOrder() signature
@@ -174,6 +180,13 @@ export const CancelOrderComponent = ({
         showRandomBtn={true}
       />
 
+      <ExecutorSelector
+        label="Are you using an originExecutor?"
+        inputId="originExecutorInput_CancelOrder"
+        placeholder="Enter originExecutor address"
+        onExecutorToggle={setIsUsingOriginExecutor}
+        isUsingExecutor={isUsingOriginExecutor}
+      />
 
       {/* Create signature button */}
       <Button

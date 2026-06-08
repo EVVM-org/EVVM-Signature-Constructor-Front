@@ -18,6 +18,7 @@ import {
   HelperInfo,
   NumberInputField,
   StakingActionSelector,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 import { Button } from '@mantine/core'
 
@@ -33,6 +34,7 @@ export const PresaleStakingComponent = ({
   coreAddress,
 }: StakingComponentProps) => {
   const [isStaking, setIsStaking] = React.useState(true)
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [priority, setPriority] = React.useState<'low' | 'high'>('high')
   const [dataToGet, setDataToGet] = React.useState<InputData | null>(null)
   const [loading, setLoading] = React.useState(false)
@@ -49,6 +51,9 @@ export const PresaleStakingComponent = ({
     const priorityFeePay = getValue('priorityFeeInput_presaleStaking')
     const noncePay = getValue('nonceEVVMInput_presaleStaking')
     const nonce = getValue('nonceStakingInput_presaleStaking')
+    const originExecutor = isUsingOriginExecutor
+      ? (getValue('originExecutorInput_presaleStaking') as `0x${string}`)
+      : '0x0000000000000000000000000000000000000000'
 
     if (!priorityFeePay || !noncePay || !nonce) {
       console.error('All fields are required')
@@ -79,6 +84,7 @@ export const PresaleStakingComponent = ({
         nonce: BigInt(noncePay),
         isAsyncExec: true,
         senderExecutor: stakingAddress as `0x${string}`,
+        originExecutor: originExecutor,
       })
 
       const stakingAction = await stakingService.presaleStaking({
@@ -143,6 +149,14 @@ export const PresaleStakingComponent = ({
         inputId="nonceEVVMInput_presaleStaking"
         placeholder="Enter nonce"
         showRandomBtn={true}
+      />
+
+      <ExecutorSelector
+        label="Are you using an originExecutor?"
+        inputId="originExecutorInput_presaleStaking"
+        placeholder="Enter originExecutor address"
+        onExecutorToggle={setIsUsingOriginExecutor}
+        isUsingExecutor={isUsingOriginExecutor}
       />
 
       <Button

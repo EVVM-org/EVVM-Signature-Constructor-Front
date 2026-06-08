@@ -10,6 +10,7 @@ import {
   NumberInputField,
   TextInputField,
   DateInputField,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 import { execute } from '@evvm/evvm-js'
 import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
@@ -35,6 +36,7 @@ export const MakeOfferComponent = ({
   coreAddress,
 }: NameServiceComponentProps) => {
   const [priority, setPriority] = React.useState('high')
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
 
   const makeSig = async () => {
@@ -54,10 +56,13 @@ export const MakeOfferComponent = ({
       isAsyncExec: priority === 'high',
     }
 
+    const originExecutor = isUsingOriginExecutor
+      ? (getValue('originExecutorInput_makeOffer') as `0x${string}`)
+      : '0x0000000000000000000000000000000000000000'
+
     try {
       const signer = await getEvvmSigner()
 
-      // Create EVVM service for payment
       const coreService = new Core({
         signer,
         address: coreAddress as `0x${string}`,
@@ -80,6 +85,7 @@ export const MakeOfferComponent = ({
         nonce: BigInt(formData.nonceEVVM),
         isAsyncExec: formData.isAsyncExec,
         senderExecutor: formData.addressNameService as `0x${string}`,
+        originExecutor: originExecutor,
       })
 
       // Sign make offer action
@@ -160,6 +166,14 @@ export const MakeOfferComponent = ({
         inputId="nonceEVVMInput_makeOffer"
         placeholder="Enter nonce"
         showRandomBtn={true}
+      />
+
+      <ExecutorSelector
+        label="Are you using an originExecutor?"
+        inputId="originExecutorInput_makeOffer"
+        placeholder="Enter originExecutor address"
+        onExecutorToggle={setIsUsingOriginExecutor}
+        isUsingExecutor={isUsingOriginExecutor}
       />
 
       {/* Create signature button */}

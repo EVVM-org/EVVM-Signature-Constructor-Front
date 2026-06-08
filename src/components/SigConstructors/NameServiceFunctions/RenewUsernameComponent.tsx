@@ -10,6 +10,7 @@ import {
   HelperInfo,
   NumberInputField,
   TextInputField,
+  ExecutorSelector,
 } from '@/components/SigConstructors/InputsAndModules'
 import { execute } from '@evvm/evvm-js'
 import { getEvvmSigner, getCurrentChainId } from '@/utils/evvm-signer'
@@ -35,6 +36,7 @@ export const RenewUsernameComponent = ({
   coreAddress,
 }: NameServiceComponentProps) => {
   const [priority, setPriority] = React.useState('high')
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [dataToGet, setDataToGet] = React.useState<InfoData | null>(null)
   const [amountToRenew, setAmountToRenew] = React.useState<bigint | null>(null)
 
@@ -59,10 +61,13 @@ export const RenewUsernameComponent = ({
       isAsyncExec: priority === 'high',
     }
 
+    const originExecutor = isUsingOriginExecutor
+      ? (getValue('originExecutorInput_renewUsername') as `0x${string}`)
+      : '0x0000000000000000000000000000000000000000'
+
     try {
       const signer = await getEvvmSigner()
 
-      // Create EVVM service for payment
       const coreService = new Core({
         signer,
         address: coreAddress as `0x${string}`,
@@ -85,6 +90,7 @@ export const RenewUsernameComponent = ({
         nonce: formData.nonceEVVM,
         isAsyncExec: formData.isAsyncExec,
         senderExecutor: formData.addressNameService as `0x${string}`,
+        originExecutor: originExecutor,
       })
 
       // Sign renew username action
@@ -185,6 +191,14 @@ export const RenewUsernameComponent = ({
         inputId="nonceEVVMInput_renewUsername"
         placeholder="Enter nonce"
         showRandomBtn={true}
+      />
+
+      <ExecutorSelector
+        label="Are you using an originExecutor?"
+        inputId="originExecutorInput_renewUsername"
+        placeholder="Enter originExecutor address"
+        onExecutorToggle={setIsUsingOriginExecutor}
+        isUsingExecutor={isUsingOriginExecutor}
       />
 
       <Button

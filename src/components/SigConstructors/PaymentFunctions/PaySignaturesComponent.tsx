@@ -27,6 +27,7 @@ export const PaySignaturesComponent = ({
 }: PaySignaturesComponentProps) => {
   const [isUsingUsernames, setIsUsingUsernames] = React.useState(false)
   const [isUsingExecutor, setIsUsingExecutor] = React.useState(false)
+  const [isUsingOriginExecutor, setIsUsingOriginExecutor] = React.useState(false)
   const [priority, setPriority] = React.useState<'low' | 'high'>('low')
   const [dataToGet, setDataToGet] =
     React.useState<ISerializableSignedAction<IPayData> | null>(null)
@@ -47,6 +48,9 @@ export const PaySignaturesComponent = ({
     const nonce = getValue('nonceInput_Pay')
     const senderExecutor = isUsingExecutor
       ? getValue('senderExecutorInput_Pay')
+      : '0x0000000000000000000000000000000000000000'
+    const originExecutor = isUsingOriginExecutor
+      ? getValue('originExecutorInput_Pay')
       : '0x0000000000000000000000000000000000000000'
 
     if (!to || !tokenAddress || !amount || !priorityFee || !nonce) {
@@ -73,6 +77,7 @@ export const PaySignaturesComponent = ({
           nonce: BigInt(nonce),
           isAsyncExec: priority === 'high',
           senderExecutor: senderExecutor as `0x${string}`,
+          originExecutor: originExecutor as `0x${string}`,
         })
       } else {
         signedAction = await evvm.pay({
@@ -83,6 +88,7 @@ export const PaySignaturesComponent = ({
           nonce: BigInt(nonce),
           isAsyncExec: priority === 'high',
           senderExecutor: senderExecutor as `0x${string}`,
+          originExecutor: originExecutor as `0x${string}`,
         })
       }
 
@@ -184,6 +190,14 @@ export const PaySignaturesComponent = ({
         placeholder="Enter senderExecutor address"
         onExecutorToggle={setIsUsingExecutor}
         isUsingExecutor={isUsingExecutor}
+      />
+
+      <ExecutorSelector
+        label="Are you using an originExecutor?"
+        inputId="originExecutorInput_Pay"
+        placeholder="Enter originExecutor address"
+        onExecutorToggle={setIsUsingOriginExecutor}
+        isUsingExecutor={isUsingOriginExecutor}
       />
 
       <PrioritySelector onPriorityChange={setPriority} />
